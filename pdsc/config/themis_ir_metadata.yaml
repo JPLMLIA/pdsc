@@ -1,0 +1,60 @@
+columns:
+    - [OBSERVATION_ID, observation_id, text]
+    - [LINE_SAMPLES, samples, integer]
+    - [LINES, lines, integer]
+    - [CENTER_LATITUDE, center_latitude, real]
+    - [CENTER_LONGITUDE, center_longitude, real]
+    - [NORTH_AZIMUTH, north_azimuth, real]
+    - [SAMPLE_RESOLUTION, pixel_width, real]
+    - [PIXEL_ASPECT_RATIO, pixel_aspect_ratio, real]
+    - [START_TIME, start_time, timestamp]
+    - [STOP_TIME, stop_time, timestamp]
+    - [SPACECRAFT_CLOCK_START_COUNT, sclk_start, real]
+    - [SPACECRAFT_CLOCK_STOP_COUNT, sclk_stop, real]
+    - [START_TIME_ET, scet_start, real]
+    - [STOP_TIME_ET, scet_stop, real]
+    - [UNCORRECTED_SCLK_START_COUNT, uncorrected_sclk_start, real]
+    - [IMAGE_DURATION, image_duration, real]
+    - [BAND_NUMBER, band_number, integer]
+    - [DESCRIPTION, description, text]
+    - [GAIN_NUMBER, gain_number, integer]
+    - [OFFSET_NUMBER, offset_number, integer]
+    - [TIME_DELAY_INTEGRATION_FLAG, time_delay_integration_flag, integer]
+    - [TLM_ENTRIES, tlm_entries, integer]
+    - [SPATIAL_SUMMING, spatial_summing, integer]
+    - [MISSING_SCAN_LINES, missing_scan_lines, integer]
+    - [CALIB_FLAG_IMAGE, calib_flag_image, text]
+    - [CALIB_FLAG_TEMP, calib_flag_temp, real]
+    - [BTR_BAND, btr_band, integer]
+    - [MINIMUM_BRIGHTNESS_TEMPERATURE, minimum_brightness_temperature, real]
+    - [MAXIMUM_BRIGHTNESS_TEMPERATURE, maximum_brightness_temperature, real]
+    - [IR_VIS_PAIR, ir_vis_pair, text]
+    - [GEOMETRY_SOURCE, geometry_source, text]
+    - [LINE_RESOLUTION, pixel_height, real]
+    - [UPPER_LEFT_LATITUDE, upper_left_latitude, real]
+    - [UPPER_LEFT_LONGITUDE, upper_left_longitude, real]
+    - [UPPER_RIGHT_LATITUDE, upper_right_latitude, real]
+    - [UPPER_RIGHT_LONGITUDE, upper_right_longitude, real]
+    - [LOWER_LEFT_LATITUDE, lower_left_latitude, real]
+    - [LOWER_LEFT_LONGITUDE, lower_left_longitude, real]
+    - [LOWER_RIGHT_LATITUDE, lower_right_latitude, real]
+    - [LOWER_RIGHT_LONGITUDE, lower_right_longitude, real]
+    - [PHASE_ANGLE, phase_angle, real]
+    - [INCIDENCE_ANGLE, incidence_angle, real]
+    - [EMISSION_ANGLE, emission_angle, real]
+    - [SLANT_DISTANCE, slant_distance, real]
+    - [LOCAL_TIME, local_time, real]
+    - [SOLAR_LONGITUDE, solar_longitude, real]
+    - [SUB_SOLAR_AZIMUTH, sub_solar_aziumth, real]
+
+scale_factors:
+    SAMPLE_RESOLUTION: 1000 # km to m
+    LINE_RESOLUTION: 1000 # km to m
+    SLANT_DISTANCE: 1000 # km to m
+
+index:
+    - observation_id
+    - ir_vis_pair
+
+segmentation:
+    resolution: 40000
