@@ -7,9 +7,15 @@ from sklearn.neighbors import DistanceMetric
 # Requires geographiclib-1.49
 from geographiclib.geodesic import Geodesic
 
+from .util import registerer
+
 # https://tharsis.gsfc.nasa.gov/geodesy.html
 MARS_RADIUS_M = 3396200
 MARS_FLATTENING = 1.0 / 169.8
+
+LOCALIZERS = {}
+
+register_localizer = registerer(LOCALIZERS)
 
 def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):
     haversine = DistanceMetric.get_metric('haversine')
@@ -100,6 +106,7 @@ class GeodesicLocalizer(Localizer):
 
         return cross_line_point['lat2'], cross_line_point['lon2']
 
+@register_localizer('ctx')
 class CtxLocalizer(GeodesicLocalizer):
 
     BODY = Geodesic(MARS_RADIUS_M, 0.0) # Works better assuming sphere
@@ -116,6 +123,8 @@ class CtxLocalizer(GeodesicLocalizer):
             flipped_na, -1
         )
 
+@register_localizer('themis_vis')
+@register_localizer('themis_ir')
 class ThemisLocalizer(GeodesicLocalizer):
 
     def __init__(self, metadata):
@@ -128,6 +137,7 @@ class ThemisLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
+@register_localizer('hirise')
 class HiRiseLocalizer(GeodesicLocalizer):
 
     def __init__(self, metadata):
@@ -140,6 +150,7 @@ class HiRiseLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
+@register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):
 
     BODY = Geodesic(MARS_RADIUS_M, 0.0) # Works better assuming sphere
@@ -155,14 +166,6 @@ class MocLocalizer(GeodesicLocalizer):
             metadata.image_width / metadata.samples,
             flipped_na, -1
         )
-
-LOCALIZERS = {
-    'ctx' : CtxLocalizer,
-    'themis_ir': ThemisLocalizer,
-    'themis_vis': ThemisLocalizer,
-    'hirise': HiRiseLocalizer,
-    'moc': MocLocalizer,
-}
 
 def get_localizer(metadata):
     if metadata.instrument not in LOCALIZERS:

@@ -7,7 +7,11 @@ import os
 
 import pdsc
 
-def main(idx, outputdir, configdir):
+def main(idx, outputdir, configdir, extensions):
+
+    for e in extensions:
+        with open(e, 'r') as f:
+            exec(f.read())
 
     lfile, tfile = pdsc.get_idx_file_pair(idx)
 
@@ -30,6 +34,7 @@ if __name__ == '__main__':
     parser.add_argument('idx', help='cumulative index file location')
     parser.add_argument('outputdir')
     parser.add_argument('-c', '--configdir', default=None)
+    parser.add_argument('-e', '--extensions', default=[], nargs='+')
 
     args = parser.parse_args()
     main(**vars(args))

@@ -7,6 +7,14 @@ from datetime import datetime
 from pds.core.parser import Parser
 from progressbar import ProgressBar, Bar, ETA
 
+from .util import registerer
+
+INSTRUMENT_TABLES = {}
+register_table = registerer(INSTRUMENT_TABLES)
+
+INSTRUMENT_DETERMINERS = {}
+register_determiner = registerer(INSTRUMENT_DETERMINERS)
+
 def themis_datetime(s):
     return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%f')
 
@@ -19,41 +27,56 @@ def ctx_sclk(s):
 def moc_observation_id(s):
     return s.replace('/', '')
 
-def determine_instrument(label_file):
-    exception = ValueError('Could not determine instrument')
+@register_determiner('hirise')
+def hirise_determiner(label_file):
+    with open(label_file, 'r') as f:
+        raw = f.read()
+        return ('HiRISE' in raw)
+
+def themis_determiner(label_file, detector_name):
     with open(label_file, 'r') as f:
         try:
             parser = Parser()
             labels = parser.parse(f)
             instrument = labels.get('INSTRUMENT_NAME', None)
-        except AssertionError:
-            instrument = None
-
-        if instrument is None:
-            f.seek(0)
-            raw = f.read()
-            if 'HiRISE' in raw:
-                return 'hirise'
-            else:
-                raise exception
-
-        elif 'THERMAL EMISSION IMAGING SYSTEM' in instrument:
             detector = labels.get('DETECTOR_ID', None)
-            if 'VIS' in detector:
-                return 'themis_vis'
-            elif 'IR' in detector:
-                return 'themis_ir'
-            else:
-                raise exception
+            return (
+                'THERMAL EMISSION IMAGING SYSTEM' in instrument
+                and detector_name in detector
+            )
+        except:
+            return False
 
-        elif 'CONTEXT CAMERA' in instrument:
-            return 'ctx'
+def generic_determiner(label_file, instrument_name):
+    with open(label_file, 'r') as f:
+        try:
+            parser = Parser()
+            labels = parser.parse(f)
+            instrument = labels.get('INSTRUMENT_NAME', None)
+            return (instrument_name in instrument)
+        except:
+            return False
 
-        elif 'MARS ORBITER CAMERA' in instrument:
-            return 'moc'
+@register_determiner('themis_vis')
+def themis_vis_determiner(label_file):
+    return themis_determiner(label_file, 'VIS')
 
-        else:
-            raise exception
+@register_determiner('themis_ir')
+def themis_vis_determiner(label_file):
+    return themis_determiner(label_file, 'IR')
+
+@register_determiner('ctx')
+def ctx_determiner(label_file):
+    return generic_determiner(label_file, 'CONTEXT CAMERA')
+
+@register_determiner('moc')
+def ctx_determiner(label_file):
+    return generic_determiner(label_file, 'MARS ORBITER CAMERA')
+
+def determine_instrument(label_file):
+    for iname, determiner in sorted(INSTRUMENT_DETERMINERS.items()):
+        if determiner(label_file): return iname
+    raise ValueError('Could not determine instrument')
 
 class PdsTableColumn(object):
 
@@ -259,6 +282,7 @@ class CtxTableColumn(PdsTableColumn):
         'SPACECRAFT_CLOCK_START_COUNT': ctx_sclk,
     }
 
+@register_table('ctx')
 class CtxTable(PdsTable): COLUMN_CLASS = CtxTableColumn
 
 # ****************************************************************************
@@ -289,6 +313,8 @@ class ThemisTableColumn(PdsTableColumn):
         'LOCAL_TIME': float,
     }
 
+@register_table('themis_vis')
+@register_table('themis_ir')
 class ThemisTable(PdsTable): COLUMN_CLASS = ThemisTableColumn
 
 # ****************************************************************************
@@ -307,6 +333,7 @@ class HiRiseTableColumn(PdsTableColumn):
         'ADC_CONVERSION_SETTINGS': str,
     }
 
+@register_table('hirise')
 class HiRiseTable(PdsTable):
     COLUMN_CLASS = HiRiseTableColumn
     TABLE_OBJECT_NAME = 'EDR_INDEX_TABLE'
@@ -324,15 +351,8 @@ class MocTableColumn(PdsTableColumn):
         'PRODUCT_ID': moc_observation_id,
     }
 
+@register_table('moc')
 class MocTable(PdsTable): COLUMN_CLASS = MocTableColumn
-
-INSTRUMENT_TABLES = {
-    'ctx': CtxTable,
-    'themis_ir': ThemisTable,
-    'themis_vis': ThemisTable,
-    'hirise': HiRiseTable,
-    'moc': MocTable,
-}
 
 def parse_table(label_file, table_file):
     instrument = determine_instrument(label_file)
