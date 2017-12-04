@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+from __future__ import print_function
+"""
+Implmements server that wraps client for remote calls over HTTP
+"""
+from pdsc import PdsServer
+
+def main(database_directory, port, socket_host):
+    server = PdsServer(
+        database_directory=database_directory,
+        port=port,
+        socket_host=socket_host
+    )
+    server.start()
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
+
+    parser.add_argument('-d', '--database_directory', default=None)
+    parser.add_argument('-p', '--port', default=2115)
+    parser.add_argument('-s', '--socket_host', default='127.0.0.1')
+
+    args = parser.parse_args()
+    main(**vars(args))

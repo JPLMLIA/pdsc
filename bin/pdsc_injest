@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+from __future__ import print_function
+"""
+Injests PDS metadata into database for quick querying
+"""
+import os
+
+import pdsc
+
+def main(idx, outputdir, configdir):
+
+    lfile, tfile = pdsc.get_idx_file_pair(idx)
+
+    for f, n in zip((tfile, lfile), ('table', 'label')):
+        if not os.path.exists(f):
+            raise ValueError('Expected %s file %s does not exist' % (n, f))
+
+    if not os.path.exists(outputdir):
+        os.mkdir(outputdir)
+
+    if configdir is None:
+        configdir = pdsc.DEFAULT_CONFIG_DIR
+
+    pdsc.injest_idx(lfile, tfile, configdir, outputdir)
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
+
+    parser.add_argument('idx', help='cumulative index file location')
+    parser.add_argument('outputdir')
+    parser.add_argument('-c', '--configdir', default=None)
+
+    args = parser.parse_args()
+    main(**vars(args))

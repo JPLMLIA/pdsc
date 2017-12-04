@@ -162,30 +162,3 @@ def injest_idx(label_file, table_file, configdir, outputdir):
         '%s%s' % (instrument, SEGMENT_TREE_SUFFIX)
     )
     store_segment_tree(outputfile, segments)
-
-def main(idx, outputdir, configdir):
-
-    lfile, tfile = get_idx_file_pair(idx)
-
-    for f, n in zip((tfile, lfile), ('table', 'label')):
-        if not os.path.exists(f):
-            raise ValueError('Expected %s file %s does not exist' % (n, f))
-
-    if not os.path.exists(outputdir):
-        os.mkdir(outputdir)
-
-    if configdir is None:
-        configdir = DEFAULT_CONFIG_DIR
-
-    injest_idx(lfile, tfile, configdir, outputdir)
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
-
-    parser.add_argument('idx', help='cumulative index file location')
-    parser.add_argument('outputdir')
-    parser.add_argument('-c', '--configdir', default=None)
-
-    args = parser.parse_args()
-    main(**vars(args))
