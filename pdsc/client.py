@@ -7,9 +7,9 @@ import sqlite3
 import requests
 from glob import glob
 
-from metadata import PdsMetadata, METADATA_DB_SUFFIX, json_loads
+from .metadata import PdsMetadata, METADATA_DB_SUFFIX, json_loads
 
-from segment import (SegmentTree, PointQuery, TriSegment,
+from .segment import (SegmentTree, PointQuery, TriSegment,
     SEGMENT_DB_SUFFIX, SEGMENT_TREE_SUFFIX)
 
 DATABASE_DIRECTORY_VAR = 'PDS_DATABASE_DIR'

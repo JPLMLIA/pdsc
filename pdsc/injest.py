@@ -8,9 +8,9 @@ import yaml
 import sqlite3
 from progressbar import ProgressBar, ETA, Bar
 
-import pds_table
-from metadata import PdsMetadata, METADATA_DB_SUFFIX
-from segment import (
+from .table import parse_table
+from .metadata import PdsMetadata, METADATA_DB_SUFFIX
+from .segment import (
     SEGMENT_DB_SUFFIX, SEGMENT_TREE_SUFFIX,
     TriSegmentedFootprint, SegmentTree)
 
@@ -133,7 +133,7 @@ def store_segment_tree(outputfile, segments):
     tree.save(outputfile)
 
 def injest_idx(label_file, table_file, configdir, outputdir):
-    instrument, table = pds_table.parse_table(label_file, table_file)
+    instrument, table = parse_table(label_file, table_file)
     configfile = os.path.join(configdir, '%s_metadata.yaml' % instrument)
     if not os.path.exists(configfile):
         raise ValueError(

@@ -8,7 +8,7 @@ from sklearn.neighbors import BallTree
 from progressbar import ProgressBar, Bar, ETA
 from Polygon import Polygon # (the Polygon2 package)
 
-import localization
+from .localization import MARS_RADIUS_M, geodesic_distance, get_localizer
 
 SEGMENT_DB_SUFFIX = '_segments.db'
 SEGMENT_TREE_SUFFIX = '_segment_tree.pkl'
@@ -74,13 +74,13 @@ class SegmentTree(object):
 
     def query_point(self, point):
         total_radius = point.radius + self.max_radius
-        haversine_radius = total_radius / localization.MARS_RADIUS_M
+        haversine_radius = total_radius / MARS_RADIUS_M
         X = np.deg2rad(point.latlon).reshape((1, -1))
         return self.ball_tree.query_radius(X, haversine_radius)[0]
 
     def query_segment(self, segment):
         total_radius = segment.radius + self.max_radius
-        haversine_radius = total_radius / localization.MARS_RADIUS_M
+        haversine_radius = total_radius / MARS_RADIUS_M
         X = np.deg2rad([[segment.center_latitude, segment.center_longitude]])
         return self.ball_tree.query_radius(X, haversine_radius)[0]
 
@@ -138,7 +138,7 @@ class TriSegment(object):
         if self._radius is None:
             llcenter = np.deg2rad([self.center_latitude, self.center_longitude])
             self._radius = np.min([
-                localization.geodesic_distance(llcenter, np.deg2rad(ll))
+                geodesic_distance(llcenter, np.deg2rad(ll))
                 for ll in self.latlon_points
             ])
         return self._radius
@@ -185,7 +185,7 @@ class TriSegment(object):
 
         p = np.deg2rad(xyz2latlon(xyz))
         return np.min([
-            localization.geodesic_distance(p, pi)
+            geodesic_distance(p, pi)
             for pi in np.deg2rad(points_to_check)
         ])
 
@@ -206,7 +206,7 @@ class SegmentedFootprint(object):
     def __init__(self, metadata, resolution):
         self.metadata = metadata
         self.resolution = resolution
-        self.localizer = localization.get_localizer(metadata)
+        self.localizer = get_localizer(metadata)
         n_row_chunks = int(np.ceil(self.localizer.height / resolution))
         n_col_chunks = int(np.ceil(self.localizer.width / resolution))
         row_idx = np.linspace(0, self.localizer.n_rows-1, n_row_chunks + 1)

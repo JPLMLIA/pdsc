@@ -7,8 +7,8 @@ import json
 import cherrypy
 from cherrypy import expose, HTTPError
 
-from client import PdsClient
-from metadata import json_dumps
+from .client import PdsClient
+from .metadata import json_dumps
 
 def content_type(t):
     def decorator(f):
