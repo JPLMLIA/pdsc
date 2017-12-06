@@ -6,13 +6,13 @@ Injests PDS metadata into database for quick querying
 import os
 import yaml
 import sqlite3
-from progressbar import ProgressBar, ETA, Bar
 
 from .table import parse_table
 from .metadata import PdsMetadata, METADATA_DB_SUFFIX
 from .segment import (
     SEGMENT_DB_SUFFIX, SEGMENT_TREE_SUFFIX,
     TriSegmentedFootprint, SegmentTree)
+from .util import standard_progress_bar
 
 DEFAULT_CONFIG_DIR = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
@@ -76,8 +76,7 @@ def store_metadata(outputfile, instrument, table, config):
         cur.execute('SELECT * FROM metadata')
         names = [description[0] for description in cur.description]
 
-        progress = ProgressBar(widgets=[
-            'Converting Metadata: ', Bar('='), ' ', ETA()])
+        progress = standard_progress_bar('Converting Metadata')
         return [
             PdsMetadata(instrument, **dict(zip(names, v)))
             for v in progress(cur.fetchall())
@@ -88,8 +87,7 @@ def store_segments(outputfile, metadata, config):
 
     observation_ids = []
     segments = []
-    progress = ProgressBar(widgets=[
-        'Segmenting footprints: ', Bar('='), ' ', ETA()])
+    progress = standard_progress_bar('Segmenting footprints')
     for m in progress(metadata):
         try:
             s = TriSegmentedFootprint(m, resolution)

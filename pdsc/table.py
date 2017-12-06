@@ -5,9 +5,8 @@ import re
 import numpy as np
 from datetime import datetime
 from pds.core.parser import Parser
-from progressbar import ProgressBar, Bar, ETA
 
-from .util import registerer
+from .util import registerer, standard_progress_bar
 
 INSTRUMENT_TABLES = {}
 register_table = registerer(INSTRUMENT_TABLES)
@@ -236,14 +235,8 @@ class PdsTable(object):
         else:
             column = self.columns[cidx]
 
-            if progress:
-                pbar = ProgressBar(widgets=[
-                    'Reading column %d: ' % cidx, Bar('='), ' ', ETA()
-                ])
-            else:
-                pbar = lambda x: x
-
             values = []
+            pbar = standard_progress_bar('Reading column %d' % cidx, progress)
             with open(self.table_file, 'r') as f:
                 for r in pbar(range(self.n_rows)):
                     f.seek(r*self.row_bytes + column.start_byte - 1)
@@ -253,12 +246,8 @@ class PdsTable(object):
             try:
                 data_column = np.array(values, dtype=column.dtype)
             except TypeError:
-                if progress:
-                    pbar = ProgressBar(widgets=[
-                        'Converting column %d: ' % cidx, Bar('='), ETA()
-                    ])
-                else:
-                    pbar = lambda x: x
+                pbar = standard_progress_bar(
+                    'Converting column %d' % cidx, progress)
                 data_column = np.array([column.dtype(v) for v in pbar(values)])
 
             if column.unknown_constant is not None:

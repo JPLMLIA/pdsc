@@ -5,10 +5,10 @@ Decomposes an observation footprint into triangular segments
 import pickle
 import numpy as np
 from sklearn.neighbors import BallTree
-from progressbar import ProgressBar, Bar, ETA
 from Polygon import Polygon # (the Polygon2 package)
 
 from .localization import MARS_RADIUS_M, geodesic_distance, get_localizer
+from .util import standard_progress_bar
 
 SEGMENT_DB_SUFFIX = '_segments.db'
 SEGMENT_TREE_SUFFIX = '_segment_tree.pkl'
@@ -47,23 +47,13 @@ class PointQuery(object):
 class SegmentTree(object):
 
     def __init__(self, segments, verbose=True):
-        if verbose:
-            progress = ProgressBar(
-                widgets=['Finding segment centers: ', Bar('='), ' ', ETA()])
-        else:
-            progress = lambda p : p
-
+        progress = standard_progress_bar('Finding segment centers', verbose)
         data = np.deg2rad([
             [s.center_latitude, s.center_longitude]
             for s in progress(segments)
         ])
 
-        if verbose:
-            progress = ProgressBar(
-                widgets=['Finding segment radii: ', Bar('='), ' ', ETA()])
-        else:
-            progress = lambda p : p
-
+        progress = standard_progress_bar('Finding segment radii', verbose)
         self.max_radius = np.max([
             s.radius for s in progress(segments)
         ])
