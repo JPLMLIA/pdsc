@@ -134,7 +134,11 @@ def store_segment_tree(outputfile, segments):
 
 def injest_idx(label_file, table_file, configdir, outputdir):
     instrument, table = parse_table(label_file, table_file)
-    configfile = os.path.join(configdir, '%s_metadata.yaml' % instrument)
+    if os.path.isdir(configdir):
+        configfile = os.path.join(configdir, '%s_metadata.yaml' % instrument)
+    else:
+        configfile = configdir
+
     if not os.path.exists(configfile):
         raise ValueError(
             'Required config file "%s" does not exist' %

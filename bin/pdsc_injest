@@ -7,7 +7,7 @@ import os
 
 import pdsc
 
-def main(idx, outputdir, configdir, extensions):
+def main(idx, outputdir, configfile, extensions):
 
     for e in extensions:
         with open(e, 'r') as f:
@@ -22,10 +22,10 @@ def main(idx, outputdir, configdir, extensions):
     if not os.path.exists(outputdir):
         os.mkdir(outputdir)
 
-    if configdir is None:
-        configdir = pdsc.DEFAULT_CONFIG_DIR
+    if configfile is None:
+        configfile = pdsc.DEFAULT_CONFIG_DIR
 
-    pdsc.injest_idx(lfile, tfile, configdir, outputdir)
+    pdsc.injest_idx(lfile, tfile, configfile, outputdir)
 
 if __name__ == '__main__':
     import argparse
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     parser.add_argument('idx', help='cumulative index file location')
     parser.add_argument('outputdir')
-    parser.add_argument('-c', '--configdir', default=None)
+    parser.add_argument('-c', '--configfile', default=None)
     parser.add_argument('-e', '--extensions', default=[], nargs='+')
 
     args = parser.parse_args()
