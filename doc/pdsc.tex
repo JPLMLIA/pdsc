@@ -1,0 +1,86 @@
+\documentclass[twocolumn]{extarticle}
+\usepackage{fullpage}
+\usepackage{amssymb}
+\usepackage{sidecap}
+\usepackage{units}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{hyperref}
+\usepackage[margin=0.95in]{geometry}
+\usepackage[all]{hypcap}
+\usepackage{units}
+\usepackage{upgreek}
+\usepackage{acronym}
+
+\hypersetup{ %
+  pdftitle={},
+  pdfauthor={},
+  pdfkeywords={},
+  pdfborder=0 0 0,
+  pdfpagemode=UseNone,
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  filecolor=black,
+  urlcolor=black,
+  pdfview=FitH}
+
+\acrodef{pds}[PDS]{Planetary Data System}
+\acrodef{pdsc}[PDSC]{PDS Coincidences}
+
+\sidecaptionvpos{figure}{t}
+
+\makeatletter
+\renewcommand\@maketitle{%
+\noindent\begin{minipage}{0.95\textwidth}
+%\vskip 0.7em
+\let\footnote\thanks 
+{\LARGE \@title \par }
+\vskip 0.5em
+{\large \@author \par}
+\end{minipage}
+\hfill
+\vskip 2.0em \par
+}
+\makeatother
+
+\title{
+  PDSC: Planetary Data System Coincidences
+}
+\author{Gary Doran, Kiri Wagstaff, Liang Yu, and Lukas Mandrake}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Overview}
+The \ac{pds} contains a wealth of publicly available information collected by
+spacecraft from all across the solar system. In addition to hosting this
+information, the \ac{pds} also provides capabilities to search through data
+products by spacecraft, instrument, or even image content. However, several
+other types of queries are also useful for those requiring cross-instrument
+comparison or the comparison of images taken of the same region at different
+times. Furthermore, users might desire the capability to query sets of
+overlapping images programmatically, without relying an manually using a web
+interface.
+
+\section*{Solution}
+To support queries of the type described above, we have developed a Python
+library called \ac{pdsc}. The library ingests cumulative index files of
+spacecraft imaging the surface of Mars from orbit, and allows querying images
+(1) coincident with a given latitude/longitude location or (2) overlapping some
+other image. The library is designed to be extensible to other instrument types,
+and it could readily be extended to handle images of planetary bodies other than
+Mars.
+
+\section*{Description}
+pass
+
+\section*{Novelty}
+pass
+
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+\end{document}
