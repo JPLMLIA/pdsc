@@ -10,7 +10,7 @@ setup(name='pdsc',
     packages=['pdsc'],
     platforms=['unix'],
     scripts=[
-        'bin/pdsc_injest',
+        'bin/pdsc_ingest',
         'bin/pdsc_server',
     ],
     install_requires=[

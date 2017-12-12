@@ -1,7 +1,7 @@
 PDSC: PDS Coincidences
 ======================
 
-This module allows injesting/indexing and querying PDS data for the following
+This module allows ingesting/indexing and querying PDS data for the following
 information:
 
   - Observation metadata
@@ -14,7 +14,7 @@ information:
 
 # Injesting Data
 
-In order to injest new metadata, the following steps are required:
+In order to ingest new metadata, the following steps are required:
 
 1. Modify `determine_instrument` in `pds_table.py` to recognize the instrument
 name from the cumulative index label file
@@ -35,4 +35,4 @@ easiest to subclass the `GeodesicLocalizer`
 
 6. Add the localizer subclass to the `LOCALIZERS` table in `localization.py`
 
-7. Run the following: `python injest.py [cumulative index file] [output directory]`
+7. Run the following: `python ingest.py [cumulative index file] [output directory]`
