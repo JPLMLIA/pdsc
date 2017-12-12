@@ -140,6 +140,8 @@ class ThemisLocalizer(GeodesicLocalizer):
 @register_localizer('hirise')
 class HiRiseLocalizer(GeodesicLocalizer):
 
+    DEFAULT_RESOLUTION_M = 1e-6
+
     def __init__(self, metadata):
         super(HiRiseLocalizer, self).__init__(
             metadata.lines / 2.0, metadata.samples / 2.0,
