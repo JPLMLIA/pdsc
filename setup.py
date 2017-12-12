@@ -21,6 +21,7 @@ setup(name='pdsc',
         'progressbar',
         'geographiclib',
         'CherryPy',
+        'requests',
     ],
     provides=[
         'pdsc',
