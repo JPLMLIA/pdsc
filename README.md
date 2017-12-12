@@ -12,7 +12,7 @@ information:
     location)
   - Observations overlaping some other observation
 
-# Injesting Data
+# Ingesting Data
 
 In order to ingest new metadata, the following steps are required:
 
