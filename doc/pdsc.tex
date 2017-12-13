@@ -69,13 +69,53 @@ interface.
 To support queries of the type described above, we have developed a Python
 library called \ac{pdsc}. The library ingests cumulative index files of
 spacecraft imaging the surface of Mars from orbit, and allows querying images
-(1) coincident with a given latitude/longitude location or (2) overlapping some
-other image. The library is designed to be extensible to other instrument types,
-and it could readily be extended to handle images of planetary bodies other than
-Mars.
+(1) coincident with a given latitude/longitude location to within some
+specified radius, or (2) overlapping some other image. The library is designed
+to be extensible to other instrument types, and it could readily be extended to
+handle images of planetary bodies other than Mars. The library is designed to
+be fast, responding to most queries in less than a second.
 
 \section*{Description}
-pass
+
+\subsection*{Ingestion}
+The \ac{pdsc} library allows for quickly querying coincident observations by
+constructing a set of special databases and index structures during the
+ingestion process. The first database constructed is simply a SQL version of the
+PDS cumulative index. The second set of index structures holds geometric
+information used for coincidence queries.
+
+The footprints of observations on the surface of Mars are reported differently
+across instruments. Some instruments report four corners of the observation in
+latitude and longitude coordinates. Others report a latitude/longitude
+location at the center of the observation, along with a ``north azimuth'' (the
+direction that the ground track makes with north. There are several challenges
+to using this information for determining which points fall within the
+observation footprint. First, there might be errors in geo-registration, so that
+the observation location is not entirely accurate. We do not attempt to solve
+this challenge. The second challenge is that it takes more than four corners to
+specify the precise boundary of an observation, since there is ambiguity over
+how to connect such corners over long distances. For example, for long tracks,
+the footprint is not bounded by geodesic lines. However, they are also not
+connected by ``rhumb'' lines of constant bearing, especially over polar regions.
+
+Thus, accurately describing a footprint requires projecting a geodesic line of
+flight on the surface of the body, then moving perpendicularly to the line of
+flight to determine the location of cross-track pixels. This method can be used
+to decompose the observation footprint into smaller polygonal segments, which
+are sufficiently small as to allow assuming that their vertices are connected by
+simple geodesic lines. For reasons described later, we use triangular segments
+to ensure that the segments are \emph{convex} polygons, a property that
+simplifies the querying process.
+
+These triangular segments are placed into a SQL database that records the
+observation to which they belong along with the vertices that define their
+corners. One final data structure saved to disk is a \emph{ball tree}, which is
+populated with the set of segment centers. The radius (maximum distance from a
+segment vertex to its center) is also recorded along with the tree. The use for
+the ball tree, which allows querying all segment centers that fall within some
+radius of a given query point, is also described below.
+
+\subsection*{Queries}
 
 \section*{Novelty}
 pass
