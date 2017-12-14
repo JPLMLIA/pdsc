@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from __future__ import print_function
 """
 Implmements server that wraps client for remote calls over HTTP
@@ -9,6 +8,8 @@ from cherrypy import expose, HTTPError
 
 from .client import PdsClient
 from .metadata import json_dumps
+
+DEFAULT_SERVER_PORT = 7372
 
 def content_type(t):
     def decorator(f):
@@ -22,7 +23,7 @@ def content_type(t):
 class PdsServer(object):
 
     def __init__(self, database_directory=None,
-            socket_host='127.0.0.1', port=2115):
+            socket_host='0.0.0.0', port=DEFAULT_SERVER_PORT):
         self.client = PdsClient(database_directory)
 
         self.socket_host = socket_host
@@ -34,6 +35,14 @@ class PdsServer(object):
             'server.socket_host' : self.socket_host,
         })
         cherrypy.quickstart(self)
+
+    @content_type('application/json')
+    @expose
+    def query(self, instrument, conditions=None):
+        instrument = str(instrument)
+        conditions = json.loads(conditions)
+        metadata = self.client.query(instrument, conditions)
+        return json_dumps(metadata)
 
     @content_type('application/json')
     @expose
@@ -75,22 +84,3 @@ class PdsServer(object):
             instrument, observation_id, other_instrument
         )
         return json.dumps(observations)
-
-def main(database_directory, port, socket_host):
-    server = PdsServer(
-        database_directory=database_directory,
-        port=port,
-        socket_host=socket_host
-    )
-    server.start()
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
-
-    parser.add_argument('-d', '--database_directory', default=None)
-    parser.add_argument('-p', '--port', default=2115)
-    parser.add_argument('-s', '--socket_host', default='127.0.0.1')
-
-    args = parser.parse_args()
-    main(**vars(args))

@@ -12,7 +12,9 @@ from .metadata import PdsMetadata, METADATA_DB_SUFFIX, json_loads
 from .segment import (SegmentTree, PointQuery, TriSegment,
     SEGMENT_DB_SUFFIX, SEGMENT_TREE_SUFFIX)
 
-DATABASE_DIRECTORY_VAR = 'PDS_DATABASE_DIR'
+DATABASE_DIRECTORY_VAR = 'PDSC_DATABASE_DIR'
+SERVER_VAR = 'PDSC_SERVER_HOST'
+PORT_VAR = 'PDSC_SERVER_PORT'
 
 class PdsClient(object):
 
@@ -66,13 +68,16 @@ class PdsClient(object):
                 self._seg_tree_files[instrument])
         return self._seg_trees[instrument]
 
-    def query(self, instrument, conditions=tuple()):
+    def _query(self, instrument, conditions=None):
         """
         instrument: instrument name
         conditions: list of tuples (variable name, >/=/<, value)
         """
         if instrument not in self.instruments:
             raise ValueError('Instrument "%s" not found' % instrument)
+
+        if conditions is None:
+            conditions = tuple()
 
         for t in conditions:
             if len(t) != 3:
@@ -105,9 +110,8 @@ class PdsClient(object):
                 valdict = dict(zip(names, row))
                 yield PdsMetadata(instrument, **valdict)
 
-    def query_all(self, instrument, conditions):
-        # TODO: add progressbar?
-        return list(self.query(instrument, conditions))
+    def query(self, instrument, conditions=None):
+        return list(self._query(instrument, conditions))
 
     def query_by_observation_id(self, instrument, observation_ids):
         if instrument not in self.instruments:
@@ -207,11 +211,43 @@ class PdsClient(object):
 
 class PdsHttpClient(object):
 
-    def __init__(self, host, port=None):
+    def __init__(self, host=None, port=None):
+        if port is None:
+            port = os.environ.get(PORT_VAR, None)
+            if port is not None:
+                try:
+                    port = int(port)
+                except ValueError:
+                    raise ValueError(
+                        'Port must be integer (got "%s")'
+                        % port
+                    )
+
+        if host is None:
+            host = os.environ.get(SERVER_VAR, None)
+
+        if host is None:
+            raise ValueError(
+                'Must specify server hostname '
+                'or set "%s" environment variable'
+                % SERVER_VAR
+            )
+
         self.base_url = 'http://%s%s/' % (
             host,
             '' if port is None else (':%d' % port)
         )
+
+    def query(self, instrument, conditions=None):
+        url = self.base_url + 'query'
+        params = {
+            'instrument': instrument
+        }
+        if conditions is not None:
+            params['conditions'] = json.dumps(conditions)
+        response = requests.post(url, data=params)
+        response.raise_for_status()
+        return json_loads(response.text)
 
     def query_by_observation_id(self, instrument, observation_ids):
         url = self.base_url + 'queryByObservationId'
