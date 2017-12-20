@@ -2,12 +2,13 @@
 Map projection of PDS data products
 """
 import numpy as np
+from scipy.ndimage import zoom
 from scipy.optimize import fmin
 from sklearn.neighbors import DistanceMetric
 # Requires geographiclib-1.49
 from geographiclib.geodesic import Geodesic
 
-from .util import registerer
+from .util import registerer, standard_progress_bar
 
 # https://tharsis.gsfc.nasa.gov/geodesy.html
 MARS_RADIUS_M = 3396200
@@ -105,6 +106,28 @@ class GeodesicLocalizer(Localizer):
         )
 
         return cross_line_point['lat2'], cross_line_point['lon2']
+
+    def location_mask(self, subsample_cols=25, subsample_rows=10,
+            reinterpolate=True, verbose=False):
+        ncols = int(np.ceil(self.n_cols / subsample_cols))
+        nrows = int(np.ceil(self.n_rows / subsample_rows))
+
+        progress = standard_progress_bar('Computing Location Mask', verbose)
+        L = np.array([
+            [self.pixel_to_latlon(r, c)
+                for r in np.linspace(0, self.n_rows, nrows)]
+            for c in progress(np.linspace(0, self.n_cols - 1, ncols))
+        ])
+        if reinterpolate:
+            zoom_factor = (
+                float(self.n_cols) / L.shape[0],
+                float(self.n_rows) / L.shape[1]
+            )
+            L = np.dstack([
+                zoom(L[..., 0], zoom_factor, order=1, mode='nearest'),
+                zoom(L[..., 1], zoom_factor, order=1, mode='nearest')
+            ])
+        return L
 
 @register_localizer('ctx')
 class CtxLocalizer(GeodesicLocalizer):
