@@ -107,21 +107,21 @@ class GeodesicLocalizer(Localizer):
 
         return cross_line_point['lat2'], cross_line_point['lon2']
 
-    def location_mask(self, subsample_cols=25, subsample_rows=10,
+    def location_mask(self, subsample_rows=10, subsample_cols=25,
             reinterpolate=True, verbose=False):
-        ncols = int(np.ceil(self.n_cols / subsample_cols))
         nrows = int(np.ceil(self.n_rows / subsample_rows))
+        ncols = int(np.ceil(self.n_cols / subsample_cols))
 
         progress = standard_progress_bar('Computing Location Mask', verbose)
         L = np.array([
             [self.pixel_to_latlon(r, c)
-                for r in np.linspace(0, self.n_rows, nrows)]
-            for c in progress(np.linspace(0, self.n_cols - 1, ncols))
+                for c in np.linspace(0, self.n_cols - 1, ncols)]
+            for r in progress(np.linspace(0, self.n_rows, nrows))
         ])
         if reinterpolate:
             zoom_factor = (
-                float(self.n_cols) / L.shape[0],
-                float(self.n_rows) / L.shape[1]
+                float(self.n_rows) / L.shape[1],
+                float(self.n_cols) / L.shape[0]
             )
             L = np.dstack([
                 zoom(L[..., 0], zoom_factor, order=1, mode='nearest'),
