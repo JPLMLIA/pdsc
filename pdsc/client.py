@@ -82,7 +82,7 @@ class PdsClient(object):
         for t in conditions:
             if len(t) != 3:
                 raise ValueError('Invalid condition "%s"' % str(t))
-            if t[1] not in ('<', '=', '>'):
+            if t[1] not in ('<', '=', '>', '>=', '<='):
                 raise ValueError('Invalid comparator "%s"' % t[1])
 
         query_str = 'SELECT * FROM metadata'
