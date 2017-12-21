@@ -62,6 +62,7 @@ def store_metadata(outputfile, instrument, table, config):
         )
 
         for idx_col in index:
+            print('Creating index on "%s"' % idx_col)
             cur.execute(
                 'CREATE INDEX %s_index ON metadata (%s)' %
                 (idx_col, idx_col)
