@@ -165,10 +165,48 @@ class HiRiseLocalizer(GeodesicLocalizer):
 
     DEFAULT_RESOLUTION_M = 1e-6
 
+    # Each CCD is 2048 pixels across, but they overlap
+    # by 48 pixels.
+    CCD_TABLE = {
+        'RED0': -5000,
+        'RED1': -4000,
+        'RED2': -3000,
+        'RED3': -2000,
+        'RED4': -1000,
+        'RED5':  1000,
+        'RED6':  2000,
+        'RED7':  3000,
+        'RED8':  4000,
+        'RED9':  5000,
+        'IR10': -1000,
+        'IR11':  1000,
+        'BG12': -1000,
+        'BG13':  1000,
+    }
+    CHANNEL_OFFSET = {
+        0:  512,
+        1: -512,
+    }
+
     def __init__(self, metadata):
-        super(HiRiseLocalizer, self).__init__(
+        helper_localizer = GeodesicLocalizer(
             metadata.lines / 2.0, metadata.samples / 2.0,
             metadata.center_latitude, metadata.center_longitude,
+            metadata.lines, metadata.samples,
+            metadata.pixel_width,
+            metadata.pixel_width,
+            metadata.north_azimuth, 1
+        )
+        edr_center_col = float(
+            self.CCD_TABLE[metadata.ccd_name] +
+            self.CHANNEL_OFFSET[metadata.channel_number]
+        ) / metadata.binning
+        edr_center_lat, edr_center_lon = helper_localizer.pixel_to_latlon(
+            metadata.lines / 2.0, edr_center_col)
+
+        super(HiRiseLocalizer, self).__init__(
+            metadata.lines / 2.0, metadata.samples / 2.0,
+            edr_center_lat, edr_center_lon,
             metadata.lines, metadata.samples,
             metadata.pixel_width,
             metadata.pixel_width,
