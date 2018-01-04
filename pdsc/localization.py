@@ -222,7 +222,7 @@ class ThemisLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
-@register_localizer('hirise')
+@register_localizer('hirise_edr')
 class HiRiseLocalizer(GeodesicLocalizer):
 
     DEFAULT_RESOLUTION_M = 1e-6

@@ -26,7 +26,7 @@ def ctx_sclk(s):
 def moc_observation_id(s):
     return s.replace('/', '')
 
-@register_determiner('hirise')
+@register_determiner('hirise_edr')
 def hirise_determiner(label_file):
     with open(label_file, 'r') as f:
         raw = f.read()
@@ -328,7 +328,7 @@ class HiRiseTableColumn(PdsTableColumn):
         'ADC_CONVERSION_SETTINGS': str,
     }
 
-@register_table('hirise')
+@register_table('hirise_edr')
 class HiRiseTable(PdsTable):
     COLUMN_CLASS = HiRiseTableColumn
     TABLE_OBJECT_NAME = 'EDR_INDEX_TABLE'
