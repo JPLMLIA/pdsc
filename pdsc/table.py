@@ -30,7 +30,13 @@ def moc_observation_id(s):
 def hirise_determiner(label_file):
     with open(label_file, 'r') as f:
         raw = f.read()
-        return ('HiRISE' in raw)
+        return ('HiRISE' in raw and 'EDR_INDEX_TABLE' in raw)
+
+@register_determiner('hirise_rdr')
+def hirise_rdr_determiner(label_file):
+    with open(label_file, 'r') as f:
+        raw = f.read()
+        return ('HiRISE' in raw and 'RDR_INDEX_TABLE' in raw)
 
 def themis_determiner(label_file, detector_name):
     with open(label_file, 'r') as f:
@@ -327,6 +333,16 @@ class HiRiseTable(PdsTable):
     COLUMN_CLASS = HiRiseTableColumn
     TABLE_OBJECT_NAME = 'EDR_INDEX_TABLE'
     CHECK_COLUMN_COUNT = False
+
+# ****************************************************************************
+# HiRISE RDR
+# ****************************************************************************
+
+@register_table('hirise_rdr')
+class HiRiseRdrTable(PdsTable):
+    COLUMN_CLASS = HiRiseTableColumn
+    TABLE_OBJECT_NAME = 'RDR_INDEX_TABLE'
+    CHECK_COLUMN_COUNT = True
 
 # ****************************************************************************
 # MOC

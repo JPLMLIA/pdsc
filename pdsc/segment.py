@@ -7,29 +7,15 @@ import numpy as np
 from sklearn.neighbors import BallTree
 from Polygon import Polygon # (the Polygon2 package)
 
-from .localization import MARS_RADIUS_M, geodesic_distance, get_localizer
+from .localization import (
+    MARS_RADIUS_M, geodesic_distance, get_localizer,
+    latlon2unit, xyz2latlon
+)
 from .util import standard_progress_bar
 
 SEGMENT_DB_SUFFIX = '_segments.db'
 SEGMENT_TREE_SUFFIX = '_segment_tree.pkl'
 INCLUSION_EPSILON = 1e-10 # corresponds to < 1 mm error in inclusion check
-
-def latlon2unit(latlon):
-    llrad = np.deg2rad(latlon)
-    sinll = np.sin(llrad)
-    cosll = np.cos(llrad)
-    return np.array([
-        cosll[0]*cosll[1],
-        cosll[0]*sinll[1],
-        sinll[0]
-    ])
-
-def xyz2latlon(xyz):
-    x, y, z = (xyz / np.linalg.norm(xyz))
-    return np.rad2deg([
-        np.arcsin(z), 
-        np.arctan2(y, x)
-    ])
 
 class PointQuery(object):
 

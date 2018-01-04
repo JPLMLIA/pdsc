@@ -22,6 +22,23 @@ def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):
     haversine = DistanceMetric.get_metric('haversine')
     return float(radius*haversine.pairwise([latlon1], [latlon2]))
 
+def latlon2unit(latlon):
+    llrad = np.deg2rad(latlon)
+    sinll = np.sin(llrad)
+    cosll = np.cos(llrad)
+    return np.array([
+        cosll[0]*cosll[1],
+        cosll[0]*sinll[1],
+        sinll[0]
+    ])
+
+def xyz2latlon(xyz):
+    x, y, z = (xyz / np.linalg.norm(xyz))
+    return np.rad2deg([
+        np.arcsin(z),
+        np.arctan2(y, x)
+    ])
+
 class Localizer(object):
 
     BODY_RADIUS = MARS_RADIUS_M
@@ -129,6 +146,51 @@ class GeodesicLocalizer(Localizer):
             ])
         return L
 
+class FourCornerLocalizer(GeodesicLocalizer):
+
+    def __init__(self, corners, n_rows, n_cols, flight_direction):
+
+        if n_rows <= 0: raise ValueError('No image rows')
+        if n_cols <= 0: raise ValueError('No image columns')
+
+        self.n_rows = n_rows
+        self.n_cols = n_cols
+        self.flight_direction = flight_direction
+
+        self.corners = np.asarray(corners)
+        self.corner_matrix = np.array([
+            [latlon2unit(corners[0]), latlon2unit(corners[3])],
+            [latlon2unit(corners[1]), latlon2unit(corners[2])],
+        ])
+
+        corners = np.deg2rad(corners)
+        self.pixel_height_m = (
+            (
+                geodesic_distance(corners[0], corners[3]) +
+                geodesic_distance(corners[1], corners[2])
+            ) / (2*n_rows)
+        )
+        self.pixel_width_m = (
+            (
+                geodesic_distance(corners[0], corners[1]) +
+                geodesic_distance(corners[2], corners[3])
+            ) / (2*n_cols)
+        )
+
+        self._height = None
+        self._width = None
+
+    def pixel_to_latlon(self, row, col):
+        # Use bi-linear interpolation
+        C = self.corner_matrix
+        dx = np.array([self.n_cols - col, col])
+        dy = np.array([self.n_rows - row, row])
+        interpolated = np.array([
+            np.dot(dx, np.dot(C[..., dim], dy.T))
+            for dim in range(3)
+        ]) / float(self.n_rows*self.n_cols)
+        return tuple(xyz2latlon(interpolated))
+
 @register_localizer('ctx')
 class CtxLocalizer(GeodesicLocalizer):
 
@@ -213,6 +275,22 @@ class HiRiseLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
+@register_localizer('hirise_rdr')
+class HiRiseRdrLocalizer(FourCornerLocalizer):
+
+    DEFAULT_RESOLUTION_M = 1e-6
+
+    def __init__(self, metadata):
+        corners = np.array([
+            [metadata.corner1_latitude, metadata.corner1_longitude],
+            [metadata.corner2_latitude, metadata.corner2_longitude],
+            [metadata.corner3_latitude, metadata.corner3_longitude],
+            [metadata.corner4_latitude, metadata.corner4_longitude],
+        ])
+        super(HiRiseRdrLocalizer, self).__init__(
+            corners, metadata.lines, metadata.samples, 1
+        )
+
 @register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):
 
@@ -232,7 +310,7 @@ class MocLocalizer(GeodesicLocalizer):
 
 def get_localizer(metadata):
     if metadata.instrument not in LOCALIZERS:
-        raise ValueError(
+        raise IndexError(
             'No localizer implemented for %s' % metadata.instrument)
 
     return LOCALIZERS[metadata.instrument](metadata)

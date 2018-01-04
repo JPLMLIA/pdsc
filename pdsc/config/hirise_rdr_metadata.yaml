@@ -1,0 +1,65 @@
+columns:
+    - [VOLUME_ID, volume_id, text]
+    - [FILE_NAME_SPECIFICATION, file_name_specification, text]
+    - [OBSERVATION_ID, observation_id, text]
+    - [PRODUCT_ID, product_id, text]
+    - [PRODUCT_VERSION_ID, product_version_id, text]
+    - [TARGET_NAME, target_name, text]
+    - [ORBIT_NUMBER, orbit_number, integer]
+    - [MISSION_PHASE_NAME, mission_phase_name, text]
+    - [RATIONALE_DESC, description, text]
+    - [OBSERVATION_START_TIME, observation_start_time, timestamp]
+    - [OBSERVATION_START_COUNT, observation_start_sclk, real]
+    - [START_TIME, start_time, timestamp]
+    - [SPACECRAFT_CLOCK_START_COUNT, sclk_start, real]
+    - [STOP_TIME, stop_time, timestamp]
+    - [SPACECRAFT_CLOCK_STOP_COUNT, sclk_stop, real]
+    - [LINE_SAMPLES, samples, integer]
+    - [IMAGE_LINES, lines, integer]
+    - [EMISSION_ANGLE, emission_angle, real]
+    - [INCIDENCE_ANGLE, incidence_angle, real]
+    - [PHASE_ANGLE, phase_angle, real]
+    - [SPACECRAFT_ALTITUDE, spacecraft_altitude, real]
+    - [TARGET_CENTER_DISTANCE, target_center_distance, real]
+    - [SLANT_DISTANCE, slant_distance, real]
+    - [NORTH_AZIMUTH, north_azimuth, real]
+    - [SUB_SOLAR_AZIMUTH, sub_solar_aziumth, real]
+    - [SUB_SOLAR_LATITUDE, sub_solar_latitude, real]
+    - [SUB_SOLAR_LONGITUDE, sub_solar_longitude, real]
+    - [SUB_SPACECRAFT_LATITUDE, sub_spacecraft_latitude, real]
+    - [SUB_SPACECRAFT_LONGITUDE, sub_spacecraft_longitude, real]
+    - [SOLAR_DISTANCE, solar_distance, real]
+    - [SOLAR_LONGITUDE, solar_longitude, real]
+    - [LOCAL_TIME, local_time, real]
+    - [STEREO_FLAG, stereo_flag, text]
+    - [MINIMUM_LATITUDE, minimum_latitude, real]
+    - [MAXIMUM_LATITUDE, maximum_latitude, real]
+    - [MINIMUM_LONGITUDE, minimum_longitude, real]
+    - [MAXIMUM_LONGITUDE, maximum_longitude, real]
+    - [MAP_SCALE, map_scale, real]
+    - [MAP_RESOLUTION, map_resolution, real]
+    - [MAP_PROJECTION_TYPE, map_projection_type, text]
+    - [PROJECTION_CENTER_LATITUDE, projection_center_latitude, real]
+    - [PROJECTION_CENTER_LONGITUDE, projection_center_longitude, real]
+    - [LINE_PROJECTION_OFFSET, line_projection_offset, real]
+    - [SAMPLE_PROJECTION_OFFSET, sample_projection_offset, real]
+    - [CORNER1_LATITUDE, corner1_latitude, real]
+    - [CORNER1_LONGITUDE, corner1_longitude, real]
+    - [CORNER2_LATITUDE, corner2_latitude, real]
+    - [CORNER2_LONGITUDE, corner2_longitude, real]
+    - [CORNER3_LATITUDE, corner3_latitude, real]
+    - [CORNER3_LONGITUDE, corner3_longitude, real]
+    - [CORNER4_LATITUDE, corner4_latitude, real]
+    - [CORNER4_LONGITUDE, corner4_longitude, real]
+
+scale_factors:
+    SPACECRAFT_ALTITUDE: 1000 # km to m
+    TARGET_CENTER_DISTANCE: 1000 # km to m
+    SLANT_DISTANCE: 1000 # km to m
+    SOLAR_DISTANCE: 149597870700 # au to m
+
+index:
+    - observation_id
+
+segmentation:
+    resolution: 50000
