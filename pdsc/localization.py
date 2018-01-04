@@ -43,6 +43,7 @@ class Localizer(object):
 
     BODY_RADIUS = MARS_RADIUS_M
     DEFAULT_RESOLUTION_M = 0.1
+    NORMALIZED_PIXEL_SPACE = False
 
     def pixel_to_latlon(self, row, col):
         """
@@ -279,6 +280,7 @@ class HiRiseLocalizer(GeodesicLocalizer):
 class HiRiseRdrLocalizer(FourCornerLocalizer):
 
     DEFAULT_RESOLUTION_M = 1e-6
+    NORMALIZED_PIXEL_SPACE = True
 
     def __init__(self, metadata):
         corners = np.array([
@@ -288,7 +290,7 @@ class HiRiseRdrLocalizer(FourCornerLocalizer):
             [metadata.corner4_latitude, metadata.corner4_longitude],
         ])
         super(HiRiseRdrLocalizer, self).__init__(
-            corners, metadata.lines, metadata.samples, 1
+            corners, 1.0, 1.0, 1
         )
 
 @register_localizer('moc')
