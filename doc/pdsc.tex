@@ -62,7 +62,7 @@ products by spacecraft, instrument, or even image content. However, several
 other types of queries are also useful for those requiring cross-instrument
 comparison or the comparison of images taken of the same region at different
 times. Furthermore, users might desire the capability to query sets of
-overlapping images programmatically, without relying an manually using a web
+overlapping images programmatically, without relying on manually using a web
 interface.
 
 \section*{Solution}
@@ -116,6 +116,27 @@ the ball tree, which allows querying all segment centers that fall within some
 radius of a given query point, is also described below.
 
 \subsection*{Queries}
+
+There are two major query types supported by \ac{pdsc}. The first type of query
+finds all observations within some distance $\epsilon$ of a given point on the
+surface of Mars. For now, consider the case where $\epsilon = 0$, so the query
+point must be \emph{within} the observation. To avoid having to check point
+inclusion within every single observation, a pre-filtering step supported by the
+index structures is performed. If a point falls within an observation, then it
+falls within \emph{some} polygonal segment into which the observation has been
+decomposed. Thus, we can reduce the problem to finding point inclusion within
+triangular segments. Furthermore, if a point falls within a triangular segment,
+then it is within radius $r$ from the segment center, where $r$ is the largest
+distance from the center of the triangle to any of its vertices.
+
+We use the ball tree index to quickly find all segments whose centers are at
+most radius $r$ from the query point. This operation takes $O(\log n)$ time,
+where $n$ is the number of segments in the database. Thus, we can significantly
+reduce query time from the $O(n)$ operations needed to exhaustively search all
+segments. After this pre-filtering step, we are left with a much smaller set of
+segments to exhaustively check for point inclusion.
+
+To check for point inclusion, 
 
 \section*{Novelty}
 pass
