@@ -48,7 +48,7 @@
 \title{
   PDSC: Planetary Data System Coincidences
 }
-\author{Gary Doran, Kiri Wagstaff, Liang Yu, and Lukas Mandrake}
+\author{Gary Doran, Kiri Wagstaff, and Lukas Mandrake}
 \date{\today}
 
 \begin{document}
@@ -136,7 +136,60 @@ reduce query time from the $O(n)$ operations needed to exhaustively search all
 segments. After this pre-filtering step, we are left with a much smaller set of
 segments to exhaustively check for point inclusion.
 
-To check for point inclusion, 
+To check for point inclusion within a segment, we use several properties of the
+generated segmentation. First, we assume that the segments are small enough that
+the vertices of the segments are connected via geodesic lines. By definition, a
+geodesic is the intersection of a sphere with a plane passing through the
+center of the sphere. To avoid working in spherical coordinates, we explicitly
+map the point on the surface to a 3--D point on a unit sphere. For each edge
+that bounds the segment, we compute a 3--D plane passing through the two
+vertices of the edge (also represented on a unit sphere) and the center of the
+sphere). As long as each edge of the segment has nonzero length,
+the edge points $(e_1, e_2)$ and sphere center $c$ uniquely determine a plane,
+whose normal vector can be found using the cross product $(e_1 - c)\times (e_2 -
+c)$. If segment vertices are traversed in counter-clockwise order, then by the
+right-hand rule, the plane normal vectors computed in this fashion will point
+towards the center of the polygonal segment.
+
+Then, because triangular segments are guaranteed to be convex, to see
+if the point falls within the polygon, it suffices to check that the point is on
+the correct (positive) side of each bounding plane. This is easily computed with
+a dot product between the point and the plane normal vectors. After we have
+determined that a point falls within an observation, we do not need to continue
+checking inclusion within any segment that is also part of that observation.
+
+Now, suppose we have the case where $\epsilon > 0$; that is, we want to see if a
+point is at most $\epsilon$ distance away from an observation footprint. The
+approach follows that above with some minor changes. First, we must relax the
+ball tree query to look for segments whose centers are within $r + \epsilon$ of
+the query point. The triangle inequality guarantees that for points within
+$\epsilon$ of a segment, the segment center must be at most $r + \epsilon$ away
+from the point.
+
+Next, rather than compute point inclusion, we must compute the distance between
+the query point and the segment. We first check for inclusion, in which case
+the distance is zero. Otherwise, we know that the point lies outside the
+polygon. Thus, the distance between the point and the polygon is the shortest
+distance between the query point and any point on the boundary of the polygon.
+This boundary point is either on an edge or a vertex. The closest point to the
+query on an edge is approximately the query point in 3--D projected onto the
+plane passing through the edge and the center of the unit sphere (the same plane
+used for inclusion tests above), then projected back out to the surface of the
+unit sphere. If we perform this projection and the projected point falls within
+the polygon (strictly speaking, on the boundary of the polygon), then this point
+is a candidate for the closest point in the polygon to the query. Otherwise, if
+the projection falls outside the polygon, then it is not considered as a
+candidate (i.e., some vertex is closer to the query point).
+
+By performing the procedure above for each edge, we have a set of up to three
+candidates for the closest point in the polygon to the query point. We also
+include the three vertices as candidates. These points are all in spherical
+coordinates. Then, using the haversine formula, we compute the geodesic distance
+between each candidate and the query point. The minimum of these distances is
+the shortest distance between the query and the polygon. If this distance is
+less than $\epsilon$, then the observation satisfies the query and is returned.
+As for the inclusion check, if any segment from an observation satisfies the
+query, the remaining segments from that observation do not need to be checked.
 
 \section*{Novelty}
 pass
