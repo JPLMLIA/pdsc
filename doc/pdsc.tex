@@ -28,6 +28,7 @@
 
 \acrodef{pds}[PDS]{Planetary Data System}
 \acrodef{pdsc}[PDSC]{PDS Coincidences}
+\acrodef{sql}[SQL]{Structured Query Language}
 
 \sidecaptionvpos{figure}{t}
 
@@ -80,8 +81,8 @@ be fast, responding to most queries in less than a second.
 \subsection*{Ingestion}
 The \ac{pdsc} library allows for quickly querying coincident observations by
 constructing a set of special databases and index structures during the
-ingestion process. The first database constructed is simply a SQL version of the
-PDS cumulative index. The second set of index structures holds geometric
+ingestion process. The first database constructed is simply a \ac{sql} version
+of the PDS cumulative index. The second set of index structures holds geometric
 information used for coincidence queries.
 
 The footprints of observations on the surface of Mars are reported differently
@@ -107,7 +108,7 @@ simple geodesic lines. For reasons described later, we use triangular segments
 to ensure that the segments are \emph{convex} polygons, a property that
 simplifies the querying process.
 
-These triangular segments are placed into a SQL database that records the
+These triangular segments are placed into a \ac{sql} database that records the
 observation to which they belong along with the vertices that define their
 corners. One final data structure saved to disk is a \emph{ball tree}, which is
 populated with the set of segment centers. The radius (maximum distance from a
@@ -119,15 +120,21 @@ radius of a given query point, is also described below.
 
 There are two major query types supported by \ac{pdsc}. The first type of query
 finds all observations within some distance $\epsilon$ of a given point on the
-surface of Mars. For now, consider the case where $\epsilon = 0$, so the query
-point must be \emph{within} the observation. To avoid having to check point
-inclusion within every single observation, a pre-filtering step supported by the
-index structures is performed. If a point falls within an observation, then it
-falls within \emph{some} polygonal segment into which the observation has been
-decomposed. Thus, we can reduce the problem to finding point inclusion within
-triangular segments. Furthermore, if a point falls within a triangular segment,
-then it is within radius $r$ from the segment center, where $r$ is the largest
-distance from the center of the triangle to any of its vertices.
+surface of Mars. The second finds all observations that overlap with another
+observation. We discuss these two query types below.
+
+\subsubsection*{Point Queries}
+
+For point queries, a user would like to find all observations within $\epsilon$
+of a query point.  To start, consider the case where $\epsilon = 0$, so the
+query point must be \emph{within} the observation. To avoid having to check
+point inclusion within every single observation, a pre-filtering step supported
+by the index structures is performed. If a point falls within an observation,
+then it falls within \emph{some} polygonal segment into which the observation
+has been decomposed. Thus, we can reduce the problem to finding point inclusion
+within triangular segments. Furthermore, if a point falls within a triangular
+segment, then it is within radius $r$ from the segment center, where $r$ is the
+largest distance from the center of the triangle to any of its vertices.
 
 We use the ball tree index to quickly find all segments whose centers are at
 most radius $r$ from the query point. This operation takes $O(\log n)$ time,
@@ -190,6 +197,37 @@ the shortest distance between the query and the polygon. If this distance is
 less than $\epsilon$, then the observation satisfies the query and is returned.
 As for the inclusion check, if any segment from an observation satisfies the
 query, the remaining segments from that observation do not need to be checked.
+
+\subsubsection*{Overlap Queries}
+
+The second type of query supported by \ac{pdsc} enables users to find all
+observations (of any supported instrument) that overlap a given query
+observation. To support this query, a similar approach to the point query is
+used. First, the pre-computed query observation segmentation is fetched from the
+\ac{sql} database containing segments. Two observations overlap if and only if
+at least one pair of segments across the pairs overlap. Thus, for each query
+observation segment $s_i$, we must see which other segments in the database
+overlap $s_i$.
+
+If two segments $s_i$ and $s_j$ overlap, then there must be some point that lies
+within each segment. If these segments have radii $r_i$ and $r_j$, then this
+means that by the triangle inequality, the segment centers are at most $r_i +
+r_j$ apart from each other. Thus, if $c_i$ is the center of the query segment
+with radius $r_i$, and $r$ is the maximum segment radius for an instrument, then
+the ball tree is queried with point $c_i$ and radius $r_i + r$ to find all
+segments that possibly overlap with each query segment. This is done for every
+segment in the query observation.
+
+For a pair of candidate overlapping segments, checking for overlap is performed
+in two dimensions by first projecting the segments onto a common plane. The
+plane is chosen to be tangential to the surface to the sphere on which the
+segments lie at a point equidistant between the segment centers. The selection
+of this plane is intended to minimize the distortions caused by projecting the
+polygons onto a plane.
+
+The process above is performed for each pair of candidate overlapping segments.
+As soon as some pair of overlapping segments across two observations is found,
+the remaining pairs of segments do not need to be checked.
 
 \section*{Novelty}
 pass
