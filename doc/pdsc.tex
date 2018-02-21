@@ -27,6 +27,8 @@
   pdfview=FitH}
 
 \acrodef{pds}[PDS]{Planetary Data System}
+\acrodef{usgs}[USGS]{United States Geological Survey}
+\acrodef{pilot}[PILOT]{Planetary Image Locator Tool}
 \acrodef{pdsc}[PDSC]{PDS Coincidences}
 \acrodef{sql}[SQL]{Structured Query Language}
 
@@ -230,7 +232,27 @@ As soon as some pair of overlapping segments across two observations is found,
 the remaining pairs of segments do not need to be checked.
 
 \section*{Novelty}
-pass
+
+Several exiting tools allow limited capabilities for searching \ac{pds} images.
+For example, the \ac{pds} Image
+Atlas\footnote{\url{https://pds-imaging.jpl.nasa.gov/search/}} enables image
+search by metadata or even content, but not by point inclusion or overlap. The
+\ac{usgs} maintains its \ac{pilot}
+database,\footnote{\url{https://pilot.wr.usgs.gov/}} which does enable some
+search using image location. In particular, one can query to find overlapping
+stereo pairs of images from the same instrument. However, the search does not
+enable searching for overlapping pairs across images. Finally,
+JMARS\footnote{\url{https://jmars.asu.edu/}} provides a graphical interface for
+querying \ac{pds} images base on location, but not overlapping pairs. The tools
+mentioned above all rely primarily on a user interface component, whereas the
+\ac{pdsc} library allows searching directly from Python, which could be
+incorporated into a user interface if desired.
+
+In addition to the novel search capabilities offered by \ac{pdsc}, it also uses
+a new combination of existing database and data structure technologies to
+improve search efficiency. In particular, the ball tree data structure
+significantly improves the computation complexity of finding observation
+segments from $O(n)$ to $O(\log n)$ time.
 
 \bibliographystyle{plain}
 \bibliography{bibliography}
