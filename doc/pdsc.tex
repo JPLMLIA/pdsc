@@ -62,7 +62,7 @@ The \ac{pds} contains a wealth of publicly available information collected by
 spacecraft from all across the solar system. In addition to hosting this
 information, the \ac{pds} also provides capabilities to search through data
 products by spacecraft, instrument, or even image content. However, several
-other types of queries are also useful for those requiring cross-instrument
+other types of queries are also necessary for users requiring cross-instrument
 comparison or the comparison of images taken of the same region at different
 times. Furthermore, users might desire the capability to query sets of
 overlapping images programmatically, without relying on manually using a web
@@ -91,7 +91,7 @@ The footprints of observations on the surface of Mars are reported differently
 across instruments. Some instruments report four corners of the observation in
 latitude and longitude coordinates. Others report a latitude/longitude
 location at the center of the observation, along with a ``north azimuth'' (the
-direction that the ground track makes with north. There are several challenges
+direction that the ground track makes with north). There are several challenges
 to using this information for determining which points fall within the
 observation footprint. First, there might be errors in geo-registration, so that
 the observation location is not entirely accurate. We do not attempt to solve
@@ -153,7 +153,7 @@ center of the sphere. To avoid working in spherical coordinates, we explicitly
 map the point on the surface to a 3--D point on a unit sphere. For each edge
 that bounds the segment, we compute a 3--D plane passing through the two
 vertices of the edge (also represented on a unit sphere) and the center of the
-sphere). As long as each edge of the segment has nonzero length,
+sphere As long as each edge of the segment has nonzero length,
 the edge points $(e_1, e_2)$ and sphere center $c$ uniquely determine a plane,
 whose normal vector can be found using the cross product $(e_1 - c)\times (e_2 -
 c)$. If segment vertices are traversed in counter-clockwise order, then by the
@@ -243,7 +243,7 @@ search using image location. In particular, one can query to find overlapping
 stereo pairs of images from the same instrument. However, the search does not
 enable searching for overlapping pairs across images. Finally,
 JMARS\footnote{\url{https://jmars.asu.edu/}} provides a graphical interface for
-querying \ac{pds} images base on location, but not overlapping pairs. The tools
+querying \ac{pds} images based on location, but not overlapping pairs. The tools
 mentioned above all rely primarily on a user interface component, whereas the
 \ac{pdsc} library allows searching directly from Python, which could be
 incorporated into a user interface if desired.
