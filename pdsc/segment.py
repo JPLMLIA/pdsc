@@ -20,6 +20,10 @@ INCLUSION_EPSILON = 1e-10 # corresponds to < 1 mm error in inclusion check
 class PointQuery(object):
 
     def __init__(self, lat, lon, radius):
+        if radius < 0:
+            raise ValueError('Radius must be non-negative')
+        if lat < -90 or lat > 90:
+            raise ValueError('Latitude must be in range [-90, 90]')
         self.latlon = np.array([lat, lon])
         self.radius = radius
         self._xyz = None
