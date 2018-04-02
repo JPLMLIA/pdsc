@@ -19,9 +19,14 @@ setup(name='pdsc',
         'scikit-learn',
         'Polygon2',
         'progressbar',
+        'PyPDS>=1.0.2',
+        'PyYAML',
         'geographiclib',
         'CherryPy',
         'requests',
+    ],
+    dependency_links=[
+        'git+https://github.com/RyanBalfanz/PyPDS.git#egg=PyPDS-1.0.2'
     ],
     provides=[
         'pdsc',
