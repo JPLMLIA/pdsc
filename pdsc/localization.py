@@ -195,6 +195,8 @@ class FourCornerLocalizer(GeodesicLocalizer):
 @register_localizer('ctx')
 class CtxLocalizer(GeodesicLocalizer):
 
+    DEFAULT_RESOLUTION_M = 1e-3
+
     BODY = Geodesic(MARS_RADIUS_M, 0.0) # Works better assuming sphere
 
     def __init__(self, metadata):
