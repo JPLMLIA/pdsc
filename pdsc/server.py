@@ -10,6 +10,7 @@ from .client import PdsClient
 from .metadata import json_dumps
 
 DEFAULT_SERVER_PORT = 7372
+DEFAULT_SOCKET_TIMEOUT = 10000
 
 def content_type(t):
     def decorator(f):
@@ -33,6 +34,7 @@ class PdsServer(object):
         cherrypy.config.update({
             'server.socket_port' : self.port,
             'server.socket_host' : self.socket_host,
+            'server.socket_timeout': DEFAULT_SOCKET_TIMEOUT,
         })
         cherrypy.quickstart(self)
 
