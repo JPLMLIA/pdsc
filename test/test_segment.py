@@ -1,10 +1,11 @@
 """
 Unit Tests for Segment Code
 """
-from nose.tools import assert_raises
+import numpy as np
+from nose.tools import assert_raises, assert_equals
 from numpy.testing import assert_allclose
 
-from pdsc.segment import PointQuery
+from pdsc.segment import PointQuery, TriSegment
 
 def test_point_query():
 
@@ -38,3 +39,16 @@ def test_point_query():
     # Latitude in range [-90, 90]
     assert_raises(ValueError, PointQuery, -91, 0, 0)
     assert_raises(ValueError, PointQuery, 91, 0, 0)
+
+def test_trisegment():
+
+    # Test basic segment
+    segment = TriSegment([0, 0], [0, 90], [90, 0])
+
+    assert_equals(str(segment),
+        'TriSegment(laton0=(0.000000, 0.000000), '
+        'laton1=(0.000000, 90.000000), '
+        'latlon2=(90.000000, 0.000000))'
+    )
+
+    assert_allclose(segment.xyz_points, np.eye(3), atol=1e-9)
