@@ -51,4 +51,11 @@ def test_trisegment():
         'latlon2=(90.000000, 0.000000))'
     )
 
+    # Test Spherical to XYZ
     assert_allclose(segment.xyz_points, np.eye(3), atol=1e-9)
+
+    # Test Segment Center
+    assert_allclose(
+        segment.center(),
+        [np.rad2deg(np.arcsin(0.57735026919)), 45]
+    )
