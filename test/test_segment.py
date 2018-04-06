@@ -54,8 +54,13 @@ def test_trisegment():
     # Test Spherical to XYZ
     assert_allclose(segment.xyz_points, np.eye(3), atol=1e-9)
 
-    # Test Segment Center
+    expected_center = [np.rad2deg(np.arcsin(0.57735026919)), 45]
+
+    # Test segment center
+    assert_allclose(segment.center(), expected_center)
+
+    # Test center properties
     assert_allclose(
         segment.center(),
-        [np.rad2deg(np.arcsin(0.57735026919)), 45]
+        [segment.center_latitude, segment.center_longitude]
     )
