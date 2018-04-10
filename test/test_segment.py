@@ -1,8 +1,8 @@
 """
 Unit Tests for Segment Code
 """
+import pytest
 import numpy as np
-from nose.tools import assert_raises, assert_equals
 from numpy.testing import assert_allclose
 
 from cosmic_test_tools import unit
@@ -37,11 +37,11 @@ def test_point_query():
     assert_allclose(point_query.xyz, [0, 0, -1], atol=1e-9)
 
     # Radius must be non-negative
-    assert_raises(ValueError, PointQuery, 0, 0, -1)
+    pytest.raises(ValueError, PointQuery, 0, 0, -1)
 
     # Latitude in range [-90, 90]
-    assert_raises(ValueError, PointQuery, -91, 0, 0)
-    assert_raises(ValueError, PointQuery, 91, 0, 0)
+    pytest.raises(ValueError, PointQuery, -91, 0, 0)
+    pytest.raises(ValueError, PointQuery, 91, 0, 0)
 
 @unit
 def test_trisegment():
@@ -49,7 +49,7 @@ def test_trisegment():
     # Test basic segment
     segment = TriSegment([0, 0], [0, 90], [90, 0])
 
-    assert_equals(str(segment),
+    assert (str(segment) ==
         'TriSegment(laton0=(0.000000, 0.000000), '
         'laton1=(0.000000, 90.000000), '
         'latlon2=(90.000000, 0.000000))'

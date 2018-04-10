@@ -4,3 +4,5 @@ build
 dist
 pdsc.egg-info
 **.DS_Store
+**.coverage
+**.pytest_cache
