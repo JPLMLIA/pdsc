@@ -1,0 +1,599 @@
+PDS_VERSION_ID                 = PDS3
+RECORD_TYPE                    = FIXED_LENGTH
+^TABLE                         = "INDEX.TAB"
+DATA_SET_ID                    = "MRO-M-CTX-2-EDR-L0-V1.0"
+SPACECRAFT_NAME                = "MARS RECONNAISSANCE ORBITER"
+INSTRUMENT_NAME                = "TEST INSTRUMENT"
+TARGET_NAME                    = MARS
+MISSION_PHASE_NAME             = "PSP"
+PRODUCT_CREATION_TIME          = 2007-05-23T19:00:00
+
+OBJECT                         = TABLE
+ INTERCHANGE_FORMAT            = ASCII
+ ROWS                          = 41
+ COLUMNS                       = 51
+ ROW_BYTES                     = 555
+ INDEX_TYPE                    = SINGLE
+
+OBJECT = COLUMN
+NAME = VOLUME_ID
+COLUMN_NUMBER = 1
+DATA_TYPE = CHARACTER
+START_BYTE = 2
+BYTES = 9
+FORMAT = "A9"
+DESCRIPTION = "volume id"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = FILE_SPECIFICATION_NAME
+COLUMN_NUMBER = 2
+DATA_TYPE = CHARACTER
+START_BYTE = 14
+BYTES = 35
+FORMAT = "A35"
+DESCRIPTION = "file name"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = ORIGINAL_PRODUCT_ID
+COLUMN_NUMBER = 3
+DATA_TYPE = CHARACTER
+START_BYTE = 52
+BYTES = 16
+FORMAT = "A16"
+DESCRIPTION = "original product id"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = PRODUCT_ID
+COLUMN_NUMBER = 4
+DATA_TYPE = CHARACTER
+START_BYTE = 71
+BYTES = 26
+FORMAT = "A26"
+DESCRIPTION = "product id"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = IMAGE_TIME
+COLUMN_NUMBER = 5
+DATA_TYPE = CHARACTER
+START_BYTE = 100
+BYTES = 23
+FORMAT = "A23"
+DESCRIPTION = "SCET time at start of image"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = INSTRUMENT_ID
+COLUMN_NUMBER = 6
+DATA_TYPE = CHARACTER
+START_BYTE = 126
+BYTES = 6
+FORMAT = "A6"
+DESCRIPTION = "instrument id (abbreviated name or acronym)"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = INSTRUMENT_MODE_ID
+COLUMN_NUMBER = 7
+DATA_TYPE = CHARACTER
+START_BYTE = 135
+BYTES = 5
+FORMAT = "A5"
+DESCRIPTION = "command mode (ITL or NIFL) in which this image
+was acquired"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LINE_SAMPLES
+COLUMN_NUMBER = 8
+DATA_TYPE = ASCII_INTEGER
+START_BYTE = 142
+BYTES = 4
+FORMAT = "I4"
+DESCRIPTION = "image width"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LINES
+COLUMN_NUMBER = 9
+DATA_TYPE = ASCII_INTEGER
+START_BYTE = 147
+BYTES = 6
+FORMAT = "I6"
+DESCRIPTION = "image height"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SPATIAL_SUMMING
+COLUMN_NUMBER = 10
+DATA_TYPE = ASCII_INTEGER
+START_BYTE = 154
+BYTES = 2
+FORMAT = "I2"
+DESCRIPTION = "spatial summing"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SCALED_PIXEL_WIDTH
+COLUMN_NUMBER = 11
+DATA_TYPE = ASCII_REAL
+START_BYTE = 157
+BYTES = 8
+FORMAT = "F8.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "image resolution in meters/pixel at center of image"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = PIXEL_ASPECT_RATIO
+COLUMN_NUMBER = 12
+DATA_TYPE = ASCII_REAL
+START_BYTE = 166
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "pixel aspect ratio (pixel height/pixel width)
+at center of image.  The image's center pixel is projected on the
+ground and its linear extents are ratioed, so any effects of
+emission angle and line time are modelled.  To recover an image
+with 'square' pixels, the image should be resampled to a height
+of aspect_ratio * input height."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = EMISSION_ANGLE
+COLUMN_NUMBER = 13
+DATA_TYPE = ASCII_REAL
+START_BYTE = 173
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "emission angle at center of image"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = INCIDENCE_ANGLE
+COLUMN_NUMBER = 14
+DATA_TYPE = ASCII_REAL
+START_BYTE = 180
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "incidence angle at center of image"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = PHASE_ANGLE
+COLUMN_NUMBER = 15
+DATA_TYPE = ASCII_REAL
+START_BYTE = 187
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "phase angle at center of image"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = CENTER_LONGITUDE
+COLUMN_NUMBER = 16
+DATA_TYPE = ASCII_REAL
+START_BYTE = 194
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "center longitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = CENTER_LATITUDE
+COLUMN_NUMBER = 17
+DATA_TYPE = ASCII_REAL
+START_BYTE = 201
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "center areographic latitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = UPPER_LEFT_LONGITUDE
+COLUMN_NUMBER = 18
+DATA_TYPE = ASCII_REAL
+START_BYTE = 208
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "upper left longitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = UPPER_LEFT_LATITUDE
+COLUMN_NUMBER = 19
+DATA_TYPE = ASCII_REAL
+START_BYTE = 215
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "upper left areographic latitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = UPPER_RIGHT_LONGITUDE
+COLUMN_NUMBER = 20
+DATA_TYPE = ASCII_REAL
+START_BYTE = 222
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "upper right longitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = UPPER_RIGHT_LATITUDE
+COLUMN_NUMBER = 21
+DATA_TYPE = ASCII_REAL
+START_BYTE = 229
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "upper right areographic latitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LOWER_LEFT_LONGITUDE
+COLUMN_NUMBER = 22
+DATA_TYPE = ASCII_REAL
+START_BYTE = 236
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "lower left longitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LOWER_LEFT_LATITUDE
+COLUMN_NUMBER = 23
+DATA_TYPE = ASCII_REAL
+START_BYTE = 243
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "lower left areographic latitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LOWER_RIGHT_LONGITUDE
+COLUMN_NUMBER = 24
+DATA_TYPE = ASCII_REAL
+START_BYTE = 250
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "lower right longitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LOWER_RIGHT_LATITUDE
+COLUMN_NUMBER = 25
+DATA_TYPE = ASCII_REAL
+START_BYTE = 257
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 999.9
+DESCRIPTION = "lower right areographic latitude"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = MISSION_PHASE_NAME
+COLUMN_NUMBER = 26
+DATA_TYPE = CHARACTER
+START_BYTE = 265
+BYTES = 10
+FORMAT = "A10"
+DESCRIPTION = "mission phase name"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = TARGET_NAME
+COLUMN_NUMBER = 27
+DATA_TYPE = CHARACTER
+START_BYTE = 278
+BYTES = 6
+FORMAT = "A6"
+DESCRIPTION = "target name (e.g., MARS, PHOBOS, STAR, SPACE)"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SPACECRAFT_CLOCK_START_COUNT
+COLUMN_NUMBER = 28
+DATA_TYPE = CHARACTER
+START_BYTE = 287
+BYTES = 15
+FORMAT = "A15"
+DESCRIPTION = "spacecraft clock value at start of image"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = FOCAL_PLANE_TEMPERATURE
+COLUMN_NUMBER = 29
+DATA_TYPE = ASCII_REAL
+START_BYTE = 304
+BYTES = 5
+FORMAT = "F5.1"
+DESCRIPTION = "focal plane temp in Kelvins"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LINE_EXPOSURE_DURATION
+COLUMN_NUMBER = 30
+DATA_TYPE = ASCII_REAL
+START_BYTE = 310
+BYTES = 8
+FORMAT = "F8.4"
+DESCRIPTION = "line integration time in milliseconds"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = OFFSET_MODE_ID
+COLUMN_NUMBER = 31
+DATA_TYPE = CHARACTER
+START_BYTE = 320
+BYTES = 11
+FORMAT = "A11"
+DESCRIPTION = "offset mode (see documentation)"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SAMPLE_FIRST_PIXEL
+COLUMN_NUMBER = 32
+DATA_TYPE = ASCII_INTEGER
+START_BYTE = 333
+BYTES = 4
+FORMAT = "I4"
+DESCRIPTION = "first pixel stored from detector, zero-based"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SCALED_IMAGE_WIDTH
+COLUMN_NUMBER = 33
+DATA_TYPE = ASCII_REAL
+START_BYTE = 338
+BYTES = 7
+FORMAT = "F7.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "image width from left to right image edge in km"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SCALED_IMAGE_HEIGHT
+COLUMN_NUMBER = 34
+DATA_TYPE = ASCII_REAL
+START_BYTE = 346
+BYTES = 8
+FORMAT = "F8.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "image height from first line to last line in km"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SPACECRAFT_ALTITUDE
+COLUMN_NUMBER = 35
+DATA_TYPE = ASCII_REAL
+START_BYTE = 355
+BYTES = 7
+FORMAT = "F7.2"
+DESCRIPTION = "distance from s/c to closest point on surface in km"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = TARGET_CENTER_DISTANCE
+COLUMN_NUMBER = 36
+DATA_TYPE = ASCII_REAL
+START_BYTE = 363
+BYTES = 7
+FORMAT = "F7.2"
+DESCRIPTION = "distance from s/c to target body center in km"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SLANT_DISTANCE
+COLUMN_NUMBER = 37
+DATA_TYPE = ASCII_REAL
+START_BYTE = 371
+BYTES = 7
+FORMAT = "F7.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "range from s/c to intersection of view vector with
+target body in km"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = USAGE_NOTE
+COLUMN_NUMBER = 38
+DATA_TYPE = CHARACTER
+START_BYTE = 380
+BYTES = 1
+FORMAT = "A1"
+DESCRIPTION = "Because of the CTX's line-scan nature, depending on the
+orientation and sense of rotation of the spacecraft, CTX images can
+either be normal or flipped left-for-right (independent of whether the
+image is north up or south up.)  This flag will be 'F' if the image
+should be flipped left-to-right, and 'N' if it is already in normal
+form."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = NORTH_AZIMUTH
+COLUMN_NUMBER = 39
+DATA_TYPE = ASCII_REAL
+START_BYTE = 383
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "The angle in degrees clockwise from the reference axis
+of the image (a line from the center to the right edge of the image)
+to the direction to the north pole of the target body.  If the
+USAGE_NOTE described previously is 'F', the image should be flipped
+prior to applying this angle."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SUB_SOLAR_AZIMUTH
+COLUMN_NUMBER = 40
+DATA_TYPE = ASCII_REAL
+START_BYTE = 390
+BYTES = 6
+FORMAT = "F6.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "The angle in degrees clockwise from the reference axis
+of the image (a line from the center to the right edge of the image)
+to the direction to the subsolar point on the target body.  If the
+USAGE_NOTE described previously is 'F', the image should be flipped
+prior to applying this angle."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SUB_SOLAR_LONGITUDE
+COLUMN_NUMBER = 41
+DATA_TYPE = ASCII_REAL
+START_BYTE = 397
+BYTES = 6
+FORMAT = "F6.2"
+DESCRIPTION = "west longitude of subsolar point in degrees"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SUB_SOLAR_LATITUDE
+COLUMN_NUMBER = 42
+DATA_TYPE = ASCII_REAL
+START_BYTE = 404
+BYTES = 6
+FORMAT = "F6.2"
+DESCRIPTION = "planetographic latitude of subsolar point in degrees"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SUB_SPACECRAFT_LONGITUDE
+COLUMN_NUMBER = 43
+DATA_TYPE = ASCII_REAL
+START_BYTE = 411
+BYTES = 6
+FORMAT = "F6.2"
+DESCRIPTION = "west longitude of subspacecraft point in degrees"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SUB_SPACECRAFT_LATITUDE
+COLUMN_NUMBER = 44
+DATA_TYPE = ASCII_REAL
+START_BYTE = 418
+BYTES = 6
+FORMAT = "F6.2"
+DESCRIPTION = "planetographic latitude of subspacecraft point in degrees"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SOLAR_DISTANCE
+COLUMN_NUMBER = 45
+DATA_TYPE = ASCII_REAL
+START_BYTE = 425
+BYTES = 11
+FORMAT = "F11.1"
+DESCRIPTION = "distance from the center of the image on the target body
+to the center of the sun in km"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = SOLAR_LONGITUDE
+COLUMN_NUMBER = 46
+DATA_TYPE = ASCII_REAL
+START_BYTE = 437
+BYTES = 6
+FORMAT = "F6.2"
+DESCRIPTION = "solar longitude ('L sub s') at time of image in degrees
+from martian vernal equinox, as computed by the method in 'Accurate
+analytic representations of solar time and seasons on Mars with
+applications to the Pathfinder/Surveyor missions', Michael Allison,
+Geophysical Reseach Letters 24, 16, pp 1967-1970 (August 15, 1997)"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LOCAL_TIME
+COLUMN_NUMBER = 47
+DATA_TYPE = ASCII_REAL
+START_BYTE = 444
+BYTES = 5
+FORMAT = "F5.2"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION = "Local True Solar Time in decimal hours from midnight at
+the center of the image, as computed by the method in 'Accurate
+analytic representations of solar time and seasons on Mars with
+applications to the Pathfinder/Surveyor missions', Michael Allison,
+Geophysical Reseach Letters 24, 16, pp 1967-1970 (August 15, 1997).
+An 'hour' in this context is an angular measure of 15 degrees
+of solar motion."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = IMAGE_SKEW_ANGLE
+COLUMN_NUMBER = 48
+DATA_TYPE = ASCII_REAL
+START_BYTE = 450
+BYTES = 5
+FORMAT = "F5.1"
+NOT_APPLICABLE_CONSTANT = 0.0
+DESCRIPTION =
+"The image skew angle is the absolute value, in degrees, of the angle
+between the left edge (a line between the lower left and upper left
+corners) and the bottom edge (a line between the lower left and lower
+right corners) of the image, where the edges are projected on the
+target body.  For images whose footprints are exactly rectangular,
+this angle will be 90 degrees.  Departures from 90 degrees indicate a
+non-rectangular image footprint, caused by slews of the spacecraft
+during imaging outside the orbit plane or off-nadir pointing, or
+both."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = RATIONALE_DESC
+COLUMN_NUMBER = 49
+DATA_TYPE = CHARACTER
+START_BYTE = 457
+BYTES = 80
+FORMAT = "A80"
+DESCRIPTION = "A text description of the scientific purpose for the
+acquisition of this image.  For routine mapping operations, this will
+most likely be the goal of the image as targeted (which may not be met
+if the image missed its target significantly, the atmosphere was
+cloudy, etc.)"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = DATA_QUALITY_DESC
+COLUMN_NUMBER = 50
+DATA_TYPE = CHARACTER
+START_BYTE = 540
+BYTES = 6
+FORMAT = "A6"
+DESCRIPTION = "'OK' if all fragments of the image are
+received without detected checksum or sequence errors, and 'ERROR'
+otherwise."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = ORBIT_NUMBER
+COLUMN_NUMBER = 51
+DATA_TYPE = ASCII_INTEGER
+START_BYTE = 548
+BYTES = 6
+FORMAT = "I6"
+DESCRIPTION = "orbit number as defined by the MRO Project"
+END_OBJECT = COLUMN
+
+END_OBJECT                     = TABLE
+
+END
+
