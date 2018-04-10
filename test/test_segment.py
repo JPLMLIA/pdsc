@@ -5,8 +5,11 @@ import numpy as np
 from nose.tools import assert_raises, assert_equals
 from numpy.testing import assert_allclose
 
+from cosmic_test_tools import unit
+
 from pdsc.segment import PointQuery, TriSegment
 
+@unit
 def test_point_query():
 
     # Test various longitudes along equator
@@ -40,6 +43,7 @@ def test_point_query():
     assert_raises(ValueError, PointQuery, -91, 0, 0)
     assert_raises(ValueError, PointQuery, 91, 0, 0)
 
+@unit
 def test_trisegment():
 
     # Test basic segment
