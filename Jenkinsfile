@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Tests') {
             parallel {
-                stage('Verification') {
+                stage('Unit Tests') {
                     steps {
                         sh '''#!/bin/bash
                             source venv_PDSC/bin/activate
@@ -46,11 +46,14 @@ pipeline {
                         '''
                     }
                 }
-                stage('Performance') {
+                stage('Functional Tests') {
                     steps {
                         sh '''#!/bin/bash
                             source venv_PDSC/bin/activate
-                            # other performance tests go here...
+                            rm -f $WORKSPACE/test_reports/xml
+                            mkdir -p $WORKSPACE/test_reports/xml
+                            pytest -c test/functional.cfg \
+                                --junit-xml=$WORKSPACE/test_reports/xml/functional.xml
                         '''
                     }
                 }
