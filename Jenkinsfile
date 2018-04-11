@@ -31,33 +31,26 @@ pipeline {
                 '''
             }
         }
-        stage('Tests') {
-            parallel {
-                stage('Unit Tests') {
-                    steps {
-                        sh '''#!/bin/bash
-                            source venv_PDSC/bin/activate
-                            mkdir -p $WORKSPACE/test_reports/html
-                            rm -f $WORKSPACE/test_reports/xml
-                            mkdir -p $WORKSPACE/test_reports/xml
-                            pytest -c test/unit.cfg \
-                                --cov-report html:$WORKSPACE/test_reports/unit_coverage \
-                                --junit-xml=$WORKSPACE/test_reports/xml/unit.xml
-                        '''
-                    }
-                }
-                stage('Functional Tests') {
-                    steps {
-                        sh '''#!/bin/bash
-                            source venv_PDSC/bin/activate
-                            rm -f $WORKSPACE/test_reports/xml
-                            mkdir -p $WORKSPACE/test_reports/xml
-                            pytest -c test/functional.cfg \
-                                --cov-report html:$WORKSPACE/test_reports/functional_coverage \
-                                --junit-xml=$WORKSPACE/test_reports/xml/functional.xml
-                        '''
-                    }
-                }
+        stage('Unit Tests') {
+            steps {
+                sh '''#!/bin/bash
+                    source venv_PDSC/bin/activate
+                    rm -f $WORKSPACE/test_reports/xml
+                    mkdir -p $WORKSPACE/test_reports/xml
+                    pytest -c test/unit.cfg \
+                        --cov-report html:$WORKSPACE/test_reports/unit_coverage \
+                        --junit-xml=$WORKSPACE/test_reports/xml/unit.xml
+                '''
+            }
+        }
+        stage('Functional Tests') {
+            steps {
+                sh '''#!/bin/bash
+                    source venv_PDSC/bin/activate
+                    pytest -c test/functional.cfg \
+                        --cov-report html:$WORKSPACE/test_reports/functional_coverage \
+                        --junit-xml=$WORKSPACE/test_reports/xml/functional.xml
+                '''
             }
         }
         stage('Publish') {
