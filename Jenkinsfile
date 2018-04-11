@@ -37,19 +37,12 @@ pipeline {
                     steps {
                         sh '''#!/bin/bash
                             source venv_PDSC/bin/activate
-                            # nosetests won't mkdirs:
                             mkdir -p $WORKSPACE/test_reports/html
                             rm -f $WORKSPACE/test_reports/xml
                             mkdir -p $WORKSPACE/test_reports/xml
-                            nosetests \
-                                --with-coverage \
-                                --cover-erase \
-                                --cover-html \
-                                --cover-html-dir=$WORKSPACE/test_reports/html \
-                                --with-xunit \
-                                --xunit-file=$WORKSPACE/test_reports/xml/nosetests.xml \
-                                --cover-package=pdsc \
-                                -w test
+                            pytest -c test/unit.cfg \
+                                --cov-report html:$WORKSPACE/test_reports/html \
+                                --junit-xml=$WORKSPACE/test_reports/xml/unit.xml
                         '''
                     }
                 }
