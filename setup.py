@@ -31,5 +31,11 @@ setup(name='pdsc',
     provides=[
         'pdsc',
     ],
-    include_package_data=True
+    include_package_data=True,
+    extras_require={
+        'devel':  [
+            'pytest',
+            'pytest-cov',
+        ],
+    }
 )
