@@ -41,7 +41,7 @@ pipeline {
                             rm -f $WORKSPACE/test_reports/xml
                             mkdir -p $WORKSPACE/test_reports/xml
                             pytest -c test/unit.cfg \
-                                --cov-report html:$WORKSPACE/test_reports/html \
+                                --cov-report html:$WORKSPACE/test_reports/unit_coverage \
                                 --junit-xml=$WORKSPACE/test_reports/xml/unit.xml
                         '''
                     }
@@ -53,6 +53,7 @@ pipeline {
                             rm -f $WORKSPACE/test_reports/xml
                             mkdir -p $WORKSPACE/test_reports/xml
                             pytest -c test/functional.cfg \
+                                --cov-report html:$WORKSPACE/test_reports/functional_coverage \
                                 --junit-xml=$WORKSPACE/test_reports/xml/functional.xml
                         '''
                     }
@@ -65,9 +66,17 @@ pipeline {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
-                    reportDir: 'test_reports/html',
+                    reportDir: 'test_reports/unit_coverage',
                     reportFiles: 'index.html',
-                    reportName: 'Code Coverage Report',
+                    reportName: 'Unit Test Coverage',
+                    reportTitles: ''])
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'test_reports/functional_coverage',
+                    reportFiles: 'index.html',
+                    reportName: 'Functional Test Coverage',
                     reportTitles: ''])
             }
         }
