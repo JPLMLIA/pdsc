@@ -10,7 +10,7 @@ pipeline {
                     extensions: [],
                     submoduleCfg: [],
                     userRemoteConfigs: [[
-                        credentialsId: 'github-cosmicfn',
+                        credentialsId: 'key_pdsc',
                         url: 'git@github-fn.jpl.nasa.gov:COSMIC/COSMIC_PDSC.git']]
                 ])
             }
