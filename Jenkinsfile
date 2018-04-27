@@ -53,6 +53,14 @@ pipeline {
                 '''
             }
         }
+        stage('Documentation Tests') {
+            steps {
+                sh '''#!/bin/bash
+                    source venv_PDSC/bin/activate
+                    pytest -c test/doctest.cfg
+                '''
+            }
+        }
         stage('Publish') {
             steps {
                 publishHTML([

@@ -21,6 +21,13 @@ def hirise_datetime(s):
     return datetime.strptime(s.strip(), '%Y-%m-%dT%H:%M:%S')
 
 def ctx_sclk(s):
+    '''
+    Takes the CTX SCLK representation with a colon and turns it
+    into a fractional second with a decimal place.
+
+    >>> ctx_sclk('1:1')
+    1.1
+    '''
     return float(s.replace(':', '.'))
 
 def moc_observation_id(s):
