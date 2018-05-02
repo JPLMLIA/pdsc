@@ -8,7 +8,7 @@ from numpy.testing import (
     assert_allclose, assert_almost_equal
 )
 
-from cosmic_test_tools import unit
+from cosmic_test_tools import unit, Approximately
 
 from pdsc.segment import (
     PointQuery, TriSegment, SegmentTree
@@ -86,29 +86,21 @@ def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_op
 
     expected_data = np.array([[np.arcsin(0.57735026919), np.deg2rad(45)]])
 
-    mock_balltree.assert_called_once()
-    args, kwargs = mock_balltree.call_args
-    assert len(args) == 1
-    assert len(kwargs) == 1
-
-    # Test BallTree args
-    assert_allclose(args[0], expected_data)
-    assert kwargs['metric'] == 'haversine'
+    mock_balltree.assert_called_once_with(
+        Approximately(expected_data), metric='haversine'
+    )
 
     point_query = PointQuery(0, 0, 0)
     tree.query_point(point_query)
-    args, kwargs = tree.ball_tree.query_radius.call_args_list[-1]
-    assert len(kwargs) == 0
-    assert len(args) == 2
-    assert_allclose(args[0], np.array([[0, 0]]))
-    assert_almost_equal(args[1], 0.9553166181245093)
+    tree.ball_tree.query_radius.assert_called_with(
+        Approximately(np.array([[1e-12, 0]])), Approximately(0.9553166181245093)
+    )
 
     tree.query_segment(segment)
     args, kwargs = tree.ball_tree.query_radius.call_args_list[-1]
-    assert len(kwargs) == 0
-    assert len(args) == 2
-    assert_allclose(args[0], expected_data)
-    assert_almost_equal(args[1], 1.9106332362490186)
+    tree.ball_tree.query_radius.assert_called_with(
+        Approximately(expected_data), Approximately(1.9106332362490186)
+    )
 
     # Test saving object
     assert tree.save('output') is None
