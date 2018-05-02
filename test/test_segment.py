@@ -76,9 +76,9 @@ def test_trisegment():
 
 @unit
 @mock.patch('pdsc.segment.open', new_callable=mock.mock_open)
-@mock.patch('pdsc.segment.BallTree')
-@mock.patch('pdsc.pickle.dump')
-@mock.patch('pdsc.pickle.load')
+@mock.patch('pdsc.segment.BallTree', autospec=True)
+@mock.patch('pdsc.pickle.dump', autospec=True)
+@mock.patch('pdsc.pickle.load', autospec=True)
 def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_open):
 
     segment = TriSegment([0, 0], [0, 90], [90, 0])
@@ -104,13 +104,11 @@ def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_op
 
     # Test saving object
     assert tree.save('output') is None
-    mock_open.assert_called_once_with('output', 'w+')
+    mock_open.assert_called_with('output', 'w+')
     mock_pickle_dump.assert_called_once_with(tree, mock.ANY)
-
-    mock_open.reset_mock()
 
     # Test loading object
     mock_pickle_load.return_value = 'object'
     assert SegmentTree.load('input') == 'object'
-    mock_open.assert_called_once_with('input', 'r')
-    mock_pickle_load.assert_called_once()
+    mock_open.assert_called_with('input', 'r')
+    mock_pickle_load.assert_called_once_with(mock.ANY)
