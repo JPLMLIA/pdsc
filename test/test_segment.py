@@ -4,7 +4,9 @@ Unit Tests for Segment Code
 import mock
 import pytest
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import (
+    assert_allclose, assert_almost_equal
+)
 
 from cosmic_test_tools import unit
 
@@ -79,27 +81,44 @@ def test_trisegment():
 @mock.patch('pdsc.pickle.load')
 def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_open):
 
-    # TODO: more complete checking of computed attributes
-
-    mock_pickle_load.return_value = 'object'
-
     segment = TriSegment([0, 0], [0, 90], [90, 0])
     tree = SegmentTree([segment], verbose=False)
 
+    expected_data = np.array([[np.arcsin(0.57735026919), np.deg2rad(45)]])
+
     mock_balltree.assert_called_once()
+    args, kwargs = mock_balltree.call_args
+    assert len(args) == 1
+    assert len(kwargs) == 1
+
+    # Test BallTree args
+    assert_allclose(args[0], expected_data)
+    assert kwargs['metric'] == 'haversine'
 
     point_query = PointQuery(0, 0, 0)
     tree.query_point(point_query)
+    args, kwargs = tree.ball_tree.query_radius.call_args_list[-1]
+    assert len(kwargs) == 0
+    assert len(args) == 2
+    assert_allclose(args[0], np.array([[0, 0]]))
+    assert_almost_equal(args[1], 0.9553166181245093)
 
     tree.query_segment(segment)
+    args, kwargs = tree.ball_tree.query_radius.call_args_list[-1]
+    assert len(kwargs) == 0
+    assert len(args) == 2
+    assert_allclose(args[0], expected_data)
+    assert_almost_equal(args[1], 1.9106332362490186)
 
-    # Test loading and saving
+    # Test saving object
     assert tree.save('output') is None
     mock_open.assert_called_once_with('output', 'w+')
     mock_pickle_dump.assert_called_once_with(tree, mock.ANY)
 
     mock_open.reset_mock()
 
+    # Test loading object
+    mock_pickle_load.return_value = 'object'
     assert SegmentTree.load('input') == 'object'
     mock_open.assert_called_once_with('input', 'r')
     mock_pickle_load.assert_called_once()
