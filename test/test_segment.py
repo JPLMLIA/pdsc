@@ -1,13 +1,16 @@
 """
 Unit Tests for Segment Code
 """
+import mock
 import pytest
 import numpy as np
 from numpy.testing import assert_allclose
 
 from cosmic_test_tools import unit
 
-from pdsc.segment import PointQuery, TriSegment
+from pdsc.segment import (
+    PointQuery, TriSegment, SegmentTree
+)
 
 @unit
 def test_point_query():
@@ -68,3 +71,35 @@ def test_trisegment():
         segment.center(),
         [segment.center_latitude, segment.center_longitude]
     )
+
+@unit
+@mock.patch('pdsc.segment.open', new_callable=mock.mock_open)
+@mock.patch('pdsc.segment.BallTree')
+@mock.patch('pdsc.pickle.dump')
+@mock.patch('pdsc.pickle.load')
+def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_open):
+
+    # TODO: more complete checking of computed attributes
+
+    mock_pickle_load.return_value = 'object'
+
+    segment = TriSegment([0, 0], [0, 90], [90, 0])
+    tree = SegmentTree([segment], verbose=False)
+
+    mock_balltree.assert_called_once()
+
+    point_query = PointQuery(0, 0, 0)
+    tree.query_point(point_query)
+
+    tree.query_segment(segment)
+
+    # Test loading and saving
+    assert tree.save('output') is None
+    mock_open.assert_called_once_with('output', 'w+')
+    mock_pickle_dump.assert_called_once_with(tree, mock.ANY)
+
+    mock_open.reset_mock()
+
+    assert SegmentTree.load('input') == 'object'
+    mock_open.assert_called_once_with('input', 'r')
+    mock_pickle_load.assert_called_once()

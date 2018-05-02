@@ -36,6 +36,7 @@ setup(name='pdsc',
         'devel':  [
             'pytest',
             'pytest-cov',
+            'mock',
         ],
     }
 )
