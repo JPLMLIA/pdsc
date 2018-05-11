@@ -192,6 +192,59 @@ class FourCornerLocalizer(GeodesicLocalizer):
         ]) / float(self.n_rows*self.n_cols)
         return tuple(xyz2latlon(interpolated))
 
+class MapLocalizer(Localizer):
+
+    MARS_RADIUS_POLAR = 3376200
+    MARS_RADIUS_EQUATORIAL = 3396190
+
+    def __init__(self, proj_type, proj_latitude, proj_longitude,
+                 map_scale, row_offset, col_offset):
+        self.proj_type = proj_type
+        self.proj_latitude = np.deg2rad(proj_latitude)
+        self.proj_longitude = np.deg2rad(proj_longitude)
+        self.map_scale = map_scale
+        self.row_offset = row_offset
+        self.col_offset = col_offset
+
+        a = self.MARS_RADIUS_POLAR*np.cos(self.proj_latitude)
+        b = self.MARS_RADIUS_EQUATORIAL*np.sin(self.proj_latitude)
+        self.R = (
+            (self.MARS_RADIUS_POLAR*self.MARS_RADIUS_EQUATORIAL) /
+            np.sqrt(a**2 + b**2)
+        )
+        self.cos_proj_lat = np.cos(self.proj_latitude)
+
+    def _equirect_pixel_to_latlon(self, row, col):
+        x = (col - self.col_offset)*self.map_scale
+        y = -(row - self.row_offset)*self.map_scale
+        return (
+            np.rad2deg(y / self.R),
+            np.rad2deg(
+                self.proj_longitude + x / (self.R*self.cos_proj_lat)
+            )
+        )
+
+    def _equirect_latlon_to_pixel(self, lat, lon):
+        lat_rad = np.deg2rad(lat)
+        lon_rad = np.deg2rad(lon)
+        x = self.R*(lon_rad - self.proj_longitude)*self.cos_proj_lat
+        y = self.R*lat_rad
+        row = (-y / self.map_scale) + self.row_offset
+        col = (x / self.map_scale) + self.col_offset
+        return row, col
+
+    def pixel_to_latlon(self, row, col):
+        if self.proj_type == 'EQUIRECTANGULAR':
+            return self._equirect_pixel_to_latlon(row, col)
+        else:
+            raise ValueError('Unknown projection type "%s"' % self.proj_type)
+
+    def latlon_to_pixel(self, lat, lon):
+        if self.proj_type == 'EQUIRECTANGULAR':
+            return self._equirect_latlon_to_pixel(lat, lon)
+        else:
+            raise ValueError('Unknown projection type "%s"' % self.proj_type)
+
 @register_localizer('ctx')
 class CtxLocalizer(GeodesicLocalizer):
 
@@ -278,8 +331,7 @@ class HiRiseLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
-@register_localizer('hirise_rdr')
-class HiRiseRdrLocalizer(FourCornerLocalizer):
+class HiRiseRdrNoMapLocalizer(FourCornerLocalizer):
 
     DEFAULT_RESOLUTION_M = 1e-6
     NORMALIZED_PIXEL_SPACE = True
@@ -291,9 +343,31 @@ class HiRiseRdrLocalizer(FourCornerLocalizer):
             [metadata.corner3_latitude, metadata.corner3_longitude],
             [metadata.corner4_latitude, metadata.corner4_longitude],
         ])
-        super(HiRiseRdrLocalizer, self).__init__(
+        super(HiRiseRdrNoMapLocalizer, self).__init__(
             corners, 1.0, 1.0, 1
         )
+
+class HiRiseRdrLocalizer(MapLocalizer):
+
+    DEFAULT_RESOLUTION_M = 1e-6
+    NORMALIZED_PIXEL_SPACE = False
+
+    def __init__(self, metadata):
+        super(HiRiseRdrLocalizer, self).__init__(
+            metadata.map_projection_type,
+            metadata.projection_center_latitude,
+            metadata.projection_center_longitude,
+            metadata.map_scale,
+            metadata.line_projection_offset,
+            metadata.sample_projection_offset,
+        )
+
+@register_localizer('hirise_rdr')
+def hirise_rdr_localizer(metadata, nomap=False):
+    if nomap:
+        return HiRiseRdrNoMapLocalizer(metadata)
+    else:
+        return HiRiseRdrLocalizer(metadata)
 
 @register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):
@@ -312,9 +386,9 @@ class MocLocalizer(GeodesicLocalizer):
             flipped_na, -1
         )
 
-def get_localizer(metadata):
+def get_localizer(metadata, *args, **kwargs):
     if metadata.instrument not in LOCALIZERS:
         raise IndexError(
             'No localizer implemented for %s' % metadata.instrument)
 
-    return LOCALIZERS[metadata.instrument](metadata)
+    return LOCALIZERS[metadata.instrument](metadata, *args, **kwargs)
