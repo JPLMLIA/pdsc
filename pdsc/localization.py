@@ -362,12 +362,35 @@ class HiRiseRdrLocalizer(MapLocalizer):
             metadata.sample_projection_offset,
         )
 
+class HiRiseRdrBrowseLocalizer(HiRiseRdrLocalizer):
+
+    HIRISE_BROWSE_WIDTH = 2048
+
+    def __init__(self, metadata, browse_width):
+        super(HiRiseRdrBrowseLocalizer, self).__init__(metadata)
+        self.scale_factor = float(browse_width) / metadata.samples
+        if self.scale_factor <= 0:
+            raise ValueError('Invalid scale factor: %f' % self.scale_factor)
+
+    def pixel_to_latlon(self, row, col):
+        return super(HiRiseRdrBrowseLocalizer, self).pixel_to_latlon(
+            row / self.scale_factor, col / self.scale_factor
+        )
+
+    def latlon_to_pixel(self, lat, lon):
+        pix = super(HiRiseRdrBrowseLocalizer, self).latlon_to_pixel(lat, lon)
+        return pix[0]*self.scale_factor, pix[1]*self.scale_factor
+
 @register_localizer('hirise_rdr')
-def hirise_rdr_localizer(metadata, nomap=False):
+def hirise_rdr_localizer(metadata, nomap=False, browse=False,
+                         browse_width=HiRiseRdrBrowseLocalizer.HIRISE_BROWSE_WIDTH):
     if nomap:
         return HiRiseRdrNoMapLocalizer(metadata)
     else:
-        return HiRiseRdrLocalizer(metadata)
+        if browse:
+            return HiRiseRdrBrowseLocalizer(metadata, browse_width)
+        else:
+            return HiRiseRdrLocalizer(metadata)
 
 @register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):
