@@ -226,9 +226,35 @@ class MapLocalizer(Localizer):
 
     def _equirect_latlon_to_pixel(self, lat, lon):
         lat_rad = np.deg2rad(lat)
-        lon_rad = np.deg2rad(lon)
+        lon_rad = np.deg2rad(lon % 360.)
         x = self.R*(lon_rad - self.proj_longitude)*self.cos_proj_lat
         y = self.R*lat_rad
+        row = (-y / self.map_scale) + self.row_offset
+        col = (x / self.map_scale) + self.col_offset
+        return row, col
+
+    def _polar_pixel_to_latlon(self, row, col):
+        x = (col - self.col_offset)*self.map_scale
+        y = -(row - self.row_offset)*self.map_scale
+        P = np.sqrt(x**2 + y**2)
+        C = 2*np.arctan(P / (2*self.MARS_RADIUS_POLAR))
+        lon = np.rad2deg(
+            self.proj_longitude +
+            np.arctan2(x, -np.sign(self.proj_latitude)*y)
+        )
+        lat = np.rad2deg(np.arcsin(
+            np.cos(C)*np.sin(self.proj_latitude) +
+            y*np.sin(C)*np.cos(self.proj_latitude)/P
+        ))
+        return lat, lon
+
+    def _polar_latlon_to_pixel(self, lat, lon):
+        lat_rad = np.deg2rad(lat)
+        lon_rad = np.deg2rad(lon % 360.)
+        T = np.tan((np.pi / 4.0) - np.abs(lat_rad / 2.0))
+        A = 2*self.MARS_RADIUS_POLAR*T
+        x = A*np.sin(lon_rad - self.proj_longitude)
+        y = -A*np.cos(lon_rad - self.proj_longitude)*np.sign(self.proj_latitude)
         row = (-y / self.map_scale) + self.row_offset
         col = (x / self.map_scale) + self.col_offset
         return row, col
@@ -236,12 +262,16 @@ class MapLocalizer(Localizer):
     def pixel_to_latlon(self, row, col):
         if self.proj_type == 'EQUIRECTANGULAR':
             return self._equirect_pixel_to_latlon(row, col)
+        elif self.proj_type == 'POLAR STEREOGRAPHIC':
+            return self._polar_pixel_to_latlon(row, col)
         else:
             raise ValueError('Unknown projection type "%s"' % self.proj_type)
 
     def latlon_to_pixel(self, lat, lon):
         if self.proj_type == 'EQUIRECTANGULAR':
             return self._equirect_latlon_to_pixel(lat, lon)
+        elif self.proj_type == 'POLAR STEREOGRAPHIC':
+            return self._polar_latlon_to_pixel(lat, lon)
         else:
             raise ValueError('Unknown projection type "%s"' % self.proj_type)
 
