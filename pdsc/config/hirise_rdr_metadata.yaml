@@ -63,3 +63,5 @@ index:
 
 segmentation:
     resolution: 50000
+    localizer_kwargs:
+        nomap: True

@@ -183,10 +183,10 @@ class TriSegment(object):
 
 class SegmentedFootprint(object):
 
-    def __init__(self, metadata, resolution):
+    def __init__(self, metadata, resolution, localizer_kwargs):
         self.metadata = metadata
         self.resolution = resolution
-        self.localizer = get_localizer(metadata)
+        self.localizer = get_localizer(metadata, **localizer_kwargs)
         n_row_chunks = int(np.ceil(self.localizer.height / resolution))
         n_col_chunks = int(np.ceil(self.localizer.width / resolution))
         row_idx = np.linspace(0, self.localizer.n_rows, n_row_chunks + 1)

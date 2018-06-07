@@ -84,14 +84,16 @@ def store_metadata(outputfile, instrument, table, config):
         ]
 
 def store_segments(outputfile, metadata, config):
-    resolution = config.get('segmentation', {}).get('resolution', 50000)
+    seg_config = config.get('segmentation', {})
+    resolution = seg_config.get('resolution', 50000)
+    localizer_kwargs = seg_config.get('localizer_kwargs', {})
 
     observation_ids = []
     segments = []
     progress = standard_progress_bar('Segmenting footprints')
     for m in progress(metadata):
         try:
-            s = TriSegmentedFootprint(m, resolution)
+            s = TriSegmentedFootprint(m, resolution, localizer_kwargs)
             for si in s.segments:
                 segments.append(si)
                 observation_ids.append(s.metadata.observation_id)
