@@ -112,8 +112,13 @@ pipeline {
                 dir('gh-pages') {
                     sh("git add .")
                     sh("git diff --quiet --exit-code --cached || git commit -m 'publish documentation'")
-                    withCredentials([sshUserPrivateKey(credentialsId:'key_pdsc')]) {
-                        sh("git push origin gh-pages")
+                    withCredentials([sshUserPrivateKey(credentialsId: 'key_pdsc', keyFileVariable: 'GITHUB_KEY')]) {
+                        sh 'echo ssh -i $GITHUB_KEY -l git -o StrictHostKeyChecking=no \\"\\$@\\" > run_ssh.sh'
+                        sh 'chmod +x run_ssh.sh'
+                        withEnv(['GIT_SSH=run_ssh.sh']) {
+                            sh("git push origin gh-pages")
+                        }
+                        sh 'rm run_ssh.sh'
                     }
                 }
             }
