@@ -13,6 +13,18 @@ pipeline {
                         credentialsId: 'key_pdsc',
                         url: 'git@github-fn.jpl.nasa.gov:COSMIC/COSMIC_PDSC.git']]
                 ])
+                dir('gh-pages') {
+                    checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/gh-pages']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'key_pdsc',
+                        url: 'git@github-fn.jpl.nasa.gov:COSMIC/COSMIC_PDSC.git']]
+                    ])
+                }
             }
         }
         stage("Venv") {
