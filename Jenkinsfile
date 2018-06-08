@@ -110,15 +110,16 @@ pipeline {
                     reportTitles: ''])
                 sh("cp -r docs/_build/html/* gh-pages/")
                 dir('gh-pages') {
+                    sh("rm -f run_ssh.sh")
                     sh("git add .")
                     sh("git diff --quiet --exit-code --cached || git commit -m 'publish documentation'")
                     withCredentials([sshUserPrivateKey(credentialsId: 'key_pdsc', keyFileVariable: 'GITHUB_KEY')]) {
                         sh 'echo ssh -i $GITHUB_KEY -l git -o StrictHostKeyChecking=no \\"\\$@\\" > run_ssh.sh'
                         sh 'chmod +x run_ssh.sh'
-                        withEnv(['GIT_SSH=run_ssh.sh']) {
-                            sh("git push origin gh-pages")
+                        withEnv(['GIT_SSH=run_ssh.sh', 'PATH+CURRENTDIR=.']) {
+                            sh 'echo $PATH'
+                            sh 'git push origin HEAD:gh-pages'
                         }
-                        sh 'rm run_ssh.sh'
                     }
                 }
             }
