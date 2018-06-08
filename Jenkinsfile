@@ -117,7 +117,6 @@ pipeline {
                         sh 'echo ssh -i $GITHUB_KEY -l git -o StrictHostKeyChecking=no \\"\\$@\\" > run_ssh.sh'
                         sh 'chmod +x run_ssh.sh'
                         withEnv(['GIT_SSH=run_ssh.sh', 'PATH+CURRENTDIR=.']) {
-                            sh 'echo $PATH'
                             sh 'git push origin HEAD:gh-pages'
                         }
                     }
