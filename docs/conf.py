@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PDSC'
-copyright = u'2018, Jet Propulsion Laboratory, California Institute of Technology'
+copyright = u'2018, California Institute of Technology'
 author = u'Gary Doran'
 
 # The version info for the project you're documenting, acts as replacement for
