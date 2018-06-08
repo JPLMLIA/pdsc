@@ -108,6 +108,14 @@ pipeline {
                     reportFiles: 'index.html',
                     reportName: 'Documentation',
                     reportTitles: ''])
+                sshagent (credentials: ['key_pdsc']) {
+                    sh("cp -r docs/_build/html/* gh-pages/")
+                    dir('gh-pages') {
+                        sh("git add .")
+                        sh("git diff --quiet --exit-code --cached || git commit -m 'publish documentation'")
+                        sh("git push origin gh-pages")
+                    }
+                }
             }
         }
         stage('Post') {
