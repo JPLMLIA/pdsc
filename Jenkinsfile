@@ -61,6 +61,15 @@ pipeline {
                 '''
             }
         }
+        stage('Build Documentation') {
+            steps {
+                sh '''#!/bin/bash
+                    source venv_PDSC/bin/activate
+                    cd docs
+                    make html
+                '''
+            }
+        }
         stage('Publish') {
             steps {
                 publishHTML([
@@ -78,6 +87,14 @@ pipeline {
                     reportDir: 'test_reports/functional_coverage',
                     reportFiles: 'index.html',
                     reportName: 'Functional Test Coverage',
+                    reportTitles: ''])
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'docs/_build/html',
+                    reportFiles: 'index.html',
+                    reportName: 'Documentation',
                     reportTitles: ''])
             }
         }

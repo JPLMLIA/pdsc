@@ -37,6 +37,8 @@ setup(name='pdsc',
             'pytest',
             'pytest-cov',
             'mock',
+            'sphinx',
+            'sphinx_rtd_theme',
         ],
     }
 )
