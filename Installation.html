@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation and Setup &mdash; PDSC 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Running a Server" href="Server.html" />
+    <link rel="prev" title="PDSC: Planetary Data System Coincidences" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PDSC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PDSC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation and Setup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/Installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation-and-setup">
+<h1>Installation and Setup<a class="headerlink" href="#installation-and-setup" title="Permalink to this headline">¶</a></h1>
+<p>In addition to installing the Python package, there are several additional steps
+required for ingesting and building indices.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The recommended installation method is to use <code class="docutils literal notranslate"><span class="pre">pip</span></code> as follows from within the
+repository root directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">process</span><span class="o">-</span><span class="n">dependency</span><span class="o">-</span><span class="n">links</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--process-dependency-links</span></code> flag is needed to install <code class="xref py py-mod docutils literal notranslate"><span class="pre">PyPDS</span></code>,
+which follows a version numbering scheme incompatible with PyPI.</p>
+</div>
+<div class="section" id="ingesting-cumulative-indices">
+<h2>Ingesting Cumulative Indices<a class="headerlink" href="#ingesting-cumulative-indices" title="Permalink to this headline">¶</a></h2>
+<p>One of the two command-line tools installed with <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> is
+<code class="docutils literal notranslate"><span class="pre">pdsc_ingest</span></code>. This tool is used to ingest cumulative index files for PDS
+observations. The ingestion process constructs databases and index data
+structures to enable efficient querying of observations by metadata and
+geometry.</p>
+<p>By default, <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> supports ingesting cumulative index files from the
+following data products:</p>
+<blockquote>
+<div><ul class="simple">
+<li>CTX</li>
+<li>HiRISE (EDR) <a class="footnote-reference" href="#id3" id="id1">[1]</a></li>
+<li>HiRISE (RDR) <a class="footnote-reference" href="#id3" id="id2">[1]</a></li>
+<li>MOC</li>
+<li>THEMIS IR</li>
+<li>THEMIS VIS</li>
+</ul>
+</div></blockquote>
+<p>For information on extending PDSC to support other instruments, see
+<a class="reference internal" href="Extending.html#extending-pdsc"><span class="std std-ref">Extending PDSC</span></a>.</p>
+<p>As an example, the most recent cumulative index files for the HiRISE data
+products can be found here: <a class="reference external" href="https://hirise-pds.lpl.arizona.edu/PDS/INDEX/">https://hirise-pds.lpl.arizona.edu/PDS/INDEX/</a>.</p>
+<p>The cumulative index files for these instruments consist of a <code class="docutils literal notranslate"><span class="pre">.lbl</span></code> file and
+a <code class="docutils literal notranslate"><span class="pre">.tab</span></code> file. Both files must be present in the same directory, and either
+file can be specified when ingesting the index:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pdsc_ingest cumulative_index.lbl /path/to/generated/index/dir/
+</pre></div>
+</div>
+<p>It will be necessary to re-ingest new versions of the cumulative index files as
+new volumes of data are released.</p>
+</div>
+<div class="section" id="environment-variables">
+<h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>In order to use the ingested indices, several environment variables can be set
+to tell <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> where to look for the files or which server to query (see
+<a class="reference internal" href="Server.html#running-a-server"><span class="std std-ref">Running a Server</span></a>). The variables are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="32%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">PDSC_DATABASE_DIR</span></code></td>
+<td>Location of the ingested PDS cumulative indices</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">PDSC_SERVER_HOST</span></code></td>
+<td>Hostname or IP address of PDSC server</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">PDSC_SERVER_PORT</span></code></td>
+<td>Port of PDSC server</td>
+</tr>
+</tbody>
+</table>
+<p>If these environment variables are not set, they can be specified as arguments
+when constructing a client to query metadata.</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> There is a bug in the HiRISE cumulative index files; some values for the
+<code class="docutils literal notranslate"><span class="pre">SCAN_EXPOSURE_DURATION</span></code> column exceed the 9 bytes allocated for that
+column. The offending values should be modified to bring the data into
+accordance with the schema before attempting to ingest the index.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Server.html" class="btn btn-neutral float-right" title="Running a Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="PDSC: Planetary Data System Coincidences" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, California Institute of Technology.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

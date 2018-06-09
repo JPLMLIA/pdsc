@@ -27,7 +27,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation and Setup" href="Installation.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -80,13 +81,18 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">PDSC: Planetary Data System Coincidences</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-<li><a class="reference internal" href="#copyright">Copyright</a></li>
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#environment-variables">Environment Variables</a></li>
 </ul>
-</div>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
+</ul>
+
             
           
         </div>
@@ -151,20 +157,25 @@
             
   <div class="section" id="pdsc-planetary-data-system-coincidences">
 <h1>PDSC: Planetary Data System Coincidences<a class="headerlink" href="#pdsc-planetary-data-system-coincidences" title="Permalink to this headline">¶</a></h1>
-<p>This module allows ingesting/indexing and querying PDS data for the following
-information:</p>
-<blockquote>
-<div><ul class="simple">
-<li>Observation metadata</li>
-<li>Observations meeting some basic metadata constraints (e.g., within date
-range or latitude range)</li>
-<li>Localizing pixels within observations</li>
-<li>Observations of a given latitude/longitude (or within some radius of that
-location)</li>
-<li>Observations overlaping some other observation</li>
-</ul>
-</div></blockquote>
+<p>The purpose of this package is to allow quick querying via Python of remote
+sensing observations made of a particular location on the surface of a planetary
+body, or overlapping with another observation from any supported instrument.
+Incidentally, <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> also allows querying based on metadata and
+transforming between pixel and world coordinate systems. Currently, only several
+instruments from Mars orbiters are supported, but the system is designed to be
+extensible to other instruments and bodies.</p>
 <div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Installation.html#environment-variables">Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
+</ul>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -192,6 +203,13 @@ foreign countries or providing access to foreign persons.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Installation.html" class="btn btn-neutral float-right" title="Installation and Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
   
 
   <hr/>
@@ -239,7 +257,7 @@ foreign countries or providing access to foreign persons.</p>
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.Navigation.enable(false);
       });
   </script> 
 
