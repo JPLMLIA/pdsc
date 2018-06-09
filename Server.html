@@ -158,7 +158,26 @@
             
   <div class="section" id="running-a-server">
 <h1>Running a Server<a class="headerlink" href="#running-a-server" title="Permalink to this headline">¶</a></h1>
-<p>This section contains information about running a server to handle queries.</p>
+<p>PDSC currently supports two methods for querying observations: local queries and
+remote queries to a server over HTTP. The <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> package provides a
+command-line tool for running the server. It can be started as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pdsc_server -d /path/to/index/files --port [port] --socket_host [0.0.0.0]
+</pre></div>
+</div>
+<p>If no arguments are specified, the server will use the <code class="docutils literal notranslate"><span class="pre">PDSC_DATABASE_DIR</span></code>
+environment variable to determine the location of the index files. The defaul
+port is <code class="docutils literal notranslate"><span class="pre">7372</span></code> (“P-D-S-C” on a numeric keypad), and the default socket host is
+<code class="docutils literal notranslate"><span class="pre">0.0.0.0</span></code> (serve to all IP addresses).</p>
+<p>The <a class="reference internal" href="Installation.html#environment-variables"><span class="std std-ref">Environment Variables</span></a> section describes how to set environment
+variables that will allow Python clients to automaticaly identify the location
+and port of the PDSC server.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The PDSC server is not yet designed to be robust against malicious queries.
+While some care has been taken to properly parse arguments to avoid SQL
+injection attacks, for example, a thorough review of potential security
+vulnerabilities has not yet been performed.</p>
+</div>
 </div>
 
 
