@@ -1,43 +1,19 @@
-PDSC: PDS Coincidences
-======================
+PDSC: Planetary Data System Coincidences
+========================================
 
-This module allows ingesting/indexing and querying PDS data for the following
-information:
+The purpose of this package is to allow quick querying via Python of remote
+sensing observations made of a particular location on the surface of a
+planetary body, or overlapping with another observation from any supported
+instrument.  Incidentally, `pdsc` also allows querying based on metadata and
+transforming between pixel and world coordinate systems. Currently, only
+several instruments from Mars orbiters are supported, but the system is
+designed to be extensible to other instruments and bodies.
 
-  - Observation metadata
-  - Observations meeting some basic metadata constraints (e.g., within date
-    range or latitude range)
-  - Localizing pixels within observations
-  - Observations of a given latitude/longitude (or within some radius of that
-    location)
-  - Observations overlaping some other observation
+Please refer to the
+[documentation](https://github-fn.jpl.nasa.gov/pages/COSMIC/COSMIC_PDSC/) for
+instructions on installation, setup, and usage.
 
-# Ingesting Data
-
-In order to ingest new metadata, the following steps are required:
-
-1. Modify `determine_instrument` in `pds_table.py` to recognize the instrument
-name from the cumulative index label file
-
-2. Subclass `PdsTableColumn` and `PdsTable` to correctly parse the PDS table
-file
-
-3. Add the subclass of `PdsTable` to the `INSTRUMENT_TABLES` dictionary in
-`pds_table.py`
-
-4. Add a config file to the `config` directory matching the naming convention
-`[instrument name]_metadata.yaml`. This file maps table columns to metadata
-field names and also allows unit conversion, indexing of metadata fields, and
-specifying segmentation resolution
-
-5. Subclass `Localizer` in `localization.py`. For most cases, it is probably
-easiest to subclass the `GeodesicLocalizer`
-
-6. Add the localizer subclass to the `LOCALIZERS` table in `localization.py`
-
-7. Run the following: `python ingest.py [cumulative index file] [output directory]`
-
-# Copyright
+---
 
 Copyright 2018, by the California Institute of Technology. ALL RIGHTS RESERVED.
 United States Government Sponsorship acknowledged. Any commercial use must be

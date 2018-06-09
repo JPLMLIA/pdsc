@@ -1,19 +1,21 @@
 PDSC: Planetary Data System Coincidences
 ========================================
 
-This module allows ingesting/indexing and querying PDS data for the following
-information:
-
-  - Observation metadata
-  - Observations meeting some basic metadata constraints (e.g., within date
-    range or latitude range)
-  - Localizing pixels within observations
-  - Observations of a given latitude/longitude (or within some radius of that
-    location)
-  - Observations overlaping some other observation
+The purpose of this package is to allow quick querying via Python of remote
+sensing observations made of a particular location on the surface of a planetary
+body, or overlapping with another observation from any supported instrument.
+Incidentally, :py:mod:`pdsc` also allows querying based on metadata and
+transforming between pixel and world coordinate systems. Currently, only several
+instruments from Mars orbiters are supported, but the system is designed to be
+extensible to other instruments and bodies.
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 3
+  :caption: Contents
+
+  Installation
+  Server
+  Extending
 
 Indices and tables
 ==================
