@@ -100,14 +100,6 @@ pipeline {
                     reportFiles: 'index.html',
                     reportName: 'Functional Test Coverage',
                     reportTitles: ''])
-                publishHTML([
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: false,
-                    keepAll: false,
-                    reportDir: 'docs/_build/html',
-                    reportFiles: 'index.html',
-                    reportName: 'Documentation',
-                    reportTitles: ''])
                 sh("cp -r docs/_build/html/* gh-pages/")
                 dir('gh-pages') {
                     sh("rm -f run_ssh.sh")
