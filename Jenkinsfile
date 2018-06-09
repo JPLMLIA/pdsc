@@ -18,7 +18,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/gh-pages']],
                     doGenerateSubmoduleConfigurations: false,
-                    extensions: [],
+                    extensions: [[$class: 'MessageExclusion', excludedMessage: '.*publish documentation.*']],
                     submoduleCfg: [],
                     userRemoteConfigs: [[
                         credentialsId: 'key_pdsc',
