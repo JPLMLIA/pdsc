@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+"""
+Injests PDS metadata into databases and index structures for quick querying
+"""
 from __future__ import print_function
-"""
-Injests PDS metadata into database for quick querying
-"""
 import os
 import yaml
 import sqlite3
@@ -26,6 +26,22 @@ CUMIDX_EXT_PAIRS = (
 )
 
 def get_idx_file_pair(path):
+    """
+    Returns the pair of corresponding LBL and TAB files given the path to one
+    file of the pair. The case of the extension does not matter as long as it is
+    consitent (i.e., all upper-case or all lower-case). The corresponding case
+    and path prefix is assumed for the matching file.
+
+    >>> get_idx_file_pair('cumindex.lbl')
+    ('cumindex.lbl', 'cumindex.tab')
+    >>> get_idx_file_pair('CUMINDEX.TAB')
+    ('CUMINDEX.LBL', 'CUMINDEX.TAB')
+
+    :param path:
+        path to one LBL or TAB file from a pair
+
+    :return: a pair of paths to corresponding LBL and TAB files
+    """
     for l_ext, t_ext in CUMIDX_EXT_PAIRS:
         if path.endswith(l_ext):
             return (
@@ -130,6 +146,16 @@ def store_segments(outputfile, metadata, config):
     return segments
 
 def store_segment_tree(outputfile, segments):
+    """
+    Constructs a ball tree index for segmented observations and saves the
+    resulting data structure to the specified output file.
+
+    :param outputfile:
+        file to save pickled :class:`pdsc.segment.SegmentTree`
+
+    :param segments:
+        a collection of :class:`pdsc.segment.TriSegment` objects
+    """
     tree = SegmentTree(segments)
     tree.save(outputfile)
 

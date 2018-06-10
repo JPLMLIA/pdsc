@@ -1,7 +1,7 @@
-from __future__ import print_function
 """
 Decomposes an observation footprint into triangular segments
 """
+from __future__ import print_function
 import pickle
 import numpy as np
 from sklearn.neighbors import BallTree
@@ -74,8 +74,24 @@ class SegmentTree(object):
             return pickle.load(f)
 
 class TriSegment(object):
+    """
+    Represent a single triangular segment into which observations are decomposed
+    for indexing and efficient querying.
+    """
 
     def __init__(self, latlon0, latlon1, latlon2):
+        """
+        The three points of the triangular segment are enumerated in
+        *counterclockwise* order looking down on the surface. Each point is a
+        pair of (latitude, longitude) in degrees (east longitude).
+
+        :param latlon0:
+            represents the first point (index 0) in a triangular segment
+        :param latlon1:
+            represents the second point (index 1) in a triangular segment
+        :param latlon2:
+            represents the third point (index 2) in a triangular segment
+        """
         self.latlon_points = np.array([latlon0, latlon1, latlon2])
         self._center_longitude = None
         self._center_latitude = None
