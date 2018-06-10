@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pdsc.ingest &mdash; PDSC 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PDSC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#environment-variables">Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Extending.html">Extending PDSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Modules.html">Module Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PDSC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pdsc.ingest</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pdsc.ingest</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Injests PDS metadata into databases and index structures for quick querying</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="kn">from</span> <span class="nn">.table</span> <span class="k">import</span> <span class="n">parse_table</span>
+<span class="kn">from</span> <span class="nn">.metadata</span> <span class="k">import</span> <span class="n">PdsMetadata</span><span class="p">,</span> <span class="n">METADATA_DB_SUFFIX</span>
+<span class="kn">from</span> <span class="nn">.segment</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">SEGMENT_DB_SUFFIX</span><span class="p">,</span> <span class="n">SEGMENT_TREE_SUFFIX</span><span class="p">,</span>
+    <span class="n">TriSegmentedFootprint</span><span class="p">,</span> <span class="n">SegmentTree</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">standard_progress_bar</span>
+
+<span class="n">DEFAULT_CONFIG_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+    <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">CUMIDX_EXT_PAIRS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="c1"># Label File, Table File</span>
+    <span class="p">(</span><span class="s1">&#39;LBL&#39;</span><span class="p">,</span> <span class="s1">&#39;TAB&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;lbl&#39;</span><span class="p">,</span> <span class="s1">&#39;tab&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="get_idx_file_pair"><a class="viewcode-back" href="../../Modules.html#pdsc.ingest.get_idx_file_pair">[docs]</a><span class="k">def</span> <span class="nf">get_idx_file_pair</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the pair of corresponding LBL and TAB files given the path to one</span>
+<span class="sd">    file of the pair. The case of the extension does not matter as long as it is</span>
+<span class="sd">    consitent (i.e., all upper-case or all lower-case). The corresponding case</span>
+<span class="sd">    and path prefix is assumed for the matching file.</span>
+
+<span class="sd">    &gt;&gt;&gt; get_idx_file_pair(&#39;cumindex.lbl&#39;)</span>
+<span class="sd">    (&#39;cumindex.lbl&#39;, &#39;cumindex.tab&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; get_idx_file_pair(&#39;CUMINDEX.TAB&#39;)</span>
+<span class="sd">    (&#39;CUMINDEX.LBL&#39;, &#39;CUMINDEX.TAB&#39;)</span>
+
+<span class="sd">    :param path:</span>
+<span class="sd">        path to one LBL or TAB file from a pair</span>
+
+<span class="sd">    :return: a pair of paths to corresponding LBL and TAB files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">l_ext</span><span class="p">,</span> <span class="n">t_ext</span> <span class="ow">in</span> <span class="n">CUMIDX_EXT_PAIRS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">l_ext</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span>
+                <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">l_ext</span><span class="p">)]</span> <span class="o">+</span> <span class="n">t_ext</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">t_ext</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">t_ext</span><span class="p">)]</span> <span class="o">+</span> <span class="n">l_ext</span><span class="p">,</span>
+                <span class="n">path</span>
+            <span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot; not part of any known index pair&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">store_metadata</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">scale_factors</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale_factors&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;columns&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scale_factors</span> <span class="k">else</span>
+        <span class="n">scale_factors</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="n">table</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span>
+    <span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outputfile</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s1">&#39;CREATE TABLE metadata (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+            <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">])</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx_col</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating index on &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">idx_col</span><span class="p">)</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="s1">&#39;CREATE INDEX </span><span class="si">%s</span><span class="s1">_index ON metadata (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">idx_col</span><span class="p">,</span> <span class="n">idx_col</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
+            <span class="s1">&#39;INSERT INTO metadata VALUES (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+            <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]),</span>
+            <span class="n">values</span>
+        <span class="p">)</span>
+
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM metadata&#39;</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">description</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+
+        <span class="n">progress</span> <span class="o">=</span> <span class="n">standard_progress_bar</span><span class="p">(</span><span class="s1">&#39;Converting Metadata&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">PdsMetadata</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">v</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">())</span>
+        <span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">store_segments</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">seg_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;segmentation&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">resolution</span> <span class="o">=</span> <span class="n">seg_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;resolution&#39;</span><span class="p">,</span> <span class="mi">50000</span><span class="p">)</span>
+    <span class="n">localizer_kwargs</span> <span class="o">=</span> <span class="n">seg_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;localizer_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">observation_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">standard_progress_bar</span><span class="p">(</span><span class="s1">&#39;Segmenting footprints&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">(</span><span class="n">metadata</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">TriSegmentedFootprint</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">localizer_kwargs</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">si</span><span class="p">)</span>
+                <span class="n">observation_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">observation_id</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+    <span class="n">segment_generator</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">oid</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">latlon_points</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">si</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">observation_ids</span><span class="p">,</span> <span class="n">segments</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outputfile</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s1">&#39;CREATE TABLE segments (segment_id integer, &#39;</span>
+            <span class="s1">&#39;observation_id text, &#39;</span>
+            <span class="s1">&#39;latitude0 real, longitude0 real, &#39;</span>
+            <span class="s1">&#39;latitude1 real, longitude1 real, &#39;</span>
+            <span class="s1">&#39;latitude2 real, longitude2 real)&#39;</span>
+        <span class="p">)</span>
+
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX segment_index ON segments (segment_id)&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX observation_index ON segments (observation_id)&#39;</span><span class="p">)</span>
+
+        <span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
+            <span class="s1">&#39;INSERT INTO segments VALUES (?, ?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
+            <span class="n">segment_generator</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">segments</span>
+
+<div class="viewcode-block" id="store_segment_tree"><a class="viewcode-back" href="../../Modules.html#pdsc.ingest.store_segment_tree">[docs]</a><span class="k">def</span> <span class="nf">store_segment_tree</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs a ball tree index for segmented observations and saves the</span>
+<span class="sd">    resulting data structure to the specified output file.</span>
+
+<span class="sd">    :param outputfile:</span>
+<span class="sd">        file to save pickled :class:`pdsc.segment.SegmentTree`</span>
+
+<span class="sd">    :param segments:</span>
+<span class="sd">        a collection of :class:`pdsc.segment.TriSegment` objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">SegmentTree</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">ingest_idx</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="n">table_file</span><span class="p">,</span> <span class="n">configdir</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">):</span>
+    <span class="n">instrument</span><span class="p">,</span> <span class="n">table</span> <span class="o">=</span> <span class="n">parse_table</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="n">table_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">configdir</span><span class="p">):</span>
+        <span class="n">configfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">configdir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_metadata.yaml&#39;</span> <span class="o">%</span> <span class="n">instrument</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">configfile</span> <span class="o">=</span> <span class="n">configdir</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">configfile</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Required config file &quot;</span><span class="si">%s</span><span class="s1">&quot; does not exist&#39;</span> <span class="o">%</span>
+            <span class="n">configfile</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">configfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">METADATA_DB_SUFFIX</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">store_metadata</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">SEGMENT_DB_SUFFIX</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">segments</span> <span class="o">=</span> <span class="n">store_segments</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">outputdir</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">SEGMENT_TREE_SUFFIX</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">store_segment_tree</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">segments</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, California Institute of Technology.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

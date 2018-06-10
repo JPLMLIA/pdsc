@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Running a Server &mdash; PDSC 1.0 documentation</title>
+  <title>Python Module Index &mdash; PDSC 1.0 documentation</title>
   
 
   
@@ -28,8 +28,9 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Extending PDSC" href="Extending.html" />
-    <link rel="prev" title="Installation and Setup" href="Installation.html" /> 
+ 
+
+
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -83,14 +84,14 @@
             
             
               <p class="caption"><span class="caption-text">Contents</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Setup</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="Installation.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Installation.html#environment-variables">Environment Variables</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Modules.html">Module Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
@@ -143,14 +144,10 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Running a Server</li>
+      <li>Python Module Index</li>
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/Server.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -162,44 +159,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="running-a-server">
-<h1>Running a Server<a class="headerlink" href="#running-a-server" title="Permalink to this headline">¶</a></h1>
-<p>PDSC currently supports two methods for querying observations: local queries and
-remote queries to a server over HTTP. The <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> package provides a
-command-line tool for running the server. It can be started as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pdsc_server -d /path/to/index/files --port [port] --socket_host [0.0.0.0]
-</pre></div>
-</div>
-<p>If no arguments are specified, the server will use the <code class="docutils literal notranslate"><span class="pre">PDSC_DATABASE_DIR</span></code>
-environment variable to determine the location of the index files. The defaul
-port is <code class="docutils literal notranslate"><span class="pre">7372</span></code> (“P-D-S-C” on a numeric keypad), and the default socket host is
-<code class="docutils literal notranslate"><span class="pre">0.0.0.0</span></code> (serve to all IP addresses).</p>
-<p>The <a class="reference internal" href="Installation.html#environment-variables"><span class="std std-ref">Environment Variables</span></a> section describes how to set environment
-variables that will allow Python clients to automaticaly identify the location
-and port of the PDSC server.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">The PDSC server is not yet designed to be robust against malicious queries.
-While some care has been taken to properly parse arguments to avoid SQL
-injection attacks, for example, a thorough review of potential security
-vulnerabilities has not yet been performed.</p>
-</div>
-</div>
+
+   <h1>Python Module Index</h1>
+
+   <div class="modindex-jumpbox">
+   <a href="#cap-p"><strong>p</strong></a>
+   </div>
+
+   <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-p"><td></td><td>
+       <strong>p</strong></td><td></td></tr>
+     <tr>
+       <td><img src="_static/minus.png" class="toggler"
+              id="toggle-1" style="display: none" alt="-" /></td>
+       <td>
+       <code class="xref">pdsc</code></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="Modules.html#module-pdsc.client"><code class="xref">pdsc.client</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="Modules.html#module-pdsc.ingest"><code class="xref">pdsc.ingest</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="Modules.html#module-pdsc.segment"><code class="xref">pdsc.segment</code></a></td><td>
+       <em></em></td></tr>
+   </table>
 
 
            </div>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="Extending.html" class="btn btn-neutral float-right" title="Extending PDSC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="Installation.html" class="btn btn-neutral" title="Installation and Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

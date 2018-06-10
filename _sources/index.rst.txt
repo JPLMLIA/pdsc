@@ -16,6 +16,7 @@ extensible to other instruments and bodies.
   Installation
   Server
   Extending
+  Modules
 
 Indices and tables
 ==================
