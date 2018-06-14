@@ -414,7 +414,29 @@
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">segments</span>
 
-    <span class="k">def</span> <span class="nf">find_observations_of_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="PdsClient.find_observations_of_latlon"><a class="viewcode-back" href="../../Modules.html#pdsc.client.PdsClient.find_observations_of_latlon">[docs]</a>    <span class="k">def</span> <span class="nf">find_observations_of_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find observations from a particular instrument that fall within a</span>
+<span class="sd">        radius of the given location.</span>
+
+<span class="sd">        :param instrument:</span>
+<span class="sd">            PDSC instrument name</span>
+
+<span class="sd">        :param lat: degrees latitude</span>
+<span class="sd">        :param lon: degrees east longitude</span>
+<span class="sd">        :param radius: query tolerance in meters</span>
+
+<span class="sd">        :return: a list of observation ids corresponding to observations within</span>
+<span class="sd">            ``radius`` of the given location</span>
+
+<span class="sd">        &gt;&gt;&gt; import pdsc</span>
+<span class="sd">        &gt;&gt;&gt; client = pdsc.PdsClient()</span>
+<span class="sd">        &gt;&gt;&gt; observation_ids = client.find_observations_of_latlon(</span>
+<span class="sd">        ...     &#39;hirise_rdr&#39;, -4.5, 137.4, radius=0</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; observation_ids # doctest: +ELLIPSIS</span>
+<span class="sd">        [u&#39;ESP_018854_1755&#39;, u&#39;ESP_018920_1755&#39;, ..., u&#39;PSP_010639_1755&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">instrument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">)</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seg_tree</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">PointQuery</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
@@ -427,10 +449,29 @@
             <span class="k">if</span> <span class="n">seg</span><span class="o">.</span><span class="n">includes_point</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
                 <span class="n">overlapping_observations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">observation_id</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">overlapping_observations</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">overlapping_observations</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">find_overlapping_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_id</span><span class="p">,</span>
+<div class="viewcode-block" id="PdsClient.find_overlapping_observations"><a class="viewcode-back" href="../../Modules.html#pdsc.client.PdsClient.find_overlapping_observations">[docs]</a>    <span class="k">def</span> <span class="nf">find_overlapping_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_id</span><span class="p">,</span>
             <span class="n">other_instrument</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find observations from ``other_instrument`` that overlap observations</span>
+<span class="sd">        with the given ``observation_id`` from ``instrument``.</span>
+
+<span class="sd">        :param instrument: PDSC instrument name for query observation</span>
+<span class="sd">        :param observation_id: query observation id</span>
+<span class="sd">        :param other_instrument: PDSC instrument name for target instrument</span>
+
+<span class="sd">        :return: a list of observation ids corresponding to observations</span>
+<span class="sd">            overlapping the given observation</span>
+
+<span class="sd">        &gt;&gt;&gt; import pdsc</span>
+<span class="sd">        &gt;&gt;&gt; client = pdsc.PdsClient()</span>
+<span class="sd">        &gt;&gt;&gt; observation_ids = client.find_overlapping_observations(</span>
+<span class="sd">        ...     &#39;ctx&#39;, &#39;P09_004477_1906_XN_10N100W&#39;, &#39;hirise_rdr&#39;</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; observation_ids # doctest: +ELLIPSIS</span>
+<span class="sd">        [u&#39;ESP_015909_1890&#39;, u&#39;ESP_016832_1885&#39;, ..., u&#39;PSP_007246_1890&#39;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">other_instrument</span><span class="p">):</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">)</span>
@@ -446,11 +487,25 @@
                 <span class="k">if</span> <span class="n">seg</span><span class="o">.</span><span class="n">overlaps_segment</span><span class="p">(</span><span class="n">other_seg</span><span class="p">):</span>
                     <span class="n">overlapping_observations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">other_oid</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">overlapping_observations</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">overlapping_observations</span><span class="p">)</span></div></div>
 
-<span class="k">class</span> <span class="nc">PdsHttpClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PdsHttpClient"><a class="viewcode-back" href="../../Modules.html#pdsc.client.PdsHttpClient">[docs]</a><span class="k">class</span> <span class="nc">PdsHttpClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`PdsHttpClient` class handles queries to a remote PDSC</span>
+<span class="sd">    database over HTTP for looking up observations based on id or location.</span>
+
+<span class="sd">    The interface for :py:class:`PdsHttpClient` is the same as for</span>
+<span class="sd">    :py:class:`PdsClient`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param host:</span>
+<span class="sd">            the hostname of the :py:class:`PdsServer` to query</span>
+
+<span class="sd">        :param port:</span>
+<span class="sd">            the port to use for queries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PORT_VAR</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -521,7 +576,7 @@
         <span class="p">}</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span></div>
 </pre></div>
 
            </div>

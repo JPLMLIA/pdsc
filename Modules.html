@@ -232,6 +232,73 @@ database directory</td>
 </tbody>
 </table>
 <dl class="method">
+<dt id="pdsc.client.PdsClient.find_observations_of_latlon">
+<code class="descname">find_observations_of_latlon</code><span class="sig-paren">(</span><em>instrument</em>, <em>lat</em>, <em>lon</em>, <em>radius=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsClient.find_observations_of_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsClient.find_observations_of_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find observations from a particular instrument that fall within a
+radius of the given location.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>lat</strong> – degrees latitude</li>
+<li><strong>lon</strong> – degrees east longitude</li>
+<li><strong>radius</strong> – query tolerance in meters</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of observation ids corresponding to observations within
+<code class="docutils literal notranslate"><span class="pre">radius</span></code> of the given location</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdsc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">pdsc</span><span class="o">.</span><span class="n">PdsClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">find_observations_of_latlon</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;hirise_rdr&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">137.4</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">0</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> 
+<span class="go">[u&#39;ESP_018854_1755&#39;, u&#39;ESP_018920_1755&#39;, ..., u&#39;PSP_010639_1755&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.client.PdsClient.find_overlapping_observations">
+<code class="descname">find_overlapping_observations</code><span class="sig-paren">(</span><em>instrument</em>, <em>observation_id</em>, <em>other_instrument</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsClient.find_overlapping_observations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsClient.find_overlapping_observations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find observations from <code class="docutils literal notranslate"><span class="pre">other_instrument</span></code> that overlap observations
+with the given <code class="docutils literal notranslate"><span class="pre">observation_id</span></code> from <code class="docutils literal notranslate"><span class="pre">instrument</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name for query observation</li>
+<li><strong>observation_id</strong> – query observation id</li>
+<li><strong>other_instrument</strong> – PDSC instrument name for target instrument</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of observation ids corresponding to observations
+overlapping the given observation</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdsc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">pdsc</span><span class="o">.</span><span class="n">PdsClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">find_overlapping_observations</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;ctx&#39;</span><span class="p">,</span> <span class="s1">&#39;P09_004477_1906_XN_10N100W&#39;</span><span class="p">,</span> <span class="s1">&#39;hirise_rdr&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> 
+<span class="go">[u&#39;ESP_015909_1890&#39;, u&#39;ESP_016832_1885&#39;, ..., u&#39;PSP_007246_1890&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="pdsc.client.PdsClient.query">
 <code class="descname">query</code><span class="sig-paren">(</span><em>instrument</em>, <em>conditions=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsClient.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsClient.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supports a generic query of observations based on metadata</p>
@@ -325,6 +392,27 @@ observation, os a single observation id might correspond to multiple
 </div>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.client.PdsHttpClient">
+<em class="property">class </em><code class="descclassname">pdsc.client.</code><code class="descname">PdsHttpClient</code><span class="sig-paren">(</span><em>host=None</em>, <em>port=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsHttpClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsHttpClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.client.PdsHttpClient" title="pdsc.client.PdsHttpClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsHttpClient</span></code></a> class handles queries to a remote PDSC
+database over HTTP for looking up observations based on id or location.</p>
+<p>The interface for <a class="reference internal" href="#pdsc.client.PdsHttpClient" title="pdsc.client.PdsHttpClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsHttpClient</span></code></a> is the same as for
+<a class="reference internal" href="#pdsc.client.PdsClient" title="pdsc.client.PdsClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsClient</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> – the hostname of the <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsServer</span></code> to query</li>
+<li><strong>port</strong> – the port to use for queries</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
