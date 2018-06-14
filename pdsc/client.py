@@ -254,6 +254,28 @@ class PdsClient(object):
         return segments
 
     def find_observations_of_latlon(self, instrument, lat, lon, radius=0):
+        """
+        Find observations from a particular instrument that fall within a
+        radius of the given location.
+
+        :param instrument:
+            PDSC instrument name
+
+        :param lat: degrees latitude
+        :param lon: degrees east longitude
+        :param radius: query tolerance in meters
+
+        :return: a list of observation ids corresponding to observations within
+            ``radius`` of the given location
+
+        >>> import pdsc
+        >>> client = pdsc.PdsClient()
+        >>> observation_ids = client.find_observations_of_latlon(
+        ...     'hirise_rdr', -4.5, 137.4, radius=0
+        ... )
+        >>> observation_ids # doctest: +ELLIPSIS
+        [u'ESP_018854_1755', u'ESP_018920_1755', ..., u'PSP_010639_1755']
+        """
         assert(instrument in self._seg_files)
         tree = self._get_seg_tree(instrument)
         point = PointQuery(lat, lon, radius)
@@ -270,6 +292,25 @@ class PdsClient(object):
 
     def find_overlapping_observations(self, instrument, observation_id,
             other_instrument):
+        """
+        Find observations from ``other_instrument`` that overlap observations
+        with the given ``observation_id`` from ``instrument``.
+
+        :param instrument: PDSC instrument name for query observation
+        :param observation_id: query observation id
+        :param other_instrument: PDSC instrument name for target instrument
+
+        :return: a list of observation ids corresponding to observations
+            overlapping the given observation
+
+        >>> import pdsc
+        >>> client = pdsc.PdsClient()
+        >>> observation_ids = client.find_overlapping_observations(
+        ...     'ctx', 'P09_004477_1906_XN_10N100W', 'hirise_rdr'
+        ... )
+        >>> observation_ids # doctest: +ELLIPSIS
+        [u'ESP_015909_1890', u'ESP_016832_1885', ..., u'PSP_007246_1890']
+        """
 
         for i in (instrument, other_instrument):
             assert(i in self._seg_files)
@@ -288,8 +329,22 @@ class PdsClient(object):
         return sorted(overlapping_observations)
 
 class PdsHttpClient(object):
+    """
+    The :py:class:`PdsHttpClient` class handles queries to a remote PDSC
+    database over HTTP for looking up observations based on id or location.
+
+    The interface for :py:class:`PdsHttpClient` is the same as for
+    :py:class:`PdsClient`.
+    """
 
     def __init__(self, host=None, port=None):
+        """
+        :param host:
+            the hostname of the :py:class:`PdsServer` to query
+
+        :param port:
+            the port to use for queries
+        """
         if port is None:
             port = os.environ.get(PORT_VAR, None)
             if port is not None:
