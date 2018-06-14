@@ -1,5 +1,7 @@
 """
-Client class to query metadata and localization
+This module contains code to support various types of clients that can be used
+to query PDSC for metadata or find observations coincident with a point on the
+surface or another point.
 """
 import os
 import json
@@ -17,8 +19,18 @@ SERVER_VAR = 'PDSC_SERVER_HOST'
 PORT_VAR = 'PDSC_SERVER_PORT'
 
 class PdsClient(object):
+    """
+    The :py:class:`PdsClient` class handles queries to a local PDSC database for
+    looking up observations based on id or location
+    """
 
     def __init__(self, database_directory=None):
+        """
+        :param database_directory:
+            location of the PDSC databases; if ``None``, the
+            ``PDSC_DATABASE_DIR`` environment variable is used to determine the
+            database directory
+        """
         if database_directory is None:
             database_directory = os.environ.get(DATABASE_DIRECTORY_VAR, None)
 
@@ -111,6 +123,37 @@ class PdsClient(object):
                 yield PdsMetadata(instrument, **valdict)
 
     def query(self, instrument, conditions=None):
+        """
+        Supports a generic query of observations based on metadata
+
+        :param instrument:
+            PDSC instrument name
+
+        :param conditions:
+            a collection of tuples indicating query constraints; each tuple
+            should contain three entries:
+
+              - metadata variable name
+              - comparator (``'='``, ``'<'``, ``'>'``, ``'<='``, ``'>='``)
+              - value
+
+            A SQL-like query will be performed with a logical AND of the
+            specified conditions
+
+        :return: a list of :py:class:`PdsMetadata` objects corresponding to
+                 obervations matching the specified query conditions
+
+        >>> import pdsc
+        >>> client = pdsc.PdsClient()
+        >>> metadata = client.query('hirise_rdr', [
+        ...     ('corner1_latitude', '>', -0.5),
+        ...     ('corner1_latitude', '<',  0.5)
+        ... ])
+
+        .. Warning::
+            This function currently assumes non-adversarial inputs; the current
+            implementation allows a potential SQL injection attack.
+        """
         return list(self._query(instrument, conditions))
 
     def query_by_observation_id(self, instrument, observation_ids):

@@ -67,10 +67,16 @@ pipeline {
         }
         stage('Documentation Tests') {
             steps {
-                sh '''#!/bin/bash
-                    source venv_PDSC/bin/activate
-                    pytest -c test/doctest.cfg
-                '''
+                withEnv([
+                    'PDSC_DATABASE_DIR=/data/users/gdoran/pdsc_indices',
+                    'PDSC_SERVER_HOST=localhost',
+                    'PDSC_SERVER_PORT=7372'
+                ]) {
+                    sh '''#!/bin/bash
+                        source venv_PDSC/bin/activate
+                        pytest -c test/doctest.cfg
+                    '''
+                }
             }
         }
         stage('Build Documentation') {
