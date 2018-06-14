@@ -141,7 +141,7 @@ class PdsClient(object):
             specified conditions
 
         :return: a list of :py:class:`PdsMetadata` objects corresponding to
-                 obervations matching the specified query conditions
+                 observations matching the specified query conditions
 
         >>> import pdsc
         >>> client = pdsc.PdsClient()
@@ -157,6 +157,41 @@ class PdsClient(object):
         return list(self._query(instrument, conditions))
 
     def query_by_observation_id(self, instrument, observation_ids):
+        """
+        Query observation matching any of the specified ``observation_ids``
+
+        :param instrument:
+            PDSC instrument name
+
+        :param observation_ids:
+            either a collection of observation ids, or a single observation id
+
+        :return: a list of :py:class:`PdsMetadata` objects corresponding to
+                 observations matching the specified observation_id
+
+        >>> import pdsc
+        >>> client = pdsc.PdsClient()
+        >>> metadata = client.query_by_observation_id(
+        ...     'hirise_rdr', 'PSP_005423_1780'
+        ... )
+        >>> len(metadata)
+        2
+        >>> metadata[0].product_id
+        u'PSP_005423_1780_COLOR'
+        >>> metadata[1].product_id
+        u'PSP_005423_1780_RED'
+
+        >>> metadata = client.query_by_observation_id(
+        ...     'hirise_rdr', ['PSP_010341_1775', 'PSP_010486_1775']
+        ... )
+        >>> len(metadata)
+        4
+
+        .. Note::
+            Some instruments generate multiple data products per
+            observation, os a single observation id might correspond to multiple
+            :py:class:`PdsMetadata` objects for each data product.
+        """
         if instrument not in self.instruments:
             raise ValueError('Instrument "%s" not found' % instrument)
 
