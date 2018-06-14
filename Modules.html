@@ -213,7 +213,120 @@ resulting data structure to the specified output file.</p>
 </div>
 <div class="section" id="module-pdsc.client">
 <span id="pdsc-client"></span><h2><a class="reference internal" href="#module-pdsc.client" title="pdsc.client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.client</span></code></a><a class="headerlink" href="#module-pdsc.client" title="Permalink to this headline">¶</a></h2>
-<p>Client class to query metadata and localization</p>
+<p>This module contains code to support various types of clients that can be used
+to query PDSC for metadata or find observations coincident with a point on the
+surface or another point.</p>
+<dl class="class">
+<dt id="pdsc.client.PdsClient">
+<em class="property">class </em><code class="descclassname">pdsc.client.</code><code class="descname">PdsClient</code><span class="sig-paren">(</span><em>database_directory=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.client.PdsClient" title="pdsc.client.PdsClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsClient</span></code></a> class handles queries to a local PDSC database for
+looking up observations based on id or location</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>database_directory</strong> – location of the PDSC databases; if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the
+<code class="docutils literal notranslate"><span class="pre">PDSC_DATABASE_DIR</span></code> environment variable is used to determine the
+database directory</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pdsc.client.PdsClient.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>instrument</em>, <em>conditions=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsClient.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsClient.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supports a generic query of observations based on metadata</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>conditions</strong> – <p>a collection of tuples indicating query constraints; each tuple
+should contain three entries:</p>
+<blockquote>
+<div><ul>
+<li>metadata variable name</li>
+<li>comparator (<code class="docutils literal notranslate"><span class="pre">'='</span></code>, <code class="docutils literal notranslate"><span class="pre">'&lt;'</span></code>, <code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code>, <code class="docutils literal notranslate"><span class="pre">'&lt;='</span></code>, <code class="docutils literal notranslate"><span class="pre">'&gt;='</span></code>)</li>
+<li>value</li>
+</ul>
+</div></blockquote>
+<p>A SQL-like query will be performed with a logical AND of the
+specified conditions</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects corresponding to
+observations matching the specified query conditions</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdsc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">pdsc</span><span class="o">.</span><span class="n">PdsClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;hirise_rdr&#39;</span><span class="p">,</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s1">&#39;corner1_latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s1">&#39;corner1_latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>  <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function currently assumes non-adversarial inputs; the current
+implementation allows a potential SQL injection attack.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.client.PdsClient.query_by_observation_id">
+<code class="descname">query_by_observation_id</code><span class="sig-paren">(</span><em>instrument</em>, <em>observation_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/client.html#PdsClient.query_by_observation_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.client.PdsClient.query_by_observation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query observation matching any of the specified <code class="docutils literal notranslate"><span class="pre">observation_ids</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>observation_ids</strong> – either a collection of observation ids, or a single observation id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects corresponding to
+observations matching the specified observation_id</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdsc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">pdsc</span><span class="o">.</span><span class="n">PdsClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query_by_observation_id</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;hirise_rdr&#39;</span><span class="p">,</span> <span class="s1">&#39;PSP_005423_1780&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">product_id</span>
+<span class="go">u&#39;PSP_005423_1780_COLOR&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">product_id</span>
+<span class="go">u&#39;PSP_005423_1780_RED&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query_by_observation_id</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;hirise_rdr&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;PSP_010341_1775&#39;</span><span class="p">,</span> <span class="s1">&#39;PSP_010486_1775&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Some instruments generate multiple data products per
+observation, os a single observation id might correspond to multiple
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects for each data product.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-pdsc.segment">
 <span id="pdsc-segment"></span><h2><a class="reference internal" href="#module-pdsc.segment" title="pdsc.segment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a><a class="headerlink" href="#module-pdsc.segment" title="Permalink to this headline">¶</a></h2>

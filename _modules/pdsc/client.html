@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pdsc.client &mdash; PDSC 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PDSC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#environment-variables">Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Extending.html">Extending PDSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Modules.html">Module Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PDSC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pdsc.client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pdsc.client</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains code to support various types of clients that can be used</span>
+<span class="sd">to query PDSC for metadata or find observations coincident with a point on the</span>
+<span class="sd">surface or another point.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+
+<span class="kn">from</span> <span class="nn">.metadata</span> <span class="k">import</span> <span class="n">PdsMetadata</span><span class="p">,</span> <span class="n">METADATA_DB_SUFFIX</span><span class="p">,</span> <span class="n">json_loads</span>
+
+<span class="kn">from</span> <span class="nn">.segment</span> <span class="k">import</span> <span class="p">(</span><span class="n">SegmentTree</span><span class="p">,</span> <span class="n">PointQuery</span><span class="p">,</span> <span class="n">TriSegment</span><span class="p">,</span>
+    <span class="n">SEGMENT_DB_SUFFIX</span><span class="p">,</span> <span class="n">SEGMENT_TREE_SUFFIX</span><span class="p">)</span>
+
+<span class="n">DATABASE_DIRECTORY_VAR</span> <span class="o">=</span> <span class="s1">&#39;PDSC_DATABASE_DIR&#39;</span>
+<span class="n">SERVER_VAR</span> <span class="o">=</span> <span class="s1">&#39;PDSC_SERVER_HOST&#39;</span>
+<span class="n">PORT_VAR</span> <span class="o">=</span> <span class="s1">&#39;PDSC_SERVER_PORT&#39;</span>
+
+<div class="viewcode-block" id="PdsClient"><a class="viewcode-back" href="../../Modules.html#pdsc.client.PdsClient">[docs]</a><span class="k">class</span> <span class="nc">PdsClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`PdsClient` class handles queries to a local PDSC database for</span>
+<span class="sd">    looking up observations based on id or location</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param database_directory:</span>
+<span class="sd">            location of the PDSC databases; if ``None``, the</span>
+<span class="sd">            ``PDSC_DATABASE_DIR`` environment variable is used to determine the</span>
+<span class="sd">            database directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">database_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">database_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DATABASE_DIRECTORY_VAR</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">database_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Must specify database directory &#39;</span>
+                <span class="s1">&#39;or set &quot;</span><span class="si">%s</span><span class="s1">&quot; environment variable&#39;</span>
+                <span class="o">%</span> <span class="n">DATABASE_DIRECTORY_VAR</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">database_directory</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Database directory &quot;</span><span class="si">%s</span><span class="s1">&quot; does not exist&#39;</span>
+                <span class="o">%</span> <span class="n">database_directory</span>
+            <span class="p">)</span>
+
+        <span class="n">db_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">database_directory</span><span class="p">,</span> <span class="s1">&#39;*</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">METADATA_DB_SUFFIX</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">db</span><span class="p">)[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">METADATA_DB_SUFFIX</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">db_files</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_db_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([</span>
+            <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">,</span> <span class="n">db_files</span><span class="p">)])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seg_tree_files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seg_trees</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+            <span class="n">segfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database_directory</span><span class="p">,</span>
+                <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">SEGMENT_DB_SUFFIX</span><span class="p">))</span>
+            <span class="n">treefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database_directory</span><span class="p">,</span>
+                <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">SEGMENT_TREE_SUFFIX</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">segfile</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">treefile</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">segfile</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seg_tree_files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">treefile</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seg_trees</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_get_seg_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">instrument</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_trees</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Localization index not available for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">instrument</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_trees</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seg_trees</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span> <span class="o">=</span> <span class="n">SegmentTree</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_seg_tree_files</span><span class="p">[</span><span class="n">instrument</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_trees</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        instrument: instrument name</span>
+<span class="sd">        conditions: list of tuples (variable name, &gt;/=/&lt;, value)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">instrument</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Instrument &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="n">instrument</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">conditions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conditions</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">conditions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid condition &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid comparator &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">query_str</span> <span class="o">=</span> <span class="s1">&#39;SELECT * FROM metadata&#39;</span>
+        <span class="n">parts</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">?&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">comp</span><span class="p">),</span> <span class="n">val</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">conditions</span>
+        <span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">query_str</span> <span class="o">+=</span> <span class="s1">&#39; WHERE </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="s1">&#39; and &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">query_tup</span> <span class="o">=</span> <span class="p">(</span><span class="n">query_str</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query_tup</span> <span class="o">=</span> <span class="p">(</span><span class="n">query_str</span><span class="p">,)</span>
+
+        <span class="n">db_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_files</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;detect_types&#39;</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="p">}</span>
+        <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">*</span><span class="n">query_tup</span><span class="p">)</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">description</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">break</span>
+                <span class="n">valdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+                <span class="k">yield</span> <span class="n">PdsMetadata</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="o">**</span><span class="n">valdict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PdsClient.query"><a class="viewcode-back" href="../../Modules.html#pdsc.client.PdsClient.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Supports a generic query of observations based on metadata</span>
+
+<span class="sd">        :param instrument:</span>
+<span class="sd">            PDSC instrument name</span>
+
+<span class="sd">        :param conditions:</span>
+<span class="sd">            a collection of tuples indicating query constraints; each tuple</span>
+<span class="sd">            should contain three entries:</span>
+
+<span class="sd">              - metadata variable name</span>
+<span class="sd">              - comparator (``&#39;=&#39;``, ``&#39;&lt;&#39;``, ``&#39;&gt;&#39;``, ``&#39;&lt;=&#39;``, ``&#39;&gt;=&#39;``)</span>
+<span class="sd">              - value</span>
+
+<span class="sd">            A SQL-like query will be performed with a logical AND of the</span>
+<span class="sd">            specified conditions</span>
+
+<span class="sd">        :return: a list of :py:class:`PdsMetadata` objects corresponding to</span>
+<span class="sd">                 observations matching the specified query conditions</span>
+
+<span class="sd">        &gt;&gt;&gt; import pdsc</span>
+<span class="sd">        &gt;&gt;&gt; client = pdsc.PdsClient()</span>
+<span class="sd">        &gt;&gt;&gt; metadata = client.query(&#39;hirise_rdr&#39;, [</span>
+<span class="sd">        ...     (&#39;corner1_latitude&#39;, &#39;&gt;&#39;, -0.5),</span>
+<span class="sd">        ...     (&#39;corner1_latitude&#39;, &#39;&lt;&#39;,  0.5)</span>
+<span class="sd">        ... ])</span>
+
+<span class="sd">        .. Warning::</span>
+<span class="sd">            This function currently assumes non-adversarial inputs; the current</span>
+<span class="sd">            implementation allows a potential SQL injection attack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">conditions</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PdsClient.query_by_observation_id"><a class="viewcode-back" href="../../Modules.html#pdsc.client.PdsClient.query_by_observation_id">[docs]</a>    <span class="k">def</span> <span class="nf">query_by_observation_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_ids</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Query observation matching any of the specified ``observation_ids``</span>
+
+<span class="sd">        :param instrument:</span>
+<span class="sd">            PDSC instrument name</span>
+
+<span class="sd">        :param observation_ids:</span>
+<span class="sd">            either a collection of observation ids, or a single observation id</span>
+
+<span class="sd">        :return: a list of :py:class:`PdsMetadata` objects corresponding to</span>
+<span class="sd">                 observations matching the specified observation_id</span>
+
+<span class="sd">        &gt;&gt;&gt; import pdsc</span>
+<span class="sd">        &gt;&gt;&gt; client = pdsc.PdsClient()</span>
+<span class="sd">        &gt;&gt;&gt; metadata = client.query_by_observation_id(</span>
+<span class="sd">        ...     &#39;hirise_rdr&#39;, &#39;PSP_005423_1780&#39;</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; len(metadata)</span>
+<span class="sd">        2</span>
+<span class="sd">        &gt;&gt;&gt; metadata[0].product_id</span>
+<span class="sd">        u&#39;PSP_005423_1780_COLOR&#39;</span>
+<span class="sd">        &gt;&gt;&gt; metadata[1].product_id</span>
+<span class="sd">        u&#39;PSP_005423_1780_RED&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; metadata = client.query_by_observation_id(</span>
+<span class="sd">        ...     &#39;hirise_rdr&#39;, [&#39;PSP_010341_1775&#39;, &#39;PSP_010486_1775&#39;]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; len(metadata)</span>
+<span class="sd">        4</span>
+
+<span class="sd">        .. Note::</span>
+<span class="sd">            Some instruments generate multiple data products per</span>
+<span class="sd">            observation, os a single observation id might correspond to multiple</span>
+<span class="sd">            :py:class:`PdsMetadata` objects for each data product.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">instrument</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Instrument &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="n">instrument</span><span class="p">)</span>
+
+        <span class="n">single_id</span> <span class="o">=</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">observation_ids</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">single_id</span><span class="p">:</span>
+            <span class="n">observation_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">observation_ids</span><span class="p">]</span>
+
+        <span class="n">db_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_files</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;detect_types&#39;</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="p">}</span>
+        <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">observation_ids</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s1">&#39;SELECT * FROM metadata WHERE observation_id=?&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">oid</span><span class="p">,)</span>
+                <span class="p">)</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+                <span class="n">values</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">description</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">PdsMetadata</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">v</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">metadata</span></div>
+
+    <span class="k">def</span> <span class="nf">_query_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">segment_ids</span><span class="p">):</span>
+        <span class="n">db_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">segment_ids</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s1">&#39;SELECT * FROM segments WHERE segment_id=?&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">sid</span><span class="p">,)</span>
+                <span class="p">)</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">TriSegment</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">segments</span>
+
+    <span class="k">def</span> <span class="nf">_get_observation_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_id</span><span class="p">):</span>
+        <span class="n">db_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">[</span><span class="n">instrument</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="s1">&#39;SELECT * FROM segments WHERE observation_id=?&#39;</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">observation_id</span><span class="p">,)</span>
+            <span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">TriSegment</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">segments</span>
+
+    <span class="k">def</span> <span class="nf">find_observations_of_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">instrument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seg_tree</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">PointQuery</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">query_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_segments</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">overlapping_observations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">observation_id</span><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">observation_id</span> <span class="ow">in</span> <span class="n">overlapping_observations</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">seg</span><span class="o">.</span><span class="n">includes_point</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+                <span class="n">overlapping_observations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">observation_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">overlapping_observations</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">find_overlapping_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_id</span><span class="p">,</span>
+            <span class="n">other_instrument</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">other_instrument</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seg_files</span><span class="p">)</span>
+
+        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seg_tree</span><span class="p">(</span><span class="n">other_instrument</span><span class="p">)</span>
+
+        <span class="n">overlapping_observations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation_segments</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">observation_id</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">query_segment</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+            <span class="n">other_segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_segments</span><span class="p">(</span><span class="n">other_instrument</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">other_oid</span><span class="p">,</span> <span class="n">other_seg</span> <span class="ow">in</span> <span class="n">other_segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">other_oid</span> <span class="ow">in</span> <span class="n">overlapping_observations</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">seg</span><span class="o">.</span><span class="n">overlaps_segment</span><span class="p">(</span><span class="n">other_seg</span><span class="p">):</span>
+                    <span class="n">overlapping_observations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">other_oid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">overlapping_observations</span><span class="p">)</span></div>
+
+<span class="k">class</span> <span class="nc">PdsHttpClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PORT_VAR</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s1">&#39;Port must be integer (got &quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span>
+                        <span class="o">%</span> <span class="n">port</span>
+                    <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER_VAR</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Must specify server hostname &#39;</span>
+                <span class="s1">&#39;or set &quot;</span><span class="si">%s</span><span class="s1">&quot; environment variable&#39;</span>
+                <span class="o">%</span> <span class="n">SERVER_VAR</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="s1">&#39;http://</span><span class="si">%s%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">host</span><span class="p">,</span>
+            <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="s1">&#39;:</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">port</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s1">&#39;query&#39;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">instrument</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">conditions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">json_loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">query_by_observation_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_ids</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s1">&#39;queryByObservationId&#39;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">observation_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">observation_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">observation_ids</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">instrument</span><span class="p">,</span>
+            <span class="s1">&#39;observation_ids&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">observation_ids</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">json_loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">find_observations_of_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s1">&#39;queryByLatLon&#39;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">instrument</span><span class="p">,</span>
+            <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="n">lat</span><span class="p">,</span>
+            <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="n">lon</span><span class="p">,</span>
+            <span class="s1">&#39;radius&#39;</span><span class="p">:</span> <span class="n">radius</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">find_overlapping_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">observation_id</span><span class="p">,</span> <span class="n">other_instrument</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="s1">&#39;queryByOverlap&#39;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">instrument</span><span class="p">,</span>
+            <span class="s1">&#39;observation_id&#39;</span><span class="p">:</span> <span class="n">observation_id</span><span class="p">,</span>
+            <span class="s1">&#39;other_instrument&#39;</span><span class="p">:</span> <span class="n">other_instrument</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, California Institute of Technology.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
