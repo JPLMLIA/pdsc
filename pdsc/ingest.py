@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Injests PDS metadata into databases and index structures for quick querying
 """
