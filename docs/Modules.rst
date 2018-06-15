@@ -24,3 +24,9 @@ Module Documentation
 
 .. automodule:: pdsc.segment
   :members:
+
+:py:mod:`pdsc.util`
+-------------------
+
+.. automodule:: pdsc.util
+  :members:
