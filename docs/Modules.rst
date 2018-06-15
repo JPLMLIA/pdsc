@@ -13,6 +13,12 @@ Module Documentation
 .. automodule:: pdsc.client
   :members:
 
+:py:mod:`pdsc.metadata`
+-----------------------
+
+.. automodule:: pdsc.metadata
+  :members:
+
 :py:mod:`pdsc.segment`
 ----------------------
 
