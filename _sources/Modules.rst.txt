@@ -13,8 +13,26 @@ Module Documentation
 .. automodule:: pdsc.client
   :members:
 
+:py:mod:`pdsc.metadata`
+-----------------------
+
+.. automodule:: pdsc.metadata
+  :members:
+
 :py:mod:`pdsc.segment`
 ----------------------
 
 .. automodule:: pdsc.segment
+  :members:
+
+:py:mod:`pdsc.server`
+---------------------
+
+.. automodule:: pdsc.server
+  :members:
+
+:py:mod:`pdsc.util`
+-------------------
+
+.. automodule:: pdsc.util
   :members:

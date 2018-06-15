@@ -93,7 +93,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../Modules.html">Module Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -301,8 +304,9 @@
 <span class="sd">            A SQL-like query will be performed with a logical AND of the</span>
 <span class="sd">            specified conditions</span>
 
-<span class="sd">        :return: a list of :py:class:`PdsMetadata` objects corresponding to</span>
-<span class="sd">                 observations matching the specified query conditions</span>
+<span class="sd">        :return: a list of :py:class:`~pdsc.metata.PdsMetadata` objects</span>
+<span class="sd">            corresponding to observations matching the specified query</span>
+<span class="sd">            conditions</span>
 
 <span class="sd">        &gt;&gt;&gt; import pdsc</span>
 <span class="sd">        &gt;&gt;&gt; client = pdsc.PdsClient()</span>
@@ -327,8 +331,9 @@
 <span class="sd">        :param observation_ids:</span>
 <span class="sd">            either a collection of observation ids, or a single observation id</span>
 
-<span class="sd">        :return: a list of :py:class:`PdsMetadata` objects corresponding to</span>
-<span class="sd">                 observations matching the specified observation_id</span>
+<span class="sd">        :return: a list of :py:class:`~pdsc.metadata.PdsMetadata` objects</span>
+<span class="sd">            corresponding to observations matching the specified</span>
+<span class="sd">            ``observation_ids``</span>
 
 <span class="sd">        &gt;&gt;&gt; import pdsc</span>
 <span class="sd">        &gt;&gt;&gt; client = pdsc.PdsClient()</span>
@@ -351,7 +356,8 @@
 <span class="sd">        .. Note::</span>
 <span class="sd">            Some instruments generate multiple data products per</span>
 <span class="sd">            observation, os a single observation id might correspond to multiple</span>
-<span class="sd">            :py:class:`PdsMetadata` objects for each data product.</span>
+<span class="sd">            :py:class:`~pdsc.metadata.PdsMetadata` objects for each data</span>
+<span class="sd">            product.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">instrument</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Instrument &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="n">instrument</span><span class="p">)</span>
@@ -419,9 +425,7 @@
 <span class="sd">        Find observations from a particular instrument that fall within a</span>
 <span class="sd">        radius of the given location.</span>
 
-<span class="sd">        :param instrument:</span>
-<span class="sd">            PDSC instrument name</span>
-
+<span class="sd">        :param instrument: PDSC instrument name</span>
 <span class="sd">        :param lat: degrees latitude</span>
 <span class="sd">        :param lon: degrees east longitude</span>
 <span class="sd">        :param radius: query tolerance in meters</span>
@@ -500,11 +504,9 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param host:</span>
-<span class="sd">            the hostname of the :py:class:`PdsServer` to query</span>
-
-<span class="sd">        :param port:</span>
-<span class="sd">            the port to use for queries</span>
+<span class="sd">        :param host: the hostname of the :py:class:`~pdsc.server.PdsServer` to</span>
+<span class="sd">            query</span>
+<span class="sd">        :param port: the port to use for queries</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PORT_VAR</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>

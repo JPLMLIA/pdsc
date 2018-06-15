@@ -94,7 +94,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Module Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -323,8 +326,9 @@ specified conditions</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects corresponding to
-observations matching the specified query conditions</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects
+corresponding to observations matching the specified query
+conditions</p>
 </td>
 </tr>
 </tbody>
@@ -358,8 +362,9 @@ implementation allows a potential SQL injection attack.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects corresponding to
-observations matching the specified observation_id</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects
+corresponding to observations matching the specified
+<code class="docutils literal notranslate"><span class="pre">observation_ids</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -388,7 +393,8 @@ observations matching the specified observation_id</p>
 <p class="first admonition-title">Note</p>
 <p class="last">Some instruments generate multiple data products per
 observation, os a single observation id might correspond to multiple
-<code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code> objects for each data product.</p>
+<a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects for each data
+product.</p>
 </div>
 </dd></dl>
 
@@ -406,13 +412,174 @@ database over HTTP for looking up observations based on id or location.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>host</strong> – the hostname of the <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsServer</span></code> to query</li>
+<li><strong>host</strong> – the hostname of the <a class="reference internal" href="#pdsc.server.PdsServer" title="pdsc.server.PdsServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsServer</span></code></a> to
+query</li>
 <li><strong>port</strong> – the port to use for queries</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.metadata">
+<span id="pdsc-metadata"></span><h2><a class="reference internal" href="#module-pdsc.metadata" title="pdsc.metadata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a><a class="headerlink" href="#module-pdsc.metadata" title="Permalink to this headline">¶</a></h2>
+<p>This module contains classes for representing and serializing PDS metadata</p>
+<dl class="class">
+<dt id="pdsc.metadata.PdsMetadata">
+<em class="property">class </em><code class="descclassname">pdsc.metadata.</code><code class="descname">PdsMetadata</code><span class="sig-paren">(</span><em>instrument</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/metadata.html#PdsMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.metadata.PdsMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents PDS metadata associated with an observation. The metadata
+available to PDSC corresponds to the metadata in the cumulative index files,
+which is sometimes a subset of what is available in the EDR/RDR headers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>**kwargs</strong> – a dictionary mapping metadata field names to values</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.metadata.PdsMetadataJsonEncoder">
+<em class="property">class </em><code class="descclassname">pdsc.metadata.</code><code class="descname">PdsMetadataJsonEncoder</code><span class="sig-paren">(</span><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/metadata.html#PdsMetadataJsonEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.metadata.PdsMetadataJsonEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides the <code class="xref py py-class docutils literal notranslate"><span class="pre">json.JSONEncoder</span></code> class to provide support for
+serializing <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects and date-valued metadata fields</p>
+<p>Constructor for JSONEncoder, with sensible defaults.</p>
+<p>If skipkeys is false, then it is a TypeError to attempt
+encoding of keys that are not str, int, long, float or None.  If
+skipkeys is True, such items are simply skipped.</p>
+<p>If <em>ensure_ascii</em> is true (the default), all non-ASCII
+characters in the output are escaped with uXXXX sequences,
+and the results are str instances consisting of ASCII
+characters only.  If ensure_ascii is False, a result may be a
+unicode instance.  This usually happens if the input contains
+unicode strings or the <em>encoding</em> parameter is used.</p>
+<p>If check_circular is true, then lists, dicts, and custom encoded
+objects will be checked for circular references during encoding to
+prevent an infinite recursion (which would cause an OverflowError).
+Otherwise, no such check takes place.</p>
+<p>If allow_nan is true, then NaN, Infinity, and -Infinity will be
+encoded as such.  This behavior is not JSON specification compliant,
+but is consistent with most JavaScript based encoders and decoders.
+Otherwise, it will be a ValueError to encode such floats.</p>
+<p>If sort_keys is true, then the output of dictionaries will be
+sorted by key; this is useful for regression tests to ensure
+that JSON serializations can be compared on a day-to-day basis.</p>
+<p>If indent is a non-negative integer, then JSON array
+elements and object members will be pretty-printed with that
+indent level.  An indent level of 0 will only insert newlines.
+None is the most compact representation.  Since the default
+item separator is ‘, ‘,  the output might include trailing
+whitespace when indent is specified.  You can use
+separators=(‘,’, ‘: ‘) to avoid this.</p>
+<p>If specified, separators should be a (item_separator, key_separator)
+tuple.  The default is (‘, ‘, ‘: ‘).  To get the most compact JSON
+representation you should specify (‘,’, ‘:’) to eliminate whitespace.</p>
+<p>If specified, default is a function that gets called for objects
+that can’t otherwise be serialized.  It should return a JSON encodable
+version of the object or raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.</p>
+<p>If encoding is not None, then all input strings will be
+transformed into unicode using that encoding prior to JSON-encoding.
+The default is UTF-8.</p>
+<dl class="method">
+<dt id="pdsc.metadata.PdsMetadataJsonEncoder.default">
+<code class="descname">default</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/metadata.html#PdsMetadataJsonEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.metadata.PdsMetadataJsonEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.metadata.date_decoder">
+<code class="descclassname">pdsc.metadata.</code><code class="descname">date_decoder</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/metadata.html#date_decoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.metadata.date_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an <code class="docutils literal notranslate"><span class="pre">object_hook</span></code> to parse <code class="docutils literal notranslate"><span class="pre">datetime</span></code> objects out of JSON,
+assuming they were encoded using <a class="reference internal" href="#pdsc.metadata.PdsMetadataJsonEncoder" title="pdsc.metadata.PdsMetadataJsonEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadataJsonEncoder</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> – JSON object (<code class="docutils literal notranslate"><span class="pre">dict</span></code>)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">obj</span></code> if no date is detected; otherwise, return a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code> object</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">json_str</span> <span class="o">=</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;{ &quot;foo&quot;: 5, &quot;bar&quot;: { &quot;__datetime__&quot;:&#39;</span>
+<span class="gp">... </span>    <span class="s1">&#39;{ &quot;__val__&quot;: &quot;1985-10-26T01:20:00.000&quot;,&#39;</span>
+<span class="gp">... </span>    <span class="s1">&#39;  &quot;__fmt__&quot;: &quot;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">&quot;}}}&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">date_decoder</span><span class="p">)</span>
+<span class="go">{u&#39;foo&#39;: 5, u&#39;bar&#39;: datetime.datetime(1985, 10, 26, 1, 20)}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.metadata.json_dumps">
+<code class="descclassname">pdsc.metadata.</code><code class="descname">json_dumps</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/metadata.html#json_dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.metadata.json_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps a Python object to a JSON string, using the
+<a class="reference internal" href="#pdsc.metadata.PdsMetadataJsonEncoder" title="pdsc.metadata.PdsMetadataJsonEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadataJsonEncoder</span></code></a> to encode objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> – Python object to encode</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">JSON string with encoded object</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metadata</span> <span class="o">=</span> <span class="n">PdsMetadata</span><span class="p">(</span><span class="s1">&#39;hirise_rdr&#39;</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">json_dumps</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="go">&#39;{&quot;instrument&quot;: &quot;hirise_rdr&quot;, &quot;rows&quot;: 100, &quot;cols&quot;: 20}&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.metadata.json_loads">
+<code class="descclassname">pdsc.metadata.</code><code class="descname">json_loads</code><span class="sig-paren">(</span><em>jstr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/metadata.html#json_loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.metadata.json_loads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects from a JSON string; uses the
+<a class="reference internal" href="#pdsc.metadata.date_decoder" title="pdsc.metadata.date_decoder"><code class="xref py py-meth docutils literal notranslate"><span class="pre">date_decoder()</span></code></a> object hook to parse dates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jstr</strong> – JSON string with list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of parsed <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">json_loads</span><span class="p">(</span><span class="s1">&#39;[{&quot;instrument&quot;: &quot;hirise_rdr&quot;, &quot;rows&quot;: 100, &quot;cols&quot;: 20}]&#39;</span><span class="p">)</span>
+<span class="go">[PdsMetadata(instrument=u&#39;hirise_rdr&#39;, cols=20, rows=100)]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -436,6 +603,204 @@ pair of (latitude, longitude) in degrees (east longitude).</p>
 <li><strong>latlon1</strong> – represents the second point (index 1) in a triangular segment</li>
 <li><strong>latlon2</strong> – represents the third point (index 2) in a triangular segment</li>
 </ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.server">
+<span id="pdsc-server"></span><h2><a class="reference internal" href="#module-pdsc.server" title="pdsc.server"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.server</span></code></a><a class="headerlink" href="#module-pdsc.server" title="Permalink to this headline">¶</a></h2>
+<p>Implmements an HTTP server that wraps client for remote calls to PDSC</p>
+<dl class="class">
+<dt id="pdsc.server.PdsServer">
+<em class="property">class </em><code class="descclassname">pdsc.server.</code><code class="descname">PdsServer</code><span class="sig-paren">(</span><em>database_directory=None</em>, <em>socket_host='0.0.0.0'</em>, <em>port=7372</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#PdsServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.PdsServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements an HTTP server for PDSC using <code class="xref py py-mod docutils literal notranslate"><span class="pre">cherrypy</span></code></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The PDSC server is not yet designed to be robust against malicious
+queries. While some care has been taken to properly parse arguments to
+avoid SQL injection attacks, for example, a thorough review of
+potential security vulnerabilities has not yet been performed.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>database_directory</strong> – location of the PDSC databases; if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the
+<code class="docutils literal notranslate"><span class="pre">PDSC_DATABASE_DIR</span></code> environment variable is used to determine the
+database directory</li>
+<li><strong>socket_host</strong> – specifies the network interface on which the server will listen</li>
+<li><strong>port</strong> – specifies the port on which the server will listen</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pdsc.server.PdsServer.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>instrument</em>, <em>conditions=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#PdsServer.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.PdsServer.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves an interface to <a class="reference internal" href="#pdsc.client.PdsClient.query" title="pdsc.client.PdsClient.query"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PdsClient.query</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>conditions</strong> – JSON-encoded conditions of the kind described for
+<a class="reference internal" href="#pdsc.client.PdsClient.query" title="pdsc.client.PdsClient.query"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PdsClient.query</span></code></a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">JSON-encoded list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a>
+objects corresponding to observations matching the specified query
+conditions</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.server.PdsServer.queryByLatLon">
+<code class="descname">queryByLatLon</code><span class="sig-paren">(</span><em>instrument</em>, <em>lat</em>, <em>lon</em>, <em>radius=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#PdsServer.queryByLatLon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.PdsServer.queryByLatLon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves an interface to <a class="reference internal" href="#pdsc.client.PdsClient.find_observations_of_latlon" title="pdsc.client.PdsClient.find_observations_of_latlon"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PdsClient.find_observations_of_latlon</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>lat</strong> – degrees latitude</li>
+<li><strong>lon</strong> – degrees east longitude</li>
+<li><strong>radius</strong> – query tolerance in meters</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">JSON-encoded list of observation ids corresponding to
+observations within <code class="docutils literal notranslate"><span class="pre">radius</span></code> of the given location</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.server.PdsServer.queryByObservationId">
+<code class="descname">queryByObservationId</code><span class="sig-paren">(</span><em>instrument</em>, <em>observation_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#PdsServer.queryByObservationId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.PdsServer.queryByObservationId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves an interface to <a class="reference internal" href="#pdsc.client.PdsClient.query_by_observation_id" title="pdsc.client.PdsClient.query_by_observation_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PdsClient.query_by_observation_id</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>observation_ids</strong> – either a JSON-encoded list of observation ids, or a single
+observation id string</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">JSON-encoded list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a>
+objects corresponding to observations matching the specified
+<code class="docutils literal notranslate"><span class="pre">observation_ids</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.server.PdsServer.queryByOverlap">
+<code class="descname">queryByOverlap</code><span class="sig-paren">(</span><em>instrument</em>, <em>observation_id</em>, <em>other_instrument</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#PdsServer.queryByOverlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.PdsServer.queryByOverlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves an interface to <a class="reference internal" href="#pdsc.client.PdsClient.find_observations_of_latlon" title="pdsc.client.PdsClient.find_observations_of_latlon"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PdsClient.find_observations_of_latlon</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>instrument</strong> – PDSC instrument name for query observation</li>
+<li><strong>observation_id</strong> – query observation id</li>
+<li><strong>other_instrument</strong> – PDSC instrument name for target instrument</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">JSON-encoded list of observation ids corresponding to
+observations overlapping the given observation</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.server.PdsServer.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#PdsServer.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.PdsServer.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the server; this function will block until the process is
+interrupted or killed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.server.content_type">
+<code class="descclassname">pdsc.server.</code><code class="descname">content_type</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/server.html#content_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.server.content_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a decorator to set the response <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> header for CherryPy
+response handlers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> – content type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">content type decorator</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.util">
+<span id="pdsc-util"></span><h2><a class="reference internal" href="#module-pdsc.util" title="pdsc.util"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.util</span></code></a><a class="headerlink" href="#module-pdsc.util" title="Permalink to this headline">¶</a></h2>
+<p>Miscellaneous utilities</p>
+<dl class="function">
+<dt id="pdsc.util.registerer">
+<code class="descclassname">pdsc.util.</code><code class="descname">registerer</code><span class="sig-paren">(</span><em>registration_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/util.html#registerer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.util.registerer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a decorator that will “register” a method or class to a particular
+instrument. The registration decorators are used to extend PDSC to other
+instruments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>registration_dict</strong> – a dictionary to which the decorated function will be registered</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">registration decorator that assigns decorated function or class to
+the <code class="docutils literal notranslate"><span class="pre">registration_dict</span></code> keyed by a particular instrument, which is a
+required decorator argument</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.util.standard_progress_bar">
+<code class="descclassname">pdsc.util.</code><code class="descname">standard_progress_bar</code><span class="sig-paren">(</span><em>message</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/util.html#standard_progress_bar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.util.standard_progress_bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optionally constructs a standard <code class="xref py py-class docutils literal notranslate"><span class="pre">progressbar.ProgressBar</span></code> used
+through PDSC</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>message</strong> – progress message to display</li>
+<li><strong>verbose</strong> – whether to display progress</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <code class="xref py py-class docutils literal notranslate"><span class="pre">progressbar.ProgressBar</span></code> object if <code class="docutils literal notranslate"><span class="pre">verbose=True</span></code>,
+or an identify function that can be used to omit progress</p>
 </td>
 </tr>
 </tbody>

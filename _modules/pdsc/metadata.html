@@ -1,0 +1,343 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pdsc.metadata &mdash; PDSC 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PDSC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#environment-variables">Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Extending.html">Extending PDSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Modules.html">Module Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PDSC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pdsc.metadata</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pdsc.metadata</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for representing and serializing PDS metadata</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+
+<span class="n">METADATA_DB_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;_metadata.db&#39;</span>
+<span class="n">TIME_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span>
+
+<div class="viewcode-block" id="PdsMetadata"><a class="viewcode-back" href="../../Modules.html#pdsc.metadata.PdsMetadata">[docs]</a><span class="k">class</span> <span class="nc">PdsMetadata</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents PDS metadata associated with an observation. The metadata</span>
+<span class="sd">    available to PDSC corresponds to the metadata in the cumulative index files,</span>
+<span class="sd">    which is sometimes a subset of what is available in the EDR/RDR headers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param instrument:</span>
+<span class="sd">            PDSC instrument name</span>
+
+<span class="sd">        :param \**kwargs:</span>
+<span class="sd">            a dictionary mapping metadata field names to values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="n">instrument</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odict</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instrument</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;PdsMetadata(instrument=</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">)&#39;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">),</span> <span class="n">values</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PdsMetadata</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odict</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_odict</span></div>
+
+<div class="viewcode-block" id="PdsMetadataJsonEncoder"><a class="viewcode-back" href="../../Modules.html#pdsc.metadata.PdsMetadataJsonEncoder">[docs]</a><span class="k">class</span> <span class="nc">PdsMetadataJsonEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Overrides the :py:class:`json.JSONEncoder` class to provide support for</span>
+<span class="sd">    serializing :py:class:`PdsMetadata` objects and date-valued metadata fields</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PdsMetadataJsonEncoder.default"><a class="viewcode-back" href="../../Modules.html#pdsc.metadata.PdsMetadataJsonEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">PdsMetadata</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">_odict</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;__datetime__&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;__fmt__&#39;</span><span class="p">:</span> <span class="n">TIME_FORMAT</span><span class="p">,</span>
+                    <span class="s1">&#39;__val__&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIME_FORMAT</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="date_decoder"><a class="viewcode-back" href="../../Modules.html#pdsc.metadata.date_decoder">[docs]</a><span class="k">def</span> <span class="nf">date_decoder</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provides an ``object_hook`` to parse ``datetime`` objects out of JSON,</span>
+<span class="sd">    assuming they were encoded using :py:class:`PdsMetadataJsonEncoder`</span>
+
+<span class="sd">    :param obj:</span>
+<span class="sd">        JSON object (``dict``)</span>
+
+<span class="sd">    :return: ``obj`` if no date is detected; otherwise, return a</span>
+<span class="sd">             :py:class:`datetime.datetime` object</span>
+
+<span class="sd">    &gt;&gt;&gt; json_str = (</span>
+<span class="sd">    ...     &#39;{ &quot;foo&quot;: 5, &quot;bar&quot;: { &quot;__datetime__&quot;:&#39;</span>
+<span class="sd">    ...     &#39;{ &quot;__val__&quot;: &quot;1985-10-26T01:20:00.000&quot;,&#39;</span>
+<span class="sd">    ...     &#39;  &quot;__fmt__&quot;: &quot;%Y-%m-%dT%H:%M:%S.%f&quot;}}}&#39;</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; import json</span>
+<span class="sd">    &gt;&gt;&gt; json.loads(json_str, object_hook=date_decoder)</span>
+<span class="sd">    {u&#39;foo&#39;: 5, u&#39;bar&#39;: datetime.datetime(1985, 10, 26, 1, 20)}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;__datetime__&#39;</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;__datetime__&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">dt</span><span class="p">[</span><span class="s1">&#39;__val__&#39;</span><span class="p">],</span> <span class="n">dt</span><span class="p">[</span><span class="s1">&#39;__fmt__&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="json_dumps"><a class="viewcode-back" href="../../Modules.html#pdsc.metadata.json_dumps">[docs]</a><span class="k">def</span> <span class="nf">json_dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dumps a Python object to a JSON string, using the</span>
+<span class="sd">    :py:class:`PdsMetadataJsonEncoder` to encode objects</span>
+
+<span class="sd">    :param obj: Python object to encode</span>
+
+<span class="sd">    :return: JSON string with encoded object</span>
+
+<span class="sd">    &gt;&gt;&gt; metadata = PdsMetadata(&#39;hirise_rdr&#39;, rows=100, cols=20)</span>
+<span class="sd">    &gt;&gt;&gt; json_dumps(metadata)</span>
+<span class="sd">    &#39;{&quot;instrument&quot;: &quot;hirise_rdr&quot;, &quot;rows&quot;: 100, &quot;cols&quot;: 20}&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">PdsMetadataJsonEncoder</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="json_loads"><a class="viewcode-back" href="../../Modules.html#pdsc.metadata.json_loads">[docs]</a><span class="k">def</span> <span class="nf">json_loads</span><span class="p">(</span><span class="n">jstr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a list of :py:class:`PdsMetadata` objects from a JSON string; uses the</span>
+<span class="sd">    :py:meth:`date_decoder` object hook to parse dates</span>
+
+<span class="sd">    :param jstr: JSON string with list of :py:class:`PdsMetadata` objects</span>
+
+<span class="sd">    :return: list of parsed :py:class:`PdsMetadata` objects</span>
+
+<span class="sd">    &gt;&gt;&gt; json_loads(&#39;[{&quot;instrument&quot;: &quot;hirise_rdr&quot;, &quot;rows&quot;: 100, &quot;cols&quot;: 20}]&#39;)</span>
+<span class="sd">    [PdsMetadata(instrument=u&#39;hirise_rdr&#39;, cols=20, rows=100)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dicts</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jstr</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">date_decoder</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">PdsMetadata</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dicts</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, California Institute of Technology.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
