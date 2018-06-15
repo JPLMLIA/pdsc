@@ -140,8 +140,9 @@ class PdsClient(object):
             A SQL-like query will be performed with a logical AND of the
             specified conditions
 
-        :return: a list of :py:class:`PdsMetadata` objects corresponding to
-                 observations matching the specified query conditions
+        :return: a list of :py:class:`~pdsc.metata.PdsMetadata` objects
+            corresponding to observations matching the specified query
+            conditions
 
         >>> import pdsc
         >>> client = pdsc.PdsClient()
@@ -166,8 +167,9 @@ class PdsClient(object):
         :param observation_ids:
             either a collection of observation ids, or a single observation id
 
-        :return: a list of :py:class:`PdsMetadata` objects corresponding to
-                 observations matching the specified observation_id
+        :return: a list of :py:class:`~pdsc.metadata.PdsMetadata` objects
+            corresponding to observations matching the specified
+            ``observation_ids``
 
         >>> import pdsc
         >>> client = pdsc.PdsClient()
@@ -190,7 +192,8 @@ class PdsClient(object):
         .. Note::
             Some instruments generate multiple data products per
             observation, os a single observation id might correspond to multiple
-            :py:class:`PdsMetadata` objects for each data product.
+            :py:class:`~pdsc.metadata.PdsMetadata` objects for each data
+            product.
         """
         if instrument not in self.instruments:
             raise ValueError('Instrument "%s" not found' % instrument)
@@ -258,9 +261,7 @@ class PdsClient(object):
         Find observations from a particular instrument that fall within a
         radius of the given location.
 
-        :param instrument:
-            PDSC instrument name
-
+        :param instrument: PDSC instrument name
         :param lat: degrees latitude
         :param lon: degrees east longitude
         :param radius: query tolerance in meters
@@ -339,11 +340,9 @@ class PdsHttpClient(object):
 
     def __init__(self, host=None, port=None):
         """
-        :param host:
-            the hostname of the :py:class:`PdsServer` to query
-
-        :param port:
-            the port to use for queries
+        :param host: the hostname of the :py:class:`~pdsc.server.PdsServer` to
+            query
+        :param port: the port to use for queries
         """
         if port is None:
             port = os.environ.get(PORT_VAR, None)

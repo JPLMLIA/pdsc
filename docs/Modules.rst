@@ -25,6 +25,12 @@ Module Documentation
 .. automodule:: pdsc.segment
   :members:
 
+:py:mod:`pdsc.server`
+---------------------
+
+.. automodule:: pdsc.server
+  :members:
+
 :py:mod:`pdsc.util`
 -------------------
 
