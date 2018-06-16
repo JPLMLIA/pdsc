@@ -92,8 +92,9 @@
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Module Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.localization"><code class="docutils literal notranslate"><span class="pre">pdsc.localization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
@@ -166,54 +167,6 @@
             
   <div class="section" id="module-documentation">
 <h1>Module Documentation<a class="headerlink" href="#module-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-pdsc.ingest">
-<span id="pdsc-ingest"></span><h2><a class="reference internal" href="#module-pdsc.ingest" title="pdsc.ingest"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a><a class="headerlink" href="#module-pdsc.ingest" title="Permalink to this headline">¶</a></h2>
-<p>Injests PDS metadata into databases and index structures for quick querying</p>
-<dl class="function">
-<dt id="pdsc.ingest.get_idx_file_pair">
-<code class="descclassname">pdsc.ingest.</code><code class="descname">get_idx_file_pair</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#get_idx_file_pair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.get_idx_file_pair" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the pair of corresponding LBL and TAB files given the path to one
-file of the pair. The case of the extension does not matter as long as it is
-consitent (i.e., all upper-case or all lower-case). The corresponding case
-and path prefix is assumed for the matching file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_idx_file_pair</span><span class="p">(</span><span class="s1">&#39;cumindex.lbl&#39;</span><span class="p">)</span>
-<span class="go">(&#39;cumindex.lbl&#39;, &#39;cumindex.tab&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_idx_file_pair</span><span class="p">(</span><span class="s1">&#39;CUMINDEX.TAB&#39;</span><span class="p">)</span>
-<span class="go">(&#39;CUMINDEX.LBL&#39;, &#39;CUMINDEX.TAB&#39;)</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> – path to one LBL or TAB file from a pair</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a pair of paths to corresponding LBL and TAB files</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pdsc.ingest.store_segment_tree">
-<code class="descclassname">pdsc.ingest.</code><code class="descname">store_segment_tree</code><span class="sig-paren">(</span><em>outputfile</em>, <em>segments</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#store_segment_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.store_segment_tree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs a ball tree index for segmented observations and saves the
-resulting data structure to the specified output file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>outputfile</strong> – file to save pickled <code class="xref py py-class docutils literal notranslate"><span class="pre">pdsc.segment.SegmentTree</span></code></li>
-<li><strong>segments</strong> – a collection of <a class="reference internal" href="#pdsc.segment.TriSegment" title="pdsc.segment.TriSegment"><code class="xref py py-class docutils literal notranslate"><span class="pre">pdsc.segment.TriSegment</span></code></a> objects</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
 <div class="section" id="module-pdsc.client">
 <span id="pdsc-client"></span><h2><a class="reference internal" href="#module-pdsc.client" title="pdsc.client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.client</span></code></a><a class="headerlink" href="#module-pdsc.client" title="Permalink to this headline">¶</a></h2>
 <p>This module contains code to support various types of clients that can be used
@@ -420,6 +373,901 @@ query</li>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.ingest">
+<span id="pdsc-ingest"></span><h2><a class="reference internal" href="#module-pdsc.ingest" title="pdsc.ingest"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a><a class="headerlink" href="#module-pdsc.ingest" title="Permalink to this headline">¶</a></h2>
+<p>Injests PDS metadata into databases and index structures for quick querying</p>
+<dl class="function">
+<dt id="pdsc.ingest.get_idx_file_pair">
+<code class="descclassname">pdsc.ingest.</code><code class="descname">get_idx_file_pair</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#get_idx_file_pair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.get_idx_file_pair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the pair of corresponding LBL and TAB files given the path to one
+file of the pair. The case of the extension does not matter as long as it is
+consitent (i.e., all upper-case or all lower-case). The corresponding case
+and path prefix is assumed for the matching file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_idx_file_pair</span><span class="p">(</span><span class="s1">&#39;cumindex.lbl&#39;</span><span class="p">)</span>
+<span class="go">(&#39;cumindex.lbl&#39;, &#39;cumindex.tab&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_idx_file_pair</span><span class="p">(</span><span class="s1">&#39;CUMINDEX.TAB&#39;</span><span class="p">)</span>
+<span class="go">(&#39;CUMINDEX.LBL&#39;, &#39;CUMINDEX.TAB&#39;)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> – path to one LBL or TAB file from a pair</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a pair of paths to corresponding LBL and TAB files</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.ingest.ingest_idx">
+<code class="descclassname">pdsc.ingest.</code><code class="descname">ingest_idx</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em>, <em>configpath</em>, <em>outputdir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#ingest_idx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.ingest_idx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ingests a PDS cumulative index into PDSC</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – a PDS cumulative index LBL file path</li>
+<li><strong>table_file</strong> – a PDS cumulative index TAB file path</li>
+<li><strong>configpath</strong> – a configuration file or a directory containing the configuration file
+with name <code class="docutils literal notranslate"><span class="pre">[instrument</span> <span class="pre">name]_metadata.yaml</span></code></li>
+<li><strong>outputdir</strong> – the directory into which the ingested SQL databases and index structures
+will be stored</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.ingest.store_metadata">
+<code class="descclassname">pdsc.ingest.</code><code class="descname">store_metadata</code><span class="sig-paren">(</span><em>outputfile</em>, <em>instrument</em>, <em>table</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#store_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.store_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts and stores metadata into a SQL database file in accordance with
+configuration, given a PDS cumulative index table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outputfile</strong> – output location for SQL database</li>
+<li><strong>instrument</strong> – PDSC instrument name</li>
+<li><strong>table</strong> – <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code> containing parsed metadata</li>
+<li><strong>config</strong> – <p>dict containing configuration; the entries used in this function are:</p>
+<blockquote>
+<div><ul>
+<li><code class="docutils literal notranslate"><span class="pre">scale_factors</span></code>: dictionary mapping PDS cumulative index field
+names to multiplicative scale factors (e.g., for unit conversion)</li>
+<li><code class="docutils literal notranslate"><span class="pre">index</span></code>: list containing PDSC metadata column names on which to
+build a SQL index</li>
+<li><code class="docutils literal notranslate"><span class="pre">columns</span></code>: list of lists; each sub-list corresponds to a column
+and is a triple containing:<blockquote>
+<div><ul>
+<li>PDS cumulative index field name</li>
+<li>PDSC metadata column name</li>
+<li>PDSC metadata column type (a valid SQL type)</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects
+associated with every entry in the created metadata table</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.ingest.store_segment_tree">
+<code class="descclassname">pdsc.ingest.</code><code class="descname">store_segment_tree</code><span class="sig-paren">(</span><em>outputfile</em>, <em>segments</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#store_segment_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.store_segment_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a ball tree index for segmented observations and saves the
+resulting data structure to the specified output file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outputfile</strong> – file to save pickled <code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentTree</span></code></li>
+<li><strong>segments</strong> – a collection of <a class="reference internal" href="#pdsc.segment.TriSegment" title="pdsc.segment.TriSegment"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriSegment</span></code></a> objects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.ingest.store_segments">
+<code class="descclassname">pdsc.ingest.</code><code class="descname">store_segments</code><span class="sig-paren">(</span><em>outputfile</em>, <em>metadata</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/ingest.html#store_segments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.ingest.store_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segments observations corresponding to each entry in <code class="docutils literal notranslate"><span class="pre">metadata</span></code>, and
+stores these segments in a SQL database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outputfile</strong> – output location for SQL database</li>
+<li><strong>metadata</strong> – list of <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> objects corresponding to
+observations to be segmented</li>
+<li><strong>config</strong> – <p>dict containing configuration; the entries used in this function are:</p>
+<blockquote>
+<div><ul>
+<li><code class="docutils literal notranslate"><span class="pre">segmentation</span></code>: dictionary containing segmentation-specific
+parameters:<blockquote>
+<div><ul>
+<li><code class="docutils literal notranslate"><span class="pre">resolution</span></code>: the maximum size in meters of a side length in
+the triangular segmentation of an observation; a good
+heuristic is the average across-track width of an observation
+to produce isosceles triangles.</li>
+<li><code class="docutils literal notranslate"><span class="pre">localizer_kwargs</span></code>: the <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> that will be supplied to
+the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_localizer()</span></code> function for
+determining observation footprints</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of <a class="reference internal" href="#pdsc.segment.TriSegment" title="pdsc.segment.TriSegment"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriSegment</span></code></a> objects for segments
+across all observations</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.localization">
+<span id="pdsc-localization"></span><h2><a class="reference internal" href="#module-pdsc.localization" title="pdsc.localization"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.localization</span></code></a><a class="headerlink" href="#module-pdsc.localization" title="Permalink to this headline">¶</a></h2>
+<p>Contains code that performs “localization,” or the mapping between observation
+pixel coordinates and real-world latitude/longitude coordinates.</p>
+<p>PDSC uses the convention that pixel space coordinates have their origin at the
+top left of the image, with the positive <span class="math notranslate nohighlight">\(x\)</span>-direction corresponding to
+increasing columns and the positive <span class="math notranslate nohighlight">\(y\)</span>-direction corresponding to
+increasing rows. Row and column indices start at 0. The mapping from line/sample
+to row/column is instrument-specific, but typically lines are rows and samples
+are columns.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The localization provided by PDSC is not intended to be the most accurate
+localization possible, but rather the most accurate localization achievable
+<em>using only information available within PDS cumulative index files</em>.
+Therefore, PDSC localization often relies on assumptions that introduce
+errors whose magnitudes vary across instruments.</p>
+</div>
+<dl class="class">
+<dt id="pdsc.localization.CtxLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">CtxLocalizer</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#CtxLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.CtxLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the CTX instrument (subclass of
+<a class="reference internal" href="#pdsc.localization.GeodesicLocalizer" title="pdsc.localization.GeodesicLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeodesicLocalizer</span></code></a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> – “ctx” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.CtxLocalizer.BODY">
+<code class="descname">BODY</code><em class="property"> = &lt;geographiclib.geodesic.Geodesic object&gt;</em><a class="headerlink" href="#pdsc.localization.CtxLocalizer.BODY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses a Geodesic model for CTX that assumes Mars is spherical, which seems to
+work better in practice.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.CtxLocalizer.DEFAULT_RESOLUTION_M">
+<code class="descname">DEFAULT_RESOLUTION_M</code><em class="property"> = 0.001</em><a class="headerlink" href="#pdsc.localization.CtxLocalizer.DEFAULT_RESOLUTION_M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the default resolution for CTX localization</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.FourCornerLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">FourCornerLocalizer</code><span class="sig-paren">(</span><em>corners</em>, <em>n_rows</em>, <em>n_cols</em>, <em>flight_direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#FourCornerLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.FourCornerLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.localization.FourCornerLocalizer" title="pdsc.localization.FourCornerLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourCornerLocalizer</span></code></a> is a type of localizer that is used when
+observation locations are described using the latitude and longitude of the
+four corners of the observation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>corners</strong> – <p>an ordered collection of the four image corners, each a latitude and
+east longitude pair (in degrees); the order of the corners is:</p>
+<blockquote>
+<div><ul>
+<li>top left</li>
+<li>bottom left</li>
+<li>bottom right</li>
+<li>top right</li>
+</ul>
+</div></blockquote>
+</li>
+<li><strong>n_rows</strong> – the number of rows in the image</li>
+<li><strong>n_cols</strong> – the number of columns in the image</li>
+<li><strong>flight_direction</strong> – a multiplicative factor indicating the direction of flight relative
+to the <span class="math notranslate nohighlight">\(y\)</span>-direction in pixel space; if
+<code class="docutils literal notranslate"><span class="pre">flight_direction=1</span></code>, then the flight direction is from the the
+top down, whereas <code class="docutils literal notranslate"><span class="pre">flight_direction=-1</span></code> indicates a bottom-up
+direction of flight</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pdsc.localization.FourCornerLocalizer.pixel_to_latlon">
+<code class="descname">pixel_to_latlon</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#FourCornerLocalizer.pixel_to_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.FourCornerLocalizer.pixel_to_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts pixel coordinates to latitude and longitude coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>row</strong> – image row, starting at 0 at the top of the image</li>
+<li><strong>col</strong> – image column, starting at 0 at the left of the image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
+than the number of total rows/columns in the image. Otherwise, the
+pixel coordinates range from zero to one along each dimension.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.GeodesicLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">GeodesicLocalizer</code><span class="sig-paren">(</span><em>center_row</em>, <em>center_col</em>, <em>center_lat</em>, <em>center_lon</em>, <em>n_rows</em>, <em>n_cols</em>, <em>pixel_height_m</em>, <em>pixel_width_m</em>, <em>north_azimuth_deg</em>, <em>flight_direction=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#GeodesicLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.GeodesicLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.localization.GeodesicLocalizer" title="pdsc.localization.GeodesicLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeodesicLocalizer</span></code></a> is a type of localizer that is used when
+observation locations are described in terms of a center latitude/longitude
+and a line-of-flight direction. This localizer assumes that along-track
+pixels in the center column of the observaton roughly follow a geodesic path
+in the direction of flight and cross-track pixels in each row are
+perpendicular to this path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>center_row</strong> – the center row of the observation</li>
+<li><strong>center_col</strong> – the center column of the observation</li>
+<li><strong>center_lat</strong> – the latitude (in degrees) of the pixel at the center of the
+observation</li>
+<li><strong>center_lat</strong> – the longitude (east, in degrees) of the pixel at the center of the
+observation</li>
+<li><strong>n_rows</strong> – the total number of rows in the observation</li>
+<li><strong>n_cols</strong> – the total number of columns in the observation</li>
+<li><strong>pixel_height_m</strong> – the pixel height (in meters)</li>
+<li><strong>pixel_width_m</strong> – the pixel width (in meters)</li>
+<li><strong>north_azimuth_deg</strong> – the clockwise angle (in degrees) from a vector that points 90
+degrees counter-clockwise from the line-of-flight direction to north</li>
+<li><strong>flight_direction</strong> – a multiplicative factor indicating the direction of flight relative
+to the <span class="math notranslate nohighlight">\(y\)</span>-direction in pixel space; if
+<code class="docutils literal notranslate"><span class="pre">flight_direction=1</span></code>, then the flight direction is from the the
+top down, whereas <code class="docutils literal notranslate"><span class="pre">flight_direction=-1</span></code> indicates a bottom-up
+direction of flight</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.GeodesicLocalizer.BODY">
+<code class="descname">BODY</code><em class="property"> = &lt;geographiclib.geodesic.Geodesic object&gt;</em><a class="headerlink" href="#pdsc.localization.GeodesicLocalizer.BODY" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">Geodesic</span></code> object describing the target
+body</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.GeodesicLocalizer.location_mask">
+<code class="descname">location_mask</code><span class="sig-paren">(</span><em>subsample_rows=10</em>, <em>subsample_cols=25</em>, <em>reinterpolate=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#GeodesicLocalizer.location_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.GeodesicLocalizer.location_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a latitude and longitude for every pixel in an observation (with
+subsampling/reinterpolation to increase efficiency)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>subsample_rows</strong> – only compute location once every this many rows</li>
+<li><strong>subsample_cols</strong> – only compute location once every this many
+columns</li>
+<li><strong>reinterpolate</strong> – if subsampling is used, reinterpolate values for
+skipped pixels</li>
+<li><strong>verbose</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, display a progress bar</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code> containing the latitude and east
+longitude (in degrees) along the last dimension for every pixel in
+the image, modulo subsampling</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function is experimental and the reinterpolation step does not
+correctly handle discontinuities that arise near the “date line” or
+the poles.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.GeodesicLocalizer.pixel_to_latlon">
+<code class="descname">pixel_to_latlon</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#GeodesicLocalizer.pixel_to_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.GeodesicLocalizer.pixel_to_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts pixel coordinates to latitude and longitude coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>row</strong> – image row, starting at 0 at the top of the image</li>
+<li><strong>col</strong> – image column, starting at 0 at the left of the image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
+than the number of total rows/columns in the image. Otherwise, the
+pixel coordinates range from zero to one along each dimension.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.HiRiseLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">HiRiseLocalizer</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#HiRiseLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.HiRiseLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the HiRISE EDR observations (subclass of
+<a class="reference internal" href="#pdsc.localization.GeodesicLocalizer" title="pdsc.localization.GeodesicLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeodesicLocalizer</span></code></a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> – “hirise_edr” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseLocalizer.CCD_TABLE">
+<code class="descname">CCD_TABLE</code><em class="property"> = {'BG12': -1000, 'BG13': 1000, 'IR10': -1000, 'IR11': 1000, 'RED0': -9000, 'RED1': -7000, 'RED2': -5000, 'RED3': -3000, 'RED4': -1000, 'RED5': 1000, 'RED6': 3000, 'RED7': 5000, 'RED8': 7000, 'RED9': 9000}</em><a class="headerlink" href="#pdsc.localization.HiRiseLocalizer.CCD_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mapping from HiRISE CCDs to pixel offsets from the center of the
+observation. Each CCD is 2048 pixels across, but they overlap by 48 pixels.</p>
+<p>See Figure 2.1.b in the <a class="reference external" href="https://hirise.lpl.arizona.edu/pdf/HiRISE_EDR_SIS.pdf">HiRISE EDR SIS</a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseLocalizer.CHANNEL_OFFSET">
+<code class="descname">CHANNEL_OFFSET</code><em class="property"> = {0: 512, 1: -512}</em><a class="headerlink" href="#pdsc.localization.HiRiseLocalizer.CHANNEL_OFFSET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Each HiRISE CCD is split into two channels, each 1024 pixels of the full
+2048-pixel CCD. Within a CCD, this dictionary defines a mapping from channel
+to the offset of the center pixel within that channel.</p>
+<p>See Figure 2.1.b in the <a class="reference external" href="https://hirise.lpl.arizona.edu/pdf/HiRISE_EDR_SIS.pdf">HiRISE EDR SIS</a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseLocalizer.DEFAULT_RESOLUTION_M">
+<code class="descname">DEFAULT_RESOLUTION_M</code><em class="property"> = 1e-06</em><a class="headerlink" href="#pdsc.localization.HiRiseLocalizer.DEFAULT_RESOLUTION_M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the default resolution for HiRISE EDR localization</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.HiRiseRdrBrowseLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">HiRiseRdrBrowseLocalizer</code><span class="sig-paren">(</span><em>metadata</em>, <em>browse_width</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#HiRiseRdrBrowseLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.HiRiseRdrBrowseLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the HiRISE RDR (map-projected) “browse” images (subclass of
+<a class="reference internal" href="#pdsc.localization.HiRiseRdrLocalizer" title="pdsc.localization.HiRiseRdrLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseRdrLocalizer</span></code></a>)</p>
+<p>This classifier is included for convenience; it simply scales the pixel
+coordinates of the browse image to/from those of the full image before/after
+calling the super-class implementation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metadata</strong> – “hirise_rdr” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</li>
+<li><strong>browse_width</strong> – the width of the HiRISE browse image (if it varies from the default
+value)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseRdrBrowseLocalizer.HIRISE_BROWSE_WIDTH">
+<code class="descname">HIRISE_BROWSE_WIDTH</code><em class="property"> = 2048</em><a class="headerlink" href="#pdsc.localization.HiRiseRdrBrowseLocalizer.HIRISE_BROWSE_WIDTH" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default width of HiRISE browse images</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.HiRiseRdrBrowseLocalizer.latlon_to_pixel">
+<code class="descname">latlon_to_pixel</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#HiRiseRdrBrowseLocalizer.latlon_to_pixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.HiRiseRdrBrowseLocalizer.latlon_to_pixel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a latitude and longitude location to pixel coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> – latitude (in degrees)</li>
+<li><strong>lon</strong> – east longitude (in degrees)</li>
+<li><strong>resolution_m</strong> – the resolution (in meters) when optimizing the mapping from latitude
+and longitude to pixel coordinates; if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value defaults
+to <a class="reference internal" href="#pdsc.localization.Localizer.DEFAULT_RESOLUTION_M" title="pdsc.localization.Localizer.DEFAULT_RESOLUTION_M"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_RESOLUTION_M</span></code></a></li>
+<li><strong>resolution_pix</strong> – the resolution (in pixels) when optimizing the mapping from latitude
+and longitude to pixel coordinates</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the tuple containing the row and column of the specified
+location to within the stricter of the two resolution requirements</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.HiRiseRdrBrowseLocalizer.pixel_to_latlon">
+<code class="descname">pixel_to_latlon</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#HiRiseRdrBrowseLocalizer.pixel_to_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.HiRiseRdrBrowseLocalizer.pixel_to_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts pixel coordinates to latitude and longitude coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>row</strong> – image row, starting at 0 at the top of the image</li>
+<li><strong>col</strong> – image column, starting at 0 at the left of the image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
+than the number of total rows/columns in the image. Otherwise, the
+pixel coordinates range from zero to one along each dimension.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.HiRiseRdrLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">HiRiseRdrLocalizer</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#HiRiseRdrLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.HiRiseRdrLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the HiRISE RDR (map-projected) observations (subclass of
+<a class="reference internal" href="#pdsc.localization.MapLocalizer" title="pdsc.localization.MapLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapLocalizer</span></code></a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> – “hirise_rdr” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseRdrLocalizer.DEFAULT_RESOLUTION_M">
+<code class="descname">DEFAULT_RESOLUTION_M</code><em class="property"> = 1e-06</em><a class="headerlink" href="#pdsc.localization.HiRiseRdrLocalizer.DEFAULT_RESOLUTION_M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the default resolution for HiRISE RDR localization, although this
+attribute is not used for the <a class="reference internal" href="#pdsc.localization.MapLocalizer" title="pdsc.localization.MapLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapLocalizer</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.HiRiseRdrNoMapLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">HiRiseRdrNoMapLocalizer</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#HiRiseRdrNoMapLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.HiRiseRdrNoMapLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the HiRISE RDR NOMAP observations (subclass of
+<a class="reference internal" href="#pdsc.localization.FourCornerLocalizer" title="pdsc.localization.FourCornerLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourCornerLocalizer</span></code></a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> – “hirise_rdr” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseRdrNoMapLocalizer.DEFAULT_RESOLUTION_M">
+<code class="descname">DEFAULT_RESOLUTION_M</code><em class="property"> = 1e-06</em><a class="headerlink" href="#pdsc.localization.HiRiseRdrNoMapLocalizer.DEFAULT_RESOLUTION_M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the default resolution for HiRISE NOMAP localization</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.HiRiseRdrNoMapLocalizer.NORMALIZED_PIXEL_SPACE">
+<code class="descname">NORMALIZED_PIXEL_SPACE</code><em class="property"> = True</em><a class="headerlink" href="#pdsc.localization.HiRiseRdrNoMapLocalizer.NORMALIZED_PIXEL_SPACE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The HiRISE RDR cumulative index metadata does not contain information about
+the size of the NOMAP data product. Therefore, we must use a normalized
+pixel space for these observations.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.Localizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">Localizer</code><a class="reference internal" href="_modules/pdsc/localization.html#Localizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.Localizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all localizers</p>
+<p>Subclasses need only implement
+<a class="reference internal" href="#pdsc.localization.Localizer.pixel_to_latlon" title="pdsc.localization.Localizer.pixel_to_latlon"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pixel_to_latlon()</span></code></a> and the reverse
+translation <a class="reference internal" href="#pdsc.localization.Localizer.latlon_to_pixel" title="pdsc.localization.Localizer.latlon_to_pixel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">latlon_to_pixel()</span></code></a> is
+derived from it.</p>
+<dl class="attribute">
+<dt id="pdsc.localization.Localizer.BODY_RADIUS">
+<code class="descname">BODY_RADIUS</code><em class="property"> = 3396200</em><a class="headerlink" href="#pdsc.localization.Localizer.BODY_RADIUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radius of the observed body (defaults to <a class="reference external" href="https://tharsis.gsfc.nasa.gov/geodesy.html">mean Mars equatorial radius</a>)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.Localizer.DEFAULT_RESOLUTION_M">
+<code class="descname">DEFAULT_RESOLUTION_M</code><em class="property"> = 0.1</em><a class="headerlink" href="#pdsc.localization.Localizer.DEFAULT_RESOLUTION_M" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default resolution (in meters) when optimizing the reverse mapping from
+latitude and longitude back to pixel coordinates via
+<a class="reference internal" href="#pdsc.localization.Localizer.latlon_to_pixel" title="pdsc.localization.Localizer.latlon_to_pixel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">latlon_to_pixel()</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE">
+<code class="descname">NORMALIZED_PIXEL_SPACE</code><em class="property"> = False</em><a class="headerlink" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, pixel coordinates are defined such that (0, 0) is the top left
+corner of the image and (1, 1) is the bottom right. Otherwise, (0, 0) is the
+top left and (rows, cols) is the bottom right</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.Localizer.latlon_to_pixel">
+<code class="descname">latlon_to_pixel</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em>, <em>resolution_m=None</em>, <em>resolution_pix=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#Localizer.latlon_to_pixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.Localizer.latlon_to_pixel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a latitude and longitude location to pixel coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> – latitude (in degrees)</li>
+<li><strong>lon</strong> – east longitude (in degrees)</li>
+<li><strong>resolution_m</strong> – the resolution (in meters) when optimizing the mapping from latitude
+and longitude to pixel coordinates; if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value defaults
+to <a class="reference internal" href="#pdsc.localization.Localizer.DEFAULT_RESOLUTION_M" title="pdsc.localization.Localizer.DEFAULT_RESOLUTION_M"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_RESOLUTION_M</span></code></a></li>
+<li><strong>resolution_pix</strong> – the resolution (in pixels) when optimizing the mapping from latitude
+and longitude to pixel coordinates</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the tuple containing the row and column of the specified
+location to within the stricter of the two resolution requirements</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.Localizer.pixel_to_latlon">
+<code class="descname">pixel_to_latlon</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#Localizer.pixel_to_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.Localizer.pixel_to_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts pixel coordinates to latitude and longitude coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>row</strong> – image row, starting at 0 at the top of the image</li>
+<li><strong>col</strong> – image column, starting at 0 at the left of the image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
+than the number of total rows/columns in the image. Otherwise, the
+pixel coordinates range from zero to one along each dimension.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.MapLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">MapLocalizer</code><span class="sig-paren">(</span><em>proj_type</em>, <em>proj_latitude</em>, <em>proj_longitude</em>, <em>map_scale</em>, <em>row_offset</em>, <em>col_offset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#MapLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.MapLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.localization.MapLocalizer" title="pdsc.localization.MapLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapLocalizer</span></code></a> supports map-projected observations.
+Specifically, it supports the EQUIRECTANGULAR and POLAR STEREOGRAPHIC
+projection types used for HiRISE observations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>proj_type</strong> – map projection type</li>
+<li><strong>proj_latitude</strong> – projection center latitude</li>
+<li><strong>proj_longitude</strong> – projection center longitude</li>
+<li><strong>map_scale</strong> – projection map scale (meters)</li>
+<li><strong>row_offset</strong> – projection row offset</li>
+<li><strong>col_offset</strong> – projection col offset</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference external" href="https://hirise-pds.lpl.arizona.edu/PDS/CATALOG/DSMAP.CAT">https://hirise-pds.lpl.arizona.edu/PDS/CATALOG/DSMAP.CAT</a> for a
+further description of these parameters.</p>
+<dl class="attribute">
+<dt id="pdsc.localization.MapLocalizer.MARS_RADIUS_EQUATORIAL">
+<code class="descname">MARS_RADIUS_EQUATORIAL</code><em class="property"> = 3396190</em><a class="headerlink" href="#pdsc.localization.MapLocalizer.MARS_RADIUS_EQUATORIAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Mars equatorial radius used for <a class="reference external" href="https://hirise-pds.lpl.arizona.edu/PDS/CATALOG/DSMAP.CAT">HiRISE map projections</a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.MapLocalizer.MARS_RADIUS_POLAR">
+<code class="descname">MARS_RADIUS_POLAR</code><em class="property"> = 3376200</em><a class="headerlink" href="#pdsc.localization.MapLocalizer.MARS_RADIUS_POLAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Mars polar radius used for <a class="reference external" href="https://hirise-pds.lpl.arizona.edu/PDS/CATALOG/DSMAP.CAT">HiRISE map projections</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.MapLocalizer.latlon_to_pixel">
+<code class="descname">latlon_to_pixel</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#MapLocalizer.latlon_to_pixel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.MapLocalizer.latlon_to_pixel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a latitude and longitude location to pixel coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lat</strong> – latitude (in degrees)</li>
+<li><strong>lon</strong> – east longitude (in degrees)</li>
+<li><strong>resolution_m</strong> – the resolution (in meters) when optimizing the mapping from latitude
+and longitude to pixel coordinates; if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value defaults
+to <a class="reference internal" href="#pdsc.localization.Localizer.DEFAULT_RESOLUTION_M" title="pdsc.localization.Localizer.DEFAULT_RESOLUTION_M"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_RESOLUTION_M</span></code></a></li>
+<li><strong>resolution_pix</strong> – the resolution (in pixels) when optimizing the mapping from latitude
+and longitude to pixel coordinates</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the tuple containing the row and column of the specified
+location to within the stricter of the two resolution requirements</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.localization.MapLocalizer.pixel_to_latlon">
+<code class="descname">pixel_to_latlon</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#MapLocalizer.pixel_to_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.MapLocalizer.pixel_to_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts pixel coordinates to latitude and longitude coordinates within
+an observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>row</strong> – image row, starting at 0 at the top of the image</li>
+<li><strong>col</strong> – image column, starting at 0 at the left of the image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
+than the number of total rows/columns in the image. Otherwise, the
+pixel coordinates range from zero to one along each dimension.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.MocLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">MocLocalizer</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#MocLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.MocLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the MOC observations (subclass of
+<a class="reference internal" href="#pdsc.localization.GeodesicLocalizer" title="pdsc.localization.GeodesicLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeodesicLocalizer</span></code></a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> – “moc” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.localization.MocLocalizer.BODY">
+<code class="descname">BODY</code><em class="property"> = &lt;geographiclib.geodesic.Geodesic object&gt;</em><a class="headerlink" href="#pdsc.localization.MocLocalizer.BODY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses a Geodesic model for MOC that assumes Mars is spherical, which seems to
+work better in practice.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.localization.ThemisLocalizer">
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">ThemisLocalizer</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#ThemisLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.ThemisLocalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A localizer for the THEMIS VIS and IR instruments (subclass of
+<a class="reference internal" href="#pdsc.localization.GeodesicLocalizer" title="pdsc.localization.GeodesicLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeodesicLocalizer</span></code></a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> – “themis_ir” or “themis_vis” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a>
+object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.localization.geodesic_distance">
+<code class="descclassname">pdsc.localization.</code><code class="descname">geodesic_distance</code><span class="sig-paren">(</span><em>latlon1</em>, <em>latlon2</em>, <em>radius=3396200</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#geodesic_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.geodesic_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the geodesic distance on a spherical body between two points</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>latlon1</strong> – a pair containing the latitude and east longitude (in
+radians) of the first point</li>
+<li><strong>latlon2</strong> – a pair containing the latitude and east longitude (in
+radians) of the second point</li>
+<li><strong>radius</strong> – <p>the radius (in meters) of the spherical body for which
+distance is computed (defaults to <a class="reference external" href="https://tharsis.gsfc.nasa.gov/geodesy.html">mean Mars equatorial radius</a>)</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">geodesic distance (in meters) between the two given points</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geodesic_distance</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+<span class="go">10669476.970121656</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.localization.get_localizer">
+<code class="descclassname">pdsc.localization.</code><code class="descname">get_localizer</code><span class="sig-paren">(</span><em>metadata</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#get_localizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.get_localizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a localizer for an observation corresponding to the provided metadata</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metadata</strong> – a <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object for an observation</li>
+<li><strong>*args</strong> – additional args provided to the localizer constructor</li>
+<li><strong>**kwargs</strong> – additional kwargs provided to the localizer constructor</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <a class="reference internal" href="#pdsc.localization.Localizer" title="pdsc.localization.Localizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Localizer</span></code></a> for the observation</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="#pdsc.localization.get_localizer" title="pdsc.localization.get_localizer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_localizer()</span></code></a> method determines the appropriate localizer
+to use for the observation by looking for the class or function that was
+registered to the instrument using the <a class="reference internal" href="#pdsc.localization.register_localizer" title="pdsc.localization.register_localizer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_localizer()</span></code></a>
+decorator. See <a class="reference internal" href="Extending.html#extending-pdsc"><span class="std std-ref">Extending PDSC</span></a> for more details.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.localization.hirise_rdr_localizer">
+<code class="descclassname">pdsc.localization.</code><code class="descname">hirise_rdr_localizer</code><span class="sig-paren">(</span><em>metadata</em>, <em>nomap=False</em>, <em>browse=False</em>, <em>browse_width=2048</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#hirise_rdr_localizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.hirise_rdr_localizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs the appropriate HiRISE RDR localizer for the desired data
+product type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metadata</strong> – “hirise_rdr” <a class="reference internal" href="#pdsc.metadata.PdsMetadata" title="pdsc.metadata.PdsMetadata"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsMetadata</span></code></a> object</li>
+<li><strong>nomap</strong> – construct localizer for the NOMAP (non-map-projected) data product</li>
+<li><strong>browse</strong> – construct localizer for the BROWSE data product</li>
+<li><strong>browse_width</strong> – if <code class="docutils literal notranslate"><span class="pre">browse=True</span></code>, use this value as the width of the browse image</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <a class="reference internal" href="#pdsc.localization.Localizer" title="pdsc.localization.Localizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Localizer</span></code></a> for the appropriate data product</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.localization.latlon2unit">
+<code class="descclassname">pdsc.localization.</code><code class="descname">latlon2unit</code><span class="sig-paren">(</span><em>latlon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#latlon2unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.latlon2unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a latitude, longitude pair into a vector representing that point on
+a unit circle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>latlon</strong> – a pair containing the latitude and east longitude (in
+degrees) of a point on a unit sphere</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the Cartesian coordinates of the point on a unit sphere</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.localization.register_localizer">
+<code class="descclassname">pdsc.localization.</code><code class="descname">register_localizer</code><span class="sig-paren">(</span><em>instrument</em><span class="sig-paren">)</span><a class="headerlink" href="#pdsc.localization.register_localizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator that can be used to register a class or function that constructs a
+localizer to a particular instrument.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.localization.xyz2latlon">
+<code class="descclassname">pdsc.localization.</code><code class="descname">xyz2latlon</code><span class="sig-paren">(</span><em>xyz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#xyz2latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.xyz2latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a point in Cartesian coordinates to the latitude and longitude of
+that point projected onto a unit sphere</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xyz</strong> – Cartesian coordinates of a nonzero point</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">latitude and east longitude (in degrees) of the point projected
+onto a unit sphere</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xyz2latlon</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">array([90.,  0.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xyz2latlon</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">array([0., 0.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xyz2latlon</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+ <span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Point must be nonzero</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>

@@ -92,8 +92,9 @@
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Modules.html">Module Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.localization"><code class="docutils literal notranslate"><span class="pre">pdsc.localization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
@@ -166,22 +167,55 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#C"><strong>C</strong></a>
+ <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#X"><strong>X</strong></a>
  
 </div>
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.CtxLocalizer.BODY">BODY (pdsc.localization.CtxLocalizer attribute)</a>
+
+      <ul>
+        <li><a href="Modules.html#pdsc.localization.GeodesicLocalizer.BODY">(pdsc.localization.GeodesicLocalizer attribute)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.MocLocalizer.BODY">(pdsc.localization.MocLocalizer attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.Localizer.BODY_RADIUS">BODY_RADIUS (pdsc.localization.Localizer attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.HiRiseLocalizer.CCD_TABLE">CCD_TABLE (pdsc.localization.HiRiseLocalizer attribute)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.HiRiseLocalizer.CHANNEL_OFFSET">CHANNEL_OFFSET (pdsc.localization.HiRiseLocalizer attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.server.content_type">content_type() (in module pdsc.server)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.CtxLocalizer">CtxLocalizer (class in pdsc.localization)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -191,10 +225,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.metadata.date_decoder">date_decoder() (in module pdsc.metadata)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.metadata.PdsMetadataJsonEncoder.default">default() (pdsc.metadata.PdsMetadataJsonEncoder method)</a>
 </li>
+      <li><a href="Modules.html#pdsc.localization.CtxLocalizer.DEFAULT_RESOLUTION_M">DEFAULT_RESOLUTION_M (pdsc.localization.CtxLocalizer attribute)</a>
+
+      <ul>
+        <li><a href="Modules.html#pdsc.localization.HiRiseLocalizer.DEFAULT_RESOLUTION_M">(pdsc.localization.HiRiseLocalizer attribute)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.HiRiseRdrLocalizer.DEFAULT_RESOLUTION_M">(pdsc.localization.HiRiseRdrLocalizer attribute)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.HiRiseRdrNoMapLocalizer.DEFAULT_RESOLUTION_M">(pdsc.localization.HiRiseRdrNoMapLocalizer attribute)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.Localizer.DEFAULT_RESOLUTION_M">(pdsc.localization.Localizer attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -207,13 +251,51 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.client.PdsClient.find_overlapping_observations">find_overlapping_observations() (pdsc.client.PdsClient method)</a>
 </li>
+      <li><a href="Modules.html#pdsc.localization.FourCornerLocalizer">FourCornerLocalizer (class in pdsc.localization)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.geodesic_distance">geodesic_distance() (in module pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.GeodesicLocalizer">GeodesicLocalizer (class in pdsc.localization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.ingest.get_idx_file_pair">get_idx_file_pair() (in module pdsc.ingest)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.get_localizer">get_localizer() (in module pdsc.localization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.HiRiseRdrBrowseLocalizer.HIRISE_BROWSE_WIDTH">HIRISE_BROWSE_WIDTH (pdsc.localization.HiRiseRdrBrowseLocalizer attribute)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.hirise_rdr_localizer">hirise_rdr_localizer() (in module pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.HiRiseLocalizer">HiRiseLocalizer (class in pdsc.localization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.HiRiseRdrBrowseLocalizer">HiRiseRdrBrowseLocalizer (class in pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.HiRiseRdrLocalizer">HiRiseRdrLocalizer (class in pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.HiRiseRdrNoMapLocalizer">HiRiseRdrNoMapLocalizer (class in pdsc.localization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.ingest.ingest_idx">ingest_idx() (in module pdsc.ingest)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -230,6 +312,56 @@
   </ul></td>
 </tr></table>
 
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.latlon2unit">latlon2unit() (in module pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.HiRiseRdrBrowseLocalizer.latlon_to_pixel">latlon_to_pixel() (pdsc.localization.HiRiseRdrBrowseLocalizer method)</a>
+
+      <ul>
+        <li><a href="Modules.html#pdsc.localization.Localizer.latlon_to_pixel">(pdsc.localization.Localizer method)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.MapLocalizer.latlon_to_pixel">(pdsc.localization.MapLocalizer method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.Localizer">Localizer (class in pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.GeodesicLocalizer.location_mask">location_mask() (pdsc.localization.GeodesicLocalizer method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.MapLocalizer">MapLocalizer (class in pdsc.localization)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.MapLocalizer.MARS_RADIUS_EQUATORIAL">MARS_RADIUS_EQUATORIAL (pdsc.localization.MapLocalizer attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.MapLocalizer.MARS_RADIUS_POLAR">MARS_RADIUS_POLAR (pdsc.localization.MapLocalizer attribute)</a>
+</li>
+      <li><a href="Modules.html#pdsc.localization.MocLocalizer">MocLocalizer (class in pdsc.localization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.HiRiseRdrNoMapLocalizer.NORMALIZED_PIXEL_SPACE">NORMALIZED_PIXEL_SPACE (pdsc.localization.HiRiseRdrNoMapLocalizer attribute)</a>
+
+      <ul>
+        <li><a href="Modules.html#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE">(pdsc.localization.Localizer attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -237,18 +369,20 @@
 </li>
       <li><a href="Modules.html#module-pdsc.ingest">pdsc.ingest (module)</a>
 </li>
+      <li><a href="Modules.html#module-pdsc.localization">pdsc.localization (module)</a>
+</li>
       <li><a href="Modules.html#module-pdsc.metadata">pdsc.metadata (module)</a>
 </li>
       <li><a href="Modules.html#module-pdsc.segment">pdsc.segment (module)</a>
 </li>
       <li><a href="Modules.html#module-pdsc.server">pdsc.server (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#module-pdsc.util">pdsc.util (module)</a>
 </li>
       <li><a href="Modules.html#pdsc.client.PdsClient">PdsClient (class in pdsc.client)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.client.PdsHttpClient">PdsHttpClient (class in pdsc.client)</a>
 </li>
       <li><a href="Modules.html#pdsc.metadata.PdsMetadata">PdsMetadata (class in pdsc.metadata)</a>
@@ -257,6 +391,18 @@
 </li>
       <li><a href="Modules.html#pdsc.server.PdsServer">PdsServer (class in pdsc.server)</a>
 </li>
+      <li><a href="Modules.html#pdsc.localization.FourCornerLocalizer.pixel_to_latlon">pixel_to_latlon() (pdsc.localization.FourCornerLocalizer method)</a>
+
+      <ul>
+        <li><a href="Modules.html#pdsc.localization.GeodesicLocalizer.pixel_to_latlon">(pdsc.localization.GeodesicLocalizer method)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.HiRiseRdrBrowseLocalizer.pixel_to_latlon">(pdsc.localization.HiRiseRdrBrowseLocalizer method)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.Localizer.pixel_to_latlon">(pdsc.localization.Localizer method)</a>
+</li>
+        <li><a href="Modules.html#pdsc.localization.MapLocalizer.pixel_to_latlon">(pdsc.localization.MapLocalizer method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -285,6 +431,10 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.register_localizer">register_localizer() (in module pdsc.localization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.util.registerer">registerer() (in module pdsc.util)</a>
 </li>
   </ul></td>
@@ -295,11 +445,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.util.standard_progress_bar">standard_progress_bar() (in module pdsc.util)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.server.PdsServer.start">start() (pdsc.server.PdsServer method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.ingest.store_metadata">store_metadata() (in module pdsc.ingest)</a>
+</li>
       <li><a href="Modules.html#pdsc.ingest.store_segment_tree">store_segment_tree() (in module pdsc.ingest)</a>
+</li>
+      <li><a href="Modules.html#pdsc.ingest.store_segments">store_segments() (in module pdsc.ingest)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -307,7 +461,19 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.ThemisLocalizer">ThemisLocalizer (class in pdsc.localization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.segment.TriSegment">TriSegment (class in pdsc.segment)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.localization.xyz2latlon">xyz2latlon() (in module pdsc.localization)</a>
 </li>
   </ul></td>
 </tr></table>

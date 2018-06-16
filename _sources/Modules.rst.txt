@@ -1,16 +1,22 @@
 Module Documentation
 ====================
 
+:py:mod:`pdsc.client`
+---------------------
+
+.. automodule:: pdsc.client
+  :members:
+
 :py:mod:`pdsc.ingest`
 ---------------------
 
 .. automodule:: pdsc.ingest
   :members:
 
-:py:mod:`pdsc.client`
----------------------
+:py:mod:`pdsc.localization`
+---------------------------
 
-.. automodule:: pdsc.client
+.. automodule:: pdsc.localization
   :members:
 
 :py:mod:`pdsc.metadata`
