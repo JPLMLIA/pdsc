@@ -56,6 +56,36 @@ def get_idx_file_pair(path):
     raise ValueError('"%s" not part of any known index pair' % path)
 
 def store_metadata(outputfile, instrument, table, config):
+    """
+    Converts and stores metadata into a SQL database file in accordance with
+    configuration, given a PDS cumulative index table
+
+    :param outputfile:
+        output location for SQL database
+
+    :param instrument:
+        PDSC instrument name
+
+    :param table:
+        :py:class:`~pdsc.table.PdsTable` containing parsed metadata
+
+    :param config:
+        dict containing configuration; the entries used in this function are:
+
+            - ``scale_factors``: dictionary mapping PDS cumulative index field
+              names to multiplicative scale factors (e.g., for unit conversion)
+            - ``index``: list containing PDSC metadata column names on which to
+              build a SQL index
+            - ``columns``: list of lists; each sub-list corresponds to a column
+              and is a triple containing:
+
+                - PDS cumulative index field name
+                - PDSC metadata column name
+                - PDSC metadata column type (a valid SQL type)
+
+    :return: a list of :py:class:`~pdsc.metadata.PdsMetadata` objects
+        associated with every entry in the created metadata table
+    """
     scale_factors = config.get('scale_factors', {})
     index = config.get('index', [])
     columns = config.get('columns', [])
@@ -99,6 +129,34 @@ def store_metadata(outputfile, instrument, table, config):
         ]
 
 def store_segments(outputfile, metadata, config):
+    """
+    Segments observations corresponding to each entry in ``metadata``, and
+    stores these segments in a SQL database
+
+    :param outputfile:
+        output location for SQL database
+
+    :param metadata:
+        list of :py:class:`~pdsc.metadata.PdsMetadata` objects corresponding to
+        observations to be segmented
+
+    :param config:
+        dict containing configuration; the entries used in this function are:
+
+            - ``segmentation``: dictionary containing segmentation-specific
+              parameters:
+
+                - ``resolution``: the maximum size in meters of a side length in
+                  the triangular segmentation of an observation; a good
+                  heuristic is the average across-track width of an observation
+                  to produce isosceles triangles.
+                - ``localizer_kwargs``: the ``kwargs`` that will be supplied to
+                  the :py:meth:`~pdsc.localizer.get_localizer` function for
+                  determining observation footprints
+
+    :return: a list of :py:class:`~pdsc.segment.TriSegment` objects for segments
+        across all observations
+    """
     seg_config = config.get('segmentation', {})
     resolution = seg_config.get('resolution', 50000)
     localizer_kwargs = seg_config.get('localizer_kwargs', {})
@@ -150,20 +208,37 @@ def store_segment_tree(outputfile, segments):
     resulting data structure to the specified output file.
 
     :param outputfile:
-        file to save pickled :class:`pdsc.segment.SegmentTree`
+        file to save pickled :py:class:`~pdsc.segment.SegmentTree`
 
     :param segments:
-        a collection of :class:`pdsc.segment.TriSegment` objects
+        a collection of :py:class:`~pdsc.segment.TriSegment` objects
     """
     tree = SegmentTree(segments)
     tree.save(outputfile)
 
-def ingest_idx(label_file, table_file, configdir, outputdir):
+def ingest_idx(label_file, table_file, configpath, outputdir):
+    """
+    Ingests a PDS cumulative index into PDSC
+
+    :param label_file:
+        a PDS cumulative index LBL file path
+
+    :param table_file:
+        a PDS cumulative index TAB file path
+
+    :param configpath:
+        a configuration file or a directory containing the configuration file
+        with name ``[instrument name]_metadata.yaml``
+
+    :param outputdir:
+        the directory into which the ingested SQL databases and index structures
+        will be stored
+    """
     instrument, table = parse_table(label_file, table_file)
-    if os.path.isdir(configdir):
-        configfile = os.path.join(configdir, '%s_metadata.yaml' % instrument)
+    if os.path.isdir(configpath):
+        configfile = os.path.join(configpath, '%s_metadata.yaml' % instrument)
     else:
-        configfile = configdir
+        configfile = configpath
 
     if not os.path.exists(configfile):
         raise ValueError(
