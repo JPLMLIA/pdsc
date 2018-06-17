@@ -1667,7 +1667,7 @@ PDS index LBL file</td>
 </table>
 <dl class="attribute">
 <dt id="pdsc.table.CtxTableColumn.SPECIAL_TYPES">
-<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'IMAGE_TIME': &lt;function themis_datetime at 0x7f5f3076daa0&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk at 0x7f5f3076db90&gt;}</em><a class="headerlink" href="#pdsc.table.CtxTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'IMAGE_TIME': &lt;function themis_datetime&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk&gt;}</em><a class="headerlink" href="#pdsc.table.CtxTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines special types for the CTX instrument to parse observation and
 spacecraft clock times</p>
 </dd></dl>
@@ -1762,7 +1762,7 @@ PDS index LBL file</td>
 </table>
 <dl class="attribute">
 <dt id="pdsc.table.HiRiseTableColumn.SPECIAL_TYPES">
-<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'ADC_CONVERSION_SETTINGS': &lt;type 'str'&gt;, 'OBSERVATION_START_COUNT': &lt;function ctx_sclk at 0x7f5f3076db90&gt;, 'OBSERVATION_START_TIME': &lt;function hirise_datetime at 0x7f5f3076db18&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk at 0x7f5f3076db90&gt;, 'SPACECRAFT_CLOCK_STOP_COUNT': &lt;function ctx_sclk at 0x7f5f3076db90&gt;, 'START_TIME': &lt;function hirise_datetime at 0x7f5f3076db18&gt;, 'STOP_TIME': &lt;function hirise_datetime at 0x7f5f3076db18&gt;}</em><a class="headerlink" href="#pdsc.table.HiRiseTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'ADC_CONVERSION_SETTINGS': &lt;type 'str'&gt;, 'OBSERVATION_START_COUNT': &lt;function ctx_sclk&gt;, 'OBSERVATION_START_TIME': &lt;function hirise_datetime&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk&gt;, 'SPACECRAFT_CLOCK_STOP_COUNT': &lt;function ctx_sclk&gt;, 'START_TIME': &lt;function hirise_datetime&gt;, 'STOP_TIME': &lt;function hirise_datetime&gt;}</em><a class="headerlink" href="#pdsc.table.HiRiseTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines special types for the HiRISE observation metadata</p>
 </dd></dl>
 
@@ -1811,10 +1811,32 @@ PDS index LBL file</td>
 </table>
 <dl class="attribute">
 <dt id="pdsc.table.MocTableColumn.SPECIAL_TYPES">
-<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'IMAGE_TIME': &lt;function themis_datetime at 0x7f5f3076daa0&gt;, 'PRODUCT_ID': &lt;function moc_observation_id at 0x7f5f3076dc08&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk at 0x7f5f3076db90&gt;}</em><a class="headerlink" href="#pdsc.table.MocTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'IMAGE_TIME': &lt;function themis_datetime&gt;, 'PRODUCT_ID': &lt;function moc_observation_id&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk&gt;}</em><a class="headerlink" href="#pdsc.table.MocTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines special types for the MOC observation metadata</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.PdsColumnType">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">PdsColumnType</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#PdsColumnType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.PdsColumnType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a type used for PDS columns to ensure a deterministic representation
+that omits memory addresses. This is a workaroud for an issue in Sphinx.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">PdsColumnType</span><span class="p">(</span><span class="n">themis_datetime</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="go">&#39;&lt;function themis_datetime&gt;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="s1">&#39;1985-10-26T01:20:00.000&#39;</span><span class="p">)</span>
+<span class="go">datetime.datetime(1985, 10, 26, 1, 20)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>f</strong> – type function to wrap</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
@@ -2007,7 +2029,7 @@ THEMIS</p>
 
 <dl class="attribute">
 <dt id="pdsc.table.ThemisTableColumn.SPECIAL_TYPES">
-<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'BAND_NUMBER': &lt;type 'int'&gt;, 'LOCAL_TIME': &lt;type 'float'&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;type 'float'&gt;, 'SPACECRAFT_CLOCK_STOP_COUNT': &lt;type 'float'&gt;, 'START_TIME': &lt;function themis_datetime at 0x7f5f3076daa0&gt;, 'START_TIME_ET': &lt;type 'float'&gt;, 'STOP_TIME': &lt;function themis_datetime at 0x7f5f3076daa0&gt;, 'STOP_TIME_ET': &lt;type 'float'&gt;, 'UNCORRECTED_SCLK_START_COUNT': &lt;type 'float'&gt;}</em><a class="headerlink" href="#pdsc.table.ThemisTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'BAND_NUMBER': &lt;type 'int'&gt;, 'LOCAL_TIME': &lt;type 'float'&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;type 'float'&gt;, 'SPACECRAFT_CLOCK_STOP_COUNT': &lt;type 'float'&gt;, 'START_TIME': &lt;function themis_datetime&gt;, 'START_TIME_ET': &lt;type 'float'&gt;, 'STOP_TIME': &lt;function themis_datetime&gt;, 'STOP_TIME_ET': &lt;type 'float'&gt;, 'UNCORRECTED_SCLK_START_COUNT': &lt;type 'float'&gt;}</em><a class="headerlink" href="#pdsc.table.ThemisTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines special types for the THEMIS observation metadata</p>
 </dd></dl>
 
