@@ -35,6 +35,11 @@ register_localizer = registerer(LOCALIZERS)
 """
 A decorator that can be used to register a class or function that constructs a
 localizer to a particular instrument.
+
+:param instrument: PDSC instrument name
+:return: decorator that registers target to given instrument
+
+See :ref:`Extending PDSC` for more details.
 """
 
 def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):

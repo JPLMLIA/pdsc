@@ -151,7 +151,7 @@ def store_segments(outputfile, metadata, config):
                   heuristic is the average across-track width of an observation
                   to produce isosceles triangles.
                 - ``localizer_kwargs``: the ``kwargs`` that will be supplied to
-                  the :py:meth:`~pdsc.localizer.get_localizer` function for
+                  the :py:meth:`~pdsc.localization.get_localizer` function for
                   determining observation footprints
 
     :return: a list of :py:class:`~pdsc.segment.TriSegment` objects for segments
