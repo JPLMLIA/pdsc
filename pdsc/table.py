@@ -32,6 +32,31 @@ cumulative index file is for a particular instrument.
 See :ref:`Extending PDSC` for more details.
 """
 
+class PdsColumnType(object):
+    """
+    Wraps a type used for PDS columns to ensure a deterministic representation
+    that omits memory addresses. This is a workaroud for an issue in Sphinx.
+
+    >>> f = PdsColumnType(themis_datetime)
+    >>> repr(f)
+    '<function themis_datetime>'
+    >>> f('1985-10-26T01:20:00.000')
+    datetime.datetime(1985, 10, 26, 1, 20)
+    """
+
+    def __init__(self, f):
+        """
+        :param f: type function to wrap
+        """
+        self._f = f
+
+    def __repr__(self):
+        frepr = repr(self._f)
+        return re.sub(' at 0x[0-9A-Fa-f]*', '', frepr)
+
+    def __call__(self, *args, **kwargs):
+        return self._f(*args, **kwargs)
+
 def themis_datetime(s):
     """
     Parses date/time format found in THEMIS cumulative index files
@@ -481,8 +506,8 @@ class CtxTableColumn(PdsTableColumn):
     """
 
     SPECIAL_TYPES = {
-        'IMAGE_TIME': themis_datetime,
-        'SPACECRAFT_CLOCK_START_COUNT': ctx_sclk,
+        'IMAGE_TIME': PdsColumnType(themis_datetime),
+        'SPACECRAFT_CLOCK_START_COUNT': PdsColumnType(ctx_sclk),
     }
     """
     Defines special types for the CTX instrument to parse observation and
@@ -527,8 +552,8 @@ class ThemisTableColumn(PdsTableColumn):
     """
 
     SPECIAL_TYPES = {
-        'START_TIME': themis_datetime,
-        'STOP_TIME': themis_datetime,
+        'START_TIME': PdsColumnType(themis_datetime),
+        'STOP_TIME': PdsColumnType(themis_datetime),
         'SPACECRAFT_CLOCK_START_COUNT': float,
         'SPACECRAFT_CLOCK_STOP_COUNT': float,
         'START_TIME_ET': float,
@@ -566,12 +591,12 @@ class HiRiseTableColumn(PdsTableColumn):
     """
 
     SPECIAL_TYPES = {
-        'OBSERVATION_START_TIME': hirise_datetime,
-        'START_TIME': hirise_datetime,
-        'OBSERVATION_START_COUNT': ctx_sclk,
-        'STOP_TIME': hirise_datetime,
-        'SPACECRAFT_CLOCK_START_COUNT': ctx_sclk,
-        'SPACECRAFT_CLOCK_STOP_COUNT': ctx_sclk,
+        'OBSERVATION_START_TIME': PdsColumnType(hirise_datetime),
+        'START_TIME': PdsColumnType(hirise_datetime),
+        'OBSERVATION_START_COUNT': PdsColumnType(ctx_sclk),
+        'STOP_TIME': PdsColumnType(hirise_datetime),
+        'SPACECRAFT_CLOCK_START_COUNT': PdsColumnType(ctx_sclk),
+        'SPACECRAFT_CLOCK_STOP_COUNT': PdsColumnType(ctx_sclk),
         'ADC_CONVERSION_SETTINGS': str,
     }
     """
@@ -634,9 +659,9 @@ class MocTableColumn(PdsTableColumn):
     """
 
     SPECIAL_TYPES = {
-        'IMAGE_TIME': themis_datetime,
-        'SPACECRAFT_CLOCK_START_COUNT': ctx_sclk,
-        'PRODUCT_ID': moc_observation_id,
+        'IMAGE_TIME': PdsColumnType(themis_datetime),
+        'SPACECRAFT_CLOCK_START_COUNT': PdsColumnType(ctx_sclk),
+        'PRODUCT_ID': PdsColumnType(moc_observation_id),
     }
     """
     Defines special types for the MOC observation metadata
