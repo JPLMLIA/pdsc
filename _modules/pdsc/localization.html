@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
@@ -200,6 +201,11 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">A decorator that can be used to register a class or function that constructs a</span>
 <span class="sd">localizer to a particular instrument.</span>
+
+<span class="sd">:param instrument: PDSC instrument name</span>
+<span class="sd">:return: decorator that registers target to given instrument</span>
+
+<span class="sd">See :ref:`Extending PDSC` for more details.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="geodesic_distance"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.geodesic_distance">[docs]</a><span class="k">def</span> <span class="nf">geodesic_distance</span><span class="p">(</span><span class="n">latlon1</span><span class="p">,</span> <span class="n">latlon2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">MARS_RADIUS_M</span><span class="p">):</span>

@@ -98,6 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
@@ -438,7 +439,7 @@ configuration, given a PDS cumulative index table</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>outputfile</strong> – output location for SQL database</li>
 <li><strong>instrument</strong> – PDSC instrument name</li>
-<li><strong>table</strong> – <code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code> containing parsed metadata</li>
+<li><strong>table</strong> – <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> containing parsed metadata</li>
 <li><strong>config</strong> – <p>dict containing configuration; the entries used in this function are:</p>
 <blockquote>
 <div><ul>
@@ -512,7 +513,7 @@ the triangular segmentation of an observation; a good
 heuristic is the average across-track width of an observation
 to produce isosceles triangles.</li>
 <li><code class="docutils literal notranslate"><span class="pre">localizer_kwargs</span></code>: the <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> that will be supplied to
-the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_localizer()</span></code> function for
+the <a class="reference internal" href="#pdsc.localization.get_localizer" title="pdsc.localization.get_localizer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_localizer()</span></code></a> function for
 determining observation footprints</li>
 </ul>
 </div></blockquote>
@@ -1240,6 +1241,17 @@ degrees) of a point on a unit sphere</td>
 <code class="descclassname">pdsc.localization.</code><code class="descname">register_localizer</code><span class="sig-paren">(</span><em>instrument</em><span class="sig-paren">)</span><a class="headerlink" href="#pdsc.localization.register_localizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>A decorator that can be used to register a class or function that constructs a
 localizer to a particular instrument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>instrument</strong> – PDSC instrument name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">decorator that registers target to given instrument</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="Extending.html#extending-pdsc"><span class="std std-ref">Extending PDSC</span></a> for more details.</p>
 </dd></dl>
 
 <dl class="function">
@@ -1603,6 +1615,703 @@ response handlers</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> – content type</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">content type decorator</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.table">
+<span id="pdsc-table"></span><h2><a class="reference internal" href="#module-pdsc.table" title="pdsc.table"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.table</span></code></a><a class="headerlink" href="#module-pdsc.table" title="Permalink to this headline">¶</a></h2>
+<p>Parses PDS cumulative index files into an internal table representation</p>
+<dl class="class">
+<dt id="pdsc.table.CtxTable">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">CtxTable</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#CtxTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.CtxTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> for the CTX instrument that uses the
+custom <a class="reference internal" href="#pdsc.table.CtxTableColumn" title="pdsc.table.CtxTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CtxTableColumn</span></code></a> class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – path to a PDS cumulative index LBL file</li>
+<li><strong>table_file</strong> – path to a PDS cumulative index TAB file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.CtxTable.COLUMN_CLASS">
+<code class="descname">COLUMN_CLASS</code><a class="headerlink" href="#pdsc.table.CtxTable.COLUMN_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.table.CtxTable" title="pdsc.table.CtxTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">CtxTable</span></code></a> class should use <a class="reference internal" href="#pdsc.table.CtxTableColumn" title="pdsc.table.CtxTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CtxTableColumn</span></code></a> for
+parsing columns</p>
+<p>alias of <a class="reference internal" href="#pdsc.table.CtxTableColumn" title="pdsc.table.CtxTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CtxTableColumn</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.CtxTableColumn">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">CtxTableColumn</code><span class="sig-paren">(</span><em>fpointer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#CtxTableColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.CtxTableColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> for the CTX instrument to define
+some special types</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fpointer</strong> – an open file object, pointing to the start of the column within the
+PDS index LBL file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.CtxTableColumn.SPECIAL_TYPES">
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'IMAGE_TIME': &lt;function themis_datetime at 0x7f9c5055aaa0&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk at 0x7f9c5055ab90&gt;}</em><a class="headerlink" href="#pdsc.table.CtxTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines special types for the CTX instrument to parse observation and
+spacecraft clock times</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.HiRiseEdrTable">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">HiRiseEdrTable</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#HiRiseEdrTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.HiRiseEdrTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> for the HiRISE instrument that uses the
+custom <a class="reference internal" href="#pdsc.table.HiRiseTableColumn" title="pdsc.table.HiRiseTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseTableColumn</span></code></a> class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – path to a PDS cumulative index LBL file</li>
+<li><strong>table_file</strong> – path to a PDS cumulative index TAB file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.HiRiseEdrTable.CHECK_COLUMN_COUNT">
+<code class="descname">CHECK_COLUMN_COUNT</code><em class="property"> = False</em><a class="headerlink" href="#pdsc.table.HiRiseEdrTable.CHECK_COLUMN_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ignore the column count discrepancy for the HiRISE EDR table</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.HiRiseEdrTable.COLUMN_CLASS">
+<code class="descname">COLUMN_CLASS</code><a class="headerlink" href="#pdsc.table.HiRiseEdrTable.COLUMN_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.table.HiRiseEdrTable" title="pdsc.table.HiRiseEdrTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseEdrTable</span></code></a> class should use
+<a class="reference internal" href="#pdsc.table.HiRiseTableColumn" title="pdsc.table.HiRiseTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseTableColumn</span></code></a> for parsing columns</p>
+<p>alias of <a class="reference internal" href="#pdsc.table.HiRiseTableColumn" title="pdsc.table.HiRiseTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseTableColumn</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.HiRiseEdrTable.TABLE_OBJECT_NAME">
+<code class="descname">TABLE_OBJECT_NAME</code><em class="property"> = 'EDR_INDEX_TABLE'</em><a class="headerlink" href="#pdsc.table.HiRiseEdrTable.TABLE_OBJECT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The HiRISE EDR table has a custom name</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.HiRiseRdrTable">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">HiRiseRdrTable</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#HiRiseRdrTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.HiRiseRdrTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> for the HiRISE instrument that uses the
+custom <a class="reference internal" href="#pdsc.table.HiRiseTableColumn" title="pdsc.table.HiRiseTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseTableColumn</span></code></a> class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – path to a PDS cumulative index LBL file</li>
+<li><strong>table_file</strong> – path to a PDS cumulative index TAB file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.HiRiseRdrTable.COLUMN_CLASS">
+<code class="descname">COLUMN_CLASS</code><a class="headerlink" href="#pdsc.table.HiRiseRdrTable.COLUMN_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.table.HiRiseRdrTable" title="pdsc.table.HiRiseRdrTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseRdrTable</span></code></a> class should use
+<a class="reference internal" href="#pdsc.table.HiRiseTableColumn" title="pdsc.table.HiRiseTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseTableColumn</span></code></a> for parsing columns</p>
+<p>alias of <a class="reference internal" href="#pdsc.table.HiRiseTableColumn" title="pdsc.table.HiRiseTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiRiseTableColumn</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.HiRiseRdrTable.TABLE_OBJECT_NAME">
+<code class="descname">TABLE_OBJECT_NAME</code><em class="property"> = 'RDR_INDEX_TABLE'</em><a class="headerlink" href="#pdsc.table.HiRiseRdrTable.TABLE_OBJECT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The HiRISE RDR table has a custom name</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.HiRiseTableColumn">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">HiRiseTableColumn</code><span class="sig-paren">(</span><em>fpointer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#HiRiseTableColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.HiRiseTableColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> for the HiRISE instrument to define
+some special types</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fpointer</strong> – an open file object, pointing to the start of the column within the
+PDS index LBL file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.HiRiseTableColumn.SPECIAL_TYPES">
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'ADC_CONVERSION_SETTINGS': &lt;type 'str'&gt;, 'OBSERVATION_START_COUNT': &lt;function ctx_sclk at 0x7f9c5055ab90&gt;, 'OBSERVATION_START_TIME': &lt;function hirise_datetime at 0x7f9c5055ab18&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk at 0x7f9c5055ab90&gt;, 'SPACECRAFT_CLOCK_STOP_COUNT': &lt;function ctx_sclk at 0x7f9c5055ab90&gt;, 'START_TIME': &lt;function hirise_datetime at 0x7f9c5055ab18&gt;, 'STOP_TIME': &lt;function hirise_datetime at 0x7f9c5055ab18&gt;}</em><a class="headerlink" href="#pdsc.table.HiRiseTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines special types for the HiRISE observation metadata</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.MocTable">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">MocTable</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#MocTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.MocTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> for the MOC instrument that uses the
+custom <a class="reference internal" href="#pdsc.table.MocTableColumn" title="pdsc.table.MocTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">MocTableColumn</span></code></a> class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – path to a PDS cumulative index LBL file</li>
+<li><strong>table_file</strong> – path to a PDS cumulative index TAB file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.MocTable.COLUMN_CLASS">
+<code class="descname">COLUMN_CLASS</code><a class="headerlink" href="#pdsc.table.MocTable.COLUMN_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.table.MocTable" title="pdsc.table.MocTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">MocTable</span></code></a> class should use <a class="reference internal" href="#pdsc.table.MocTableColumn" title="pdsc.table.MocTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">MocTableColumn</span></code></a> for
+parsing columns</p>
+<p>alias of <a class="reference internal" href="#pdsc.table.MocTableColumn" title="pdsc.table.MocTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">MocTableColumn</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.MocTableColumn">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">MocTableColumn</code><span class="sig-paren">(</span><em>fpointer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#MocTableColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.MocTableColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> for the MOC instrument to define
+some special types</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fpointer</strong> – an open file object, pointing to the start of the column within the
+PDS index LBL file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.MocTableColumn.SPECIAL_TYPES">
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'IMAGE_TIME': &lt;function themis_datetime at 0x7f9c5055aaa0&gt;, 'PRODUCT_ID': &lt;function moc_observation_id at 0x7f9c5055ac08&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;function ctx_sclk at 0x7f9c5055ab90&gt;}</em><a class="headerlink" href="#pdsc.table.MocTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines special types for the MOC observation metadata</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.PdsTable">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">PdsTable</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#PdsTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.PdsTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for representing and parsing a PDS cumulative index table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – path to a PDS cumulative index LBL file</li>
+<li><strong>table_file</strong> – path to a PDS cumulative index TAB file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.PdsTable.CHECK_COLUMN_COUNT">
+<code class="descname">CHECK_COLUMN_COUNT</code><em class="property"> = True</em><a class="headerlink" href="#pdsc.table.PdsTable.CHECK_COLUMN_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to check the number of columns parsed against the number of columns
+reported in the table metadata; for most instruments, these numbers match,
+but other instruments have columns with multiple fields so there is
+sometimes a discrepancy between the effective number of columns and the
+reported column count.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.PdsTable.COLUMN_CLASS">
+<code class="descname">COLUMN_CLASS</code><a class="headerlink" href="#pdsc.table.PdsTable.COLUMN_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The table column class used to parse columns in this table</p>
+<p>alias of <a class="reference internal" href="#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.PdsTable.COLUMN_OBJECT_NAME">
+<code class="descname">COLUMN_OBJECT_NAME</code><em class="property"> = 'COLUMN'</em><a class="headerlink" href="#pdsc.table.PdsTable.COLUMN_OBJECT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of a COLUMN object in the PDS cumulative index label</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.PdsTable.PARSE_TABLE">
+<code class="descname">PARSE_TABLE</code><em class="property"> = {'COLUMNS': ('n_columns', &lt;type 'int'&gt;), 'ROWS': ('n_rows', &lt;type 'int'&gt;), 'ROW_BYTES': ('row_bytes', &lt;type 'int'&gt;)}</em><a class="headerlink" href="#pdsc.table.PdsTable.PARSE_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Information for parsing the table object out of the PDS cumulative index
+label file</p>
+<p>This dictionary maps the metadata identifier to a tuple containing the name
+and type of the <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> attribute that will be set when parsing
+this column.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.PdsTable.TABLE_OBJECT_NAME">
+<code class="descname">TABLE_OBJECT_NAME</code><em class="property"> = 'TABLE'</em><a class="headerlink" href="#pdsc.table.PdsTable.TABLE_OBJECT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of a TABLE object in the PDS cumulative index label</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.table.PdsTable.get_column">
+<code class="descname">get_column</code><span class="sig-paren">(</span><em>column_name_or_idx</em>, <em>progress=True</em>, <em>cache=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#PdsTable.get_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.PdsTable.get_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses all column values out of a PDS cumulative index table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>column_name_or_idx</strong> – either an integer column index, or its name as given in the PDS
+label file</li>
+<li><strong>progress</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, displays a progress bar as the column is being read</li>
+<li><strong>cache</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, caches the result in memory so that subsequent calls do
+not have to read from the file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code> containing values for every row of
+the specified column</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pdsc.table.PdsTable.get_column_idx">
+<code class="descname">get_column_idx</code><span class="sig-paren">(</span><em>column_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#PdsTable.get_column_idx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.PdsTable.get_column_idx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get numerical column index given column name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column_name</strong> – PDS table column name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">index of column within table (raises <code class="xref py py-class docutils literal notranslate"><span class="pre">IndexError</span></code> if
+the column is not found)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.PdsTableColumn">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">PdsTableColumn</code><span class="sig-paren">(</span><em>fpointer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#PdsTableColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.PdsTableColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for representing and parsing a column from a PDS cumulative index
+table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fpointer</strong> – an open file object, pointing to the start of the column within the
+PDS index LBL file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.PdsTableColumn.PARSE_TABLE">
+<code class="descname">PARSE_TABLE</code><em class="property"> = {'BYTES': ('length', &lt;type 'int'&gt;), 'COLUMN_NUMBER': ('number', &lt;type 'int'&gt;), 'DATA_TYPE': ('dtype', &lt;type 'str'&gt;), 'NAME': ('name', &lt;type 'str'&gt;), 'NOT_APPLICABLE_CONSTANT': ('unknown_constant', &lt;type 'str'&gt;), 'START_BYTE': ('start_byte', &lt;type 'int'&gt;), 'UNIT': ('unit', &lt;type 'str'&gt;)}</em><a class="headerlink" href="#pdsc.table.PdsTableColumn.PARSE_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Information for parsing table columns; each column contains associated
+metadata such as the column number, the size of the column in bytes, or the
+fill value used when an entry is not applicable</p>
+<p>This dictionary maps the metadata identifier to a tuple containing the name
+and type of the <a class="reference internal" href="#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> attribute that will be set when
+parsing this column.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.PdsTableColumn.SPECIAL_TYPES">
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {}</em><a class="headerlink" href="#pdsc.table.PdsTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains a mapping from column names with non-standard column types to
+assocaited Python types; sub-classes should use this attribute to define
+custom column types for a particular instrument</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.PdsTableColumn.TYPE_TABLE">
+<code class="descname">TYPE_TABLE</code><em class="property"> = {'ASCII_INTEGER': &lt;type 'int'&gt;, 'ASCII_REAL': &lt;type 'float'&gt;}</em><a class="headerlink" href="#pdsc.table.PdsTableColumn.TYPE_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains a mapping of standard column data types to assocaited Python types</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.ThemisTable">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">ThemisTable</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#ThemisTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.ThemisTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> for the THEMIS instrument that uses the
+custom <a class="reference internal" href="#pdsc.table.ThemisTableColumn" title="pdsc.table.ThemisTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThemisTableColumn</span></code></a> class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label_file</strong> – path to a PDS cumulative index LBL file</li>
+<li><strong>table_file</strong> – path to a PDS cumulative index TAB file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.ThemisTable.COLUMN_CLASS">
+<code class="descname">COLUMN_CLASS</code><a class="headerlink" href="#pdsc.table.ThemisTable.COLUMN_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pdsc.table.ThemisTable" title="pdsc.table.ThemisTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThemisTable</span></code></a> class should use <a class="reference internal" href="#pdsc.table.ThemisTableColumn" title="pdsc.table.ThemisTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThemisTableColumn</span></code></a>
+for parsing columns</p>
+<p>alias of <a class="reference internal" href="#pdsc.table.ThemisTableColumn" title="pdsc.table.ThemisTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThemisTableColumn</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pdsc.table.ThemisTableColumn">
+<em class="property">class </em><code class="descclassname">pdsc.table.</code><code class="descname">ThemisTableColumn</code><span class="sig-paren">(</span><em>fpointer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#ThemisTableColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.ThemisTableColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> for the THEMIS instrument to
+override column metadata and define some special types</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fpointer</strong> – an open file object, pointing to the start of the column within the
+PDS index LBL file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pdsc.table.ThemisTableColumn.PARSE_TABLE">
+<code class="descname">PARSE_TABLE</code><em class="property"> = {'BYTES': ('length', &lt;type 'int'&gt;), 'COLUMN_NUMBER': ('number', &lt;type 'int'&gt;), 'DATA_TYPE': ('dtype', &lt;type 'str'&gt;), 'NAME': ('name', &lt;type 'str'&gt;), 'START_BYTE': ('start_byte', &lt;type 'int'&gt;), 'UNIT': ('unit', &lt;type 'str'&gt;), 'UNKNOWN_CONSTANT': ('unknown_constant', &lt;type 'str'&gt;)}</em><a class="headerlink" href="#pdsc.table.ThemisTableColumn.PARSE_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override column metadata, which follows a slightly different convention for
+THEMIS</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.table.ThemisTableColumn.SPECIAL_TYPES">
+<code class="descname">SPECIAL_TYPES</code><em class="property"> = {'BAND_NUMBER': &lt;type 'int'&gt;, 'LOCAL_TIME': &lt;type 'float'&gt;, 'SPACECRAFT_CLOCK_START_COUNT': &lt;type 'float'&gt;, 'SPACECRAFT_CLOCK_STOP_COUNT': &lt;type 'float'&gt;, 'START_TIME': &lt;function themis_datetime at 0x7f9c5055aaa0&gt;, 'START_TIME_ET': &lt;type 'float'&gt;, 'STOP_TIME': &lt;function themis_datetime at 0x7f9c5055aaa0&gt;, 'STOP_TIME_ET': &lt;type 'float'&gt;, 'UNCORRECTED_SCLK_START_COUNT': &lt;type 'float'&gt;}</em><a class="headerlink" href="#pdsc.table.ThemisTableColumn.SPECIAL_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines special types for the THEMIS observation metadata</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.ctx_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">ctx_determiner</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#ctx_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.ctx_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for CTX products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for CTX products</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.ctx_sclk">
+<code class="descclassname">pdsc.table.</code><code class="descname">ctx_sclk</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#ctx_sclk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.ctx_sclk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the CTX SCLK representation with a colon into a fractional second
+with a decimal place</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> – CTX SCLK string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">floating-point fractional second</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ctx_sclk</span><span class="p">(</span><span class="s1">&#39;10:1&#39;</span><span class="p">)</span>
+<span class="go">10.1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.determine_instrument">
+<code class="descclassname">pdsc.table.</code><code class="descname">determine_instrument</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#determine_instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.determine_instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the PDSC instrument name associated with a PDS cumulative index
+LBL file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – path to PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the instrument name corresponding to the first registered
+“determiner” function that returns <code class="docutils literal notranslate"><span class="pre">True</span></code>; instruments are checked in
+alphabetical order by name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.generic_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">generic_determiner</code><span class="sig-paren">(</span><em>label_file</em>, <em>instrument_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#generic_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.generic_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for an instrument with the
+specified name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label_file</strong> – PDS cumulative index LBL file</li>
+<li><strong>instrument_name</strong> – instrument name as reported in the cumulative index
+<code class="docutils literal notranslate"><span class="pre">INSTRUMENT_NAME</span></code> header</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for the specified instrument</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This determiner works for cumulative index files that have an explicit
+<code class="docutils literal notranslate"><span class="pre">INSTRUMENT_NAME</span></code> header.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.hirise_datetime">
+<code class="descclassname">pdsc.table.</code><code class="descname">hirise_datetime</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#hirise_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.hirise_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses date/time format found in HiRISE cumulative index files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> – datetime string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code> object</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hirise_datetime</span><span class="p">(</span><span class="s1">&#39;1985-10-26T01:20:00&#39;</span><span class="p">)</span>
+<span class="go">datetime.datetime(1985, 10, 26, 1, 20)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.hirise_edr_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">hirise_edr_determiner</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#hirise_edr_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.hirise_edr_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for HiRISE EDR products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for HiRISE EDR products</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.hirise_rdr_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">hirise_rdr_determiner</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#hirise_rdr_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.hirise_rdr_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for HiRISE RDR products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for HiRISE RDR products</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.moc_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">moc_determiner</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#moc_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.moc_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for MOC products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for MOC products</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.moc_observation_id">
+<code class="descclassname">pdsc.table.</code><code class="descname">moc_observation_id</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#moc_observation_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.moc_observation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the forward slash in MOC observation ids</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> – MOC observation id</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">reformatted id</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">moc_observation_id</span><span class="p">(</span><span class="s1">&#39;FHA/00469&#39;</span><span class="p">)</span>
+<span class="go">&#39;FHA00469&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.parse_table">
+<code class="descclassname">pdsc.table.</code><code class="descname">parse_table</code><span class="sig-paren">(</span><em>label_file</em>, <em>table_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#parse_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.parse_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a PDS cumulative index table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label_file</strong> – path to the PDS LBL file assocated with the cumulate index</li>
+<li><strong>table_file</strong> – path to the PDS TAB file assocated with the cumulate index</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> object containing parsed table metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This function first uses <a class="reference internal" href="#pdsc.table.determine_instrument" title="pdsc.table.determine_instrument"><code class="xref py py-meth docutils literal notranslate"><span class="pre">determine_instrument()</span></code></a> to determine the
+instrument name associated with the <code class="docutils literal notranslate"><span class="pre">label_file</span></code>. Then, the function looks
+up the <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> subclass that has been registered to the
+instrument and uses this class to parse the table.  See <a class="reference internal" href="Extending.html#extending-pdsc"><span class="std std-ref">Extending PDSC</span></a> for more details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.register_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">register_determiner</code><span class="sig-paren">(</span><em>instrument</em><span class="sig-paren">)</span><a class="headerlink" href="#pdsc.table.register_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator that can be used to register a function that determines whether a
+cumulative index file is for a particular instrument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>instrument</strong> – PDSC instrument name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">decorator that registers target to given instrument</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="Extending.html#extending-pdsc"><span class="std std-ref">Extending PDSC</span></a> for more details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.register_table">
+<code class="descclassname">pdsc.table.</code><code class="descname">register_table</code><span class="sig-paren">(</span><em>instrument</em><span class="sig-paren">)</span><a class="headerlink" href="#pdsc.table.register_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator that can be used to register a <a class="reference internal" href="#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> subclass to a
+particular instrument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>instrument</strong> – PDSC instrument name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">decorator that registers target to given instrument</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="Extending.html#extending-pdsc"><span class="std std-ref">Extending PDSC</span></a> for more details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.themis_datetime">
+<code class="descclassname">pdsc.table.</code><code class="descname">themis_datetime</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#themis_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.themis_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses date/time format found in THEMIS cumulative index files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> – datetime string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code> object</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">themis_datetime</span><span class="p">(</span><span class="s1">&#39;1985-10-26T01:20:00.000&#39;</span><span class="p">)</span>
+<span class="go">datetime.datetime(1985, 10, 26, 1, 20)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.themis_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">themis_determiner</code><span class="sig-paren">(</span><em>label_file</em>, <em>detector_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#themis_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.themis_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for generic THEMIS products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label_file</strong> – PDS cumulative index LBL file</li>
+<li><strong>detector_name</strong> – THEMIS detector name (either <code class="docutils literal notranslate"><span class="pre">'VIS'</span></code> or <code class="docutils literal notranslate"><span class="pre">'IR'</span></code>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for THEMIS products with the
+specified detector</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.themis_ir_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">themis_ir_determiner</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#themis_ir_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.themis_ir_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for THEMIS IR products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for THEMIS IR products</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdsc.table.themis_vis_determiner">
+<code class="descclassname">pdsc.table.</code><code class="descname">themis_vis_determiner</code><span class="sig-paren">(</span><em>label_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/table.html#themis_vis_determiner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.table.themis_vis_determiner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines whether a cumulative index file is for THEMIS VIS products</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for THEMIS VIS products</td>
 </tr>
 </tbody>
 </table>

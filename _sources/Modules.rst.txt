@@ -37,6 +37,12 @@ Module Documentation
 .. automodule:: pdsc.server
   :members:
 
+:py:mod:`pdsc.table`
+--------------------
+
+.. automodule:: pdsc.table
+  :members:
+
 :py:mod:`pdsc.util`
 -------------------
 

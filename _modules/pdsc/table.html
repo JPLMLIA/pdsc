@@ -1,0 +1,904 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pdsc.table &mdash; PDSC 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PDSC
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#ingesting-cumulative-indices">Ingesting Cumulative Indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Installation.html#environment-variables">Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Extending.html">Extending PDSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Modules.html">Module Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.localization"><code class="docutils literal notranslate"><span class="pre">pdsc.localization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PDSC</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pdsc.table</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pdsc.table</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parses PDS cumulative index files into an internal table representation</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">pds.core.parser</span> <span class="k">import</span> <span class="n">Parser</span>
+
+<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">registerer</span><span class="p">,</span> <span class="n">standard_progress_bar</span>
+
+<span class="n">INSTRUMENT_TABLES</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">register_table</span> <span class="o">=</span> <span class="n">registerer</span><span class="p">(</span><span class="n">INSTRUMENT_TABLES</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A decorator that can be used to register a :py:class:`PdsTable` subclass to a</span>
+<span class="sd">particular instrument.</span>
+
+<span class="sd">:param instrument: PDSC instrument name</span>
+<span class="sd">:return: decorator that registers target to given instrument</span>
+
+<span class="sd">See :ref:`Extending PDSC` for more details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">INSTRUMENT_DETERMINERS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">register_determiner</span> <span class="o">=</span> <span class="n">registerer</span><span class="p">(</span><span class="n">INSTRUMENT_DETERMINERS</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A decorator that can be used to register a function that determines whether a</span>
+<span class="sd">cumulative index file is for a particular instrument.</span>
+
+<span class="sd">:param instrument: PDSC instrument name</span>
+<span class="sd">:return: decorator that registers target to given instrument</span>
+
+<span class="sd">See :ref:`Extending PDSC` for more details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="themis_datetime"><a class="viewcode-back" href="../../Modules.html#pdsc.table.themis_datetime">[docs]</a><span class="k">def</span> <span class="nf">themis_datetime</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses date/time format found in THEMIS cumulative index files</span>
+
+<span class="sd">    :param s: datetime string</span>
+<span class="sd">    :return: :py:class:`datetime.datetime` object</span>
+
+<span class="sd">    &gt;&gt;&gt; themis_datetime(&#39;1985-10-26T01:20:00.000&#39;)</span>
+<span class="sd">    datetime.datetime(1985, 10, 26, 1, 20)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hirise_datetime"><a class="viewcode-back" href="../../Modules.html#pdsc.table.hirise_datetime">[docs]</a><span class="k">def</span> <span class="nf">hirise_datetime</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses date/time format found in HiRISE cumulative index files</span>
+
+<span class="sd">    :param s: datetime string</span>
+<span class="sd">    :return: :py:class:`datetime.datetime` object</span>
+
+<span class="sd">    &gt;&gt;&gt; hirise_datetime(&#39;1985-10-26T01:20:00&#39;)</span>
+<span class="sd">    datetime.datetime(1985, 10, 26, 1, 20)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ctx_sclk"><a class="viewcode-back" href="../../Modules.html#pdsc.table.ctx_sclk">[docs]</a><span class="k">def</span> <span class="nf">ctx_sclk</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Converts the CTX SCLK representation with a colon into a fractional second</span>
+<span class="sd">    with a decimal place</span>
+
+<span class="sd">    :param s: CTX SCLK string</span>
+<span class="sd">    :return: floating-point fractional second</span>
+
+<span class="sd">    &gt;&gt;&gt; ctx_sclk(&#39;10:1&#39;)</span>
+<span class="sd">    10.1</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="moc_observation_id"><a class="viewcode-back" href="../../Modules.html#pdsc.table.moc_observation_id">[docs]</a><span class="k">def</span> <span class="nf">moc_observation_id</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove the forward slash in MOC observation ids</span>
+
+<span class="sd">    :param s: MOC observation id</span>
+<span class="sd">    :return: reformatted id</span>
+
+<span class="sd">    &gt;&gt;&gt; moc_observation_id(&#39;FHA/00469&#39;)</span>
+<span class="sd">    &#39;FHA00469&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hirise_edr_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.hirise_edr_determiner">[docs]</a><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;hirise_edr&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hirise_edr_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for HiRISE EDR products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :return: ``True`` iff this label file is for HiRISE EDR products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;HiRISE&#39;</span> <span class="ow">in</span> <span class="n">raw</span> <span class="ow">and</span> <span class="s1">&#39;EDR_INDEX_TABLE&#39;</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hirise_rdr_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.hirise_rdr_determiner">[docs]</a><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;hirise_rdr&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hirise_rdr_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for HiRISE RDR products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :return: ``True`` iff this label file is for HiRISE RDR products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;HiRISE&#39;</span> <span class="ow">in</span> <span class="n">raw</span> <span class="ow">and</span> <span class="s1">&#39;RDR_INDEX_TABLE&#39;</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="themis_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.themis_determiner">[docs]</a><span class="k">def</span> <span class="nf">themis_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="n">detector_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for generic THEMIS products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :param detector_name: THEMIS detector name (either ``&#39;VIS&#39;`` or ``&#39;IR&#39;``)</span>
+<span class="sd">    :return: ``True`` iff this label file is for THEMIS products with the</span>
+<span class="sd">        specified detector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">Parser</span><span class="p">()</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">instrument</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;INSTRUMENT_NAME&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">detector</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DETECTOR_ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="s1">&#39;THERMAL EMISSION IMAGING SYSTEM&#39;</span> <span class="ow">in</span> <span class="n">instrument</span>
+                <span class="ow">and</span> <span class="n">detector_name</span> <span class="ow">in</span> <span class="n">detector</span>
+            <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="generic_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.generic_determiner">[docs]</a><span class="k">def</span> <span class="nf">generic_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="n">instrument_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for an instrument with the</span>
+<span class="sd">    specified name</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :param instrument_name: instrument name as reported in the cumulative index</span>
+<span class="sd">        ``INSTRUMENT_NAME`` header</span>
+<span class="sd">    :return: ``True`` iff this label file is for the specified instrument</span>
+
+<span class="sd">    This determiner works for cumulative index files that have an explicit</span>
+<span class="sd">    ``INSTRUMENT_NAME`` header.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">Parser</span><span class="p">()</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">instrument</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;INSTRUMENT_NAME&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">instrument_name</span> <span class="ow">in</span> <span class="n">instrument</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="themis_vis_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.themis_vis_determiner">[docs]</a><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;themis_vis&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">themis_vis_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for THEMIS VIS products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :return: ``True`` iff this label file is for THEMIS VIS products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">themis_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;VIS&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="themis_ir_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.themis_ir_determiner">[docs]</a><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;themis_ir&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">themis_ir_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for THEMIS IR products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :return: ``True`` iff this label file is for THEMIS IR products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">themis_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;IR&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ctx_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.ctx_determiner">[docs]</a><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;ctx&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ctx_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for CTX products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :return: ``True`` iff this label file is for CTX products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">generic_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;CONTEXT CAMERA&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="moc_determiner"><a class="viewcode-back" href="../../Modules.html#pdsc.table.moc_determiner">[docs]</a><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;moc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">moc_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether a cumulative index file is for MOC products</span>
+
+<span class="sd">    :param label_file: PDS cumulative index LBL file</span>
+<span class="sd">    :return: ``True`` iff this label file is for MOC products</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">generic_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;MARS ORBITER CAMERA&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="determine_instrument"><a class="viewcode-back" href="../../Modules.html#pdsc.table.determine_instrument">[docs]</a><span class="k">def</span> <span class="nf">determine_instrument</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines the PDSC instrument name associated with a PDS cumulative index</span>
+<span class="sd">    LBL file</span>
+
+<span class="sd">    :param label_file: path to PDS cumulative index LBL file</span>
+<span class="sd">    :return: the instrument name corresponding to the first registered</span>
+<span class="sd">        &quot;determiner&quot; function that returns ``True``; instruments are checked in</span>
+<span class="sd">        alphabetical order by name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">iname</span><span class="p">,</span> <span class="n">determiner</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">INSTRUMENT_DETERMINERS</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span> <span class="k">return</span> <span class="n">iname</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not determine instrument&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PdsTableColumn"><a class="viewcode-back" href="../../Modules.html#pdsc.table.PdsTableColumn">[docs]</a><span class="k">class</span> <span class="nc">PdsTableColumn</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for representing and parsing a column from a PDS cumulative index</span>
+<span class="sd">    table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PARSE_TABLE</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;COLUMN_NUMBER&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;DATA_TYPE&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;START_BYTE&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;start_byte&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;BYTES&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;NOT_APPLICABLE_CONSTANT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;unknown_constant&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;UNIT&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Information for parsing table columns; each column contains associated</span>
+<span class="sd">    metadata such as the column number, the size of the column in bytes, or the</span>
+<span class="sd">    fill value used when an entry is not applicable</span>
+
+<span class="sd">    This dictionary maps the metadata identifier to a tuple containing the name</span>
+<span class="sd">    and type of the :py:class:`PdsTableColumn` attribute that will be set when</span>
+<span class="sd">    parsing this column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TYPE_TABLE</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ASCII_REAL&#39;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;ASCII_INTEGER&#39;</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains a mapping of standard column data types to assocaited Python types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SPECIAL_TYPES</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains a mapping from column names with non-standard column types to</span>
+<span class="sd">    assocaited Python types; sub-classes should use this attribute to define</span>
+<span class="sd">    custom column types for a particular instrument</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpointer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param fpointer:</span>
+<span class="sd">            an open file object, pointing to the start of the column within the</span>
+<span class="sd">            PDS index LBL file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_byte</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unknown_constant</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">fpointer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Column was not successfully parsed!&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Remap column data type</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPECIAL_TYPES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPECIAL_TYPES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_TABLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+        <span class="c1"># Recast unknown constant to type of column</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unknown_constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unknown_constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unknown_constant</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpointer</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fpointer</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">break</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s*(\w+)\s*=\s*(\w+)\s*&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;END_OBJECT&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;END_OBJECT&#39;</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;COLUMN&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PARSE_TABLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">continue</span>
+
+            <span class="n">vdest</span><span class="p">,</span> <span class="n">vtype</span> <span class="o">=</span> <span class="n">action</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vdest</span><span class="p">,</span> <span class="n">vtype</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="PdsTable"><a class="viewcode-back" href="../../Modules.html#pdsc.table.PdsTable">[docs]</a><span class="k">class</span> <span class="nc">PdsTable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for representing and parsing a PDS cumulative index table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PARSE_TABLE</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;COLUMNS&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;n_columns&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;ROWS&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;n_rows&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;ROW_BYTES&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;row_bytes&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Information for parsing the table object out of the PDS cumulative index</span>
+<span class="sd">    label file</span>
+
+<span class="sd">    This dictionary maps the metadata identifier to a tuple containing the name</span>
+<span class="sd">    and type of the :py:class:`PdsTable` attribute that will be set when parsing</span>
+<span class="sd">    this column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TABLE_OBJECT_NAME</span> <span class="o">=</span> <span class="s1">&#39;TABLE&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The name of a TABLE object in the PDS cumulative index label</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_OBJECT_NAME</span> <span class="o">=</span> <span class="s1">&#39;COLUMN&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The name of a COLUMN object in the PDS cumulative index label</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_CLASS</span> <span class="o">=</span> <span class="n">PdsTableColumn</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The table column class used to parse columns in this table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CHECK_COLUMN_COUNT</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Whether to check the number of columns parsed against the number of columns</span>
+<span class="sd">    reported in the table metadata; for most instruments, these numbers match,</span>
+<span class="sd">    but other instruments have columns with multiple fields so there is</span>
+<span class="sd">    sometimes a discrepancy between the effective number of columns and the</span>
+<span class="sd">    reported column count.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_file</span><span class="p">,</span> <span class="n">table_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param label_file: path to a PDS cumulative index LBL file</span>
+<span class="sd">        :param table_file: path to a PDS cumulative index TAB file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_file</span> <span class="o">=</span> <span class="n">label_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_file</span> <span class="o">=</span> <span class="n">table_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PARSE_TABLE</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Error parsing table&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHECK_COLUMN_COUNT</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_columns</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Expected </span><span class="si">%d</span><span class="s1"> columns; got </span><span class="si">%d</span><span class="s1">&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_columns</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpointer</span><span class="p">):</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">in_table</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fpointer</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">break</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s*(\w+)\s*=\s*(\w+)\s*&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">in_table</span> <span class="ow">and</span> <span class="s1">&#39;END_OBJECT&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">columns</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">in_table</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;END_OBJECT&#39;</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TABLE_OBJECT_NAME</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">columns</span>
+
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;OBJECT&#39;</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">COLUMN_OBJECT_NAME</span><span class="p">:</span>
+                    <span class="n">column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">COLUMN_CLASS</span><span class="p">(</span><span class="n">fpointer</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">number</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">column</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+                    <span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">column</span>
+                    <span class="k">continue</span>
+
+                <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PARSE_TABLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">action</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">continue</span>
+
+                <span class="n">vdest</span><span class="p">,</span> <span class="n">vtype</span> <span class="o">=</span> <span class="n">action</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vdest</span><span class="p">,</span> <span class="n">vtype</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;OBJECT&#39;</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TABLE_OBJECT_NAME</span><span class="p">:</span>
+                    <span class="n">in_table</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">continue</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="PdsTable.get_column_idx"><a class="viewcode-back" href="../../Modules.html#pdsc.table.PdsTable.get_column_idx">[docs]</a>    <span class="k">def</span> <span class="nf">get_column_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get numerical column index given column name</span>
+
+<span class="sd">        :param column_name: PDS table column name</span>
+
+<span class="sd">        :return: index of column within table (raises :py:class:`IndexError` if</span>
+<span class="sd">            the column is not found)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">column_name</span><span class="p">:</span> <span class="k">return</span> <span class="n">i</span>
+        <span class="k">return</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Column name &quot;</span><span class="si">%s</span><span class="s1">&quot; not found&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="PdsTable.get_column"><a class="viewcode-back" href="../../Modules.html#pdsc.table.PdsTable.get_column">[docs]</a>    <span class="k">def</span> <span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_name_or_idx</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses all column values out of a PDS cumulative index table</span>
+
+<span class="sd">        :param column_name_or_idx:</span>
+<span class="sd">            either an integer column index, or its name as given in the PDS</span>
+<span class="sd">            label file</span>
+<span class="sd">        :param progress:</span>
+<span class="sd">            if ``True``, displays a progress bar as the column is being read</span>
+<span class="sd">        :param cache:</span>
+<span class="sd">            if ``True``, caches the result in memory so that subsequent calls do</span>
+<span class="sd">            not have to read from the file</span>
+
+<span class="sd">        :return: a :py:class:`numpy.array` containing values for every row of</span>
+<span class="sd">            the specified column</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">column_name_or_idx</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">cidx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column_idx</span><span class="p">(</span><span class="n">column_name_or_idx</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cidx</span> <span class="o">=</span> <span class="n">column_name_or_idx</span>
+
+        <span class="k">if</span> <span class="n">cidx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">[</span><span class="n">cidx</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">cidx</span><span class="p">]</span>
+
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="n">standard_progress_bar</span><span class="p">(</span><span class="s1">&#39;Reading column </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cidx</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span><span class="p">)):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">row_bytes</span> <span class="o">+</span> <span class="n">column</span><span class="o">.</span><span class="n">start_byte</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+                    <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">column</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">pbar</span> <span class="o">=</span> <span class="n">standard_progress_bar</span><span class="p">(</span>
+                    <span class="s1">&#39;Converting column </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cidx</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+                <span class="n">data_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">column</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">(</span><span class="n">values</span><span class="p">)])</span>
+
+            <span class="k">if</span> <span class="n">column</span><span class="o">.</span><span class="n">unknown_constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">data_column</span><span class="p">[</span><span class="n">data_column</span> <span class="o">==</span> <span class="n">column</span><span class="o">.</span><span class="n">unknown_constant</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+            <span class="k">if</span> <span class="n">data_column</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">data_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">data_column</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">[</span><span class="n">cidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_column</span>
+            <span class="k">return</span> <span class="n">data_column</span></div></div>
+
+<span class="c1"># ****************************************************************************</span>
+<span class="c1"># CTX</span>
+<span class="c1"># ****************************************************************************</span>
+
+<div class="viewcode-block" id="CtxTableColumn"><a class="viewcode-back" href="../../Modules.html#pdsc.table.CtxTableColumn">[docs]</a><span class="k">class</span> <span class="nc">CtxTableColumn</span><span class="p">(</span><span class="n">PdsTableColumn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTableColumn` for the CTX instrument to define</span>
+<span class="sd">    some special types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SPECIAL_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;IMAGE_TIME&#39;</span><span class="p">:</span> <span class="n">themis_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;SPACECRAFT_CLOCK_START_COUNT&#39;</span><span class="p">:</span> <span class="n">ctx_sclk</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Defines special types for the CTX instrument to parse observation and</span>
+<span class="sd">    spacecraft clock times</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="CtxTable"><a class="viewcode-back" href="../../Modules.html#pdsc.table.CtxTable">[docs]</a><span class="nd">@register_table</span><span class="p">(</span><span class="s1">&#39;ctx&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">CtxTable</span><span class="p">(</span><span class="n">PdsTable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTable` for the CTX instrument that uses the</span>
+<span class="sd">    custom :py:class:`CtxTableColumn` class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_CLASS</span> <span class="o">=</span> <span class="n">CtxTableColumn</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`CtxTable` class should use :py:class:`CtxTableColumn` for</span>
+<span class="sd">    parsing columns</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<span class="c1"># ****************************************************************************</span>
+<span class="c1"># THEMIS</span>
+<span class="c1"># ****************************************************************************</span>
+
+<div class="viewcode-block" id="ThemisTableColumn"><a class="viewcode-back" href="../../Modules.html#pdsc.table.ThemisTableColumn">[docs]</a><span class="k">class</span> <span class="nc">ThemisTableColumn</span><span class="p">(</span><span class="n">PdsTableColumn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTableColumn` for the THEMIS instrument to</span>
+<span class="sd">    override column metadata and define some special types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PARSE_TABLE</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;COLUMN_NUMBER&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;DATA_TYPE&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;START_BYTE&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;start_byte&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;BYTES&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;UNKNOWN_CONSTANT&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;unknown_constant&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s1">&#39;UNIT&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Override column metadata, which follows a slightly different convention for</span>
+<span class="sd">    THEMIS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SPECIAL_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;START_TIME&#39;</span><span class="p">:</span> <span class="n">themis_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;STOP_TIME&#39;</span><span class="p">:</span> <span class="n">themis_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;SPACECRAFT_CLOCK_START_COUNT&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;SPACECRAFT_CLOCK_STOP_COUNT&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;START_TIME_ET&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;STOP_TIME_ET&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;UNCORRECTED_SCLK_START_COUNT&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;BAND_NUMBER&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s1">&#39;LOCAL_TIME&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Defines special types for the THEMIS observation metadata</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="ThemisTable"><a class="viewcode-back" href="../../Modules.html#pdsc.table.ThemisTable">[docs]</a><span class="nd">@register_table</span><span class="p">(</span><span class="s1">&#39;themis_vis&#39;</span><span class="p">)</span>
+<span class="nd">@register_table</span><span class="p">(</span><span class="s1">&#39;themis_ir&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ThemisTable</span><span class="p">(</span><span class="n">PdsTable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTable` for the THEMIS instrument that uses the</span>
+<span class="sd">    custom :py:class:`ThemisTableColumn` class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_CLASS</span> <span class="o">=</span> <span class="n">ThemisTableColumn</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`ThemisTable` class should use :py:class:`ThemisTableColumn`</span>
+<span class="sd">    for parsing columns</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<span class="c1"># ****************************************************************************</span>
+<span class="c1"># HiRISE</span>
+<span class="c1"># ****************************************************************************</span>
+
+<div class="viewcode-block" id="HiRiseTableColumn"><a class="viewcode-back" href="../../Modules.html#pdsc.table.HiRiseTableColumn">[docs]</a><span class="k">class</span> <span class="nc">HiRiseTableColumn</span><span class="p">(</span><span class="n">PdsTableColumn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTableColumn` for the HiRISE instrument to define</span>
+<span class="sd">    some special types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SPECIAL_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;OBSERVATION_START_TIME&#39;</span><span class="p">:</span> <span class="n">hirise_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;START_TIME&#39;</span><span class="p">:</span> <span class="n">hirise_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;OBSERVATION_START_COUNT&#39;</span><span class="p">:</span> <span class="n">ctx_sclk</span><span class="p">,</span>
+        <span class="s1">&#39;STOP_TIME&#39;</span><span class="p">:</span> <span class="n">hirise_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;SPACECRAFT_CLOCK_START_COUNT&#39;</span><span class="p">:</span> <span class="n">ctx_sclk</span><span class="p">,</span>
+        <span class="s1">&#39;SPACECRAFT_CLOCK_STOP_COUNT&#39;</span><span class="p">:</span> <span class="n">ctx_sclk</span><span class="p">,</span>
+        <span class="s1">&#39;ADC_CONVERSION_SETTINGS&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Defines special types for the HiRISE observation metadata</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="HiRiseEdrTable"><a class="viewcode-back" href="../../Modules.html#pdsc.table.HiRiseEdrTable">[docs]</a><span class="nd">@register_table</span><span class="p">(</span><span class="s1">&#39;hirise_edr&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HiRiseEdrTable</span><span class="p">(</span><span class="n">PdsTable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTable` for the HiRISE instrument that uses the</span>
+<span class="sd">    custom :py:class:`HiRiseTableColumn` class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_CLASS</span> <span class="o">=</span> <span class="n">HiRiseTableColumn</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`HiRiseEdrTable` class should use</span>
+<span class="sd">    :py:class:`HiRiseTableColumn` for parsing columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TABLE_OBJECT_NAME</span> <span class="o">=</span> <span class="s1">&#39;EDR_INDEX_TABLE&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The HiRISE EDR table has a custom name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CHECK_COLUMN_COUNT</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ignore the column count discrepancy for the HiRISE EDR table</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<span class="c1"># ****************************************************************************</span>
+<span class="c1"># HiRISE RDR</span>
+<span class="c1"># ****************************************************************************</span>
+
+<div class="viewcode-block" id="HiRiseRdrTable"><a class="viewcode-back" href="../../Modules.html#pdsc.table.HiRiseRdrTable">[docs]</a><span class="nd">@register_table</span><span class="p">(</span><span class="s1">&#39;hirise_rdr&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">HiRiseRdrTable</span><span class="p">(</span><span class="n">PdsTable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTable` for the HiRISE instrument that uses the</span>
+<span class="sd">    custom :py:class:`HiRiseTableColumn` class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_CLASS</span> <span class="o">=</span> <span class="n">HiRiseTableColumn</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`HiRiseRdrTable` class should use</span>
+<span class="sd">    :py:class:`HiRiseTableColumn` for parsing columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TABLE_OBJECT_NAME</span> <span class="o">=</span> <span class="s1">&#39;RDR_INDEX_TABLE&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The HiRISE RDR table has a custom name</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<span class="c1"># ****************************************************************************</span>
+<span class="c1"># MOC</span>
+<span class="c1"># ****************************************************************************</span>
+
+<div class="viewcode-block" id="MocTableColumn"><a class="viewcode-back" href="../../Modules.html#pdsc.table.MocTableColumn">[docs]</a><span class="k">class</span> <span class="nc">MocTableColumn</span><span class="p">(</span><span class="n">PdsTableColumn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTableColumn` for the MOC instrument to define</span>
+<span class="sd">    some special types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SPECIAL_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;IMAGE_TIME&#39;</span><span class="p">:</span> <span class="n">themis_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;SPACECRAFT_CLOCK_START_COUNT&#39;</span><span class="p">:</span> <span class="n">ctx_sclk</span><span class="p">,</span>
+        <span class="s1">&#39;PRODUCT_ID&#39;</span><span class="p">:</span> <span class="n">moc_observation_id</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Defines special types for the MOC observation metadata</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="MocTable"><a class="viewcode-back" href="../../Modules.html#pdsc.table.MocTable">[docs]</a><span class="nd">@register_table</span><span class="p">(</span><span class="s1">&#39;moc&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">MocTable</span><span class="p">(</span><span class="n">PdsTable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subclass of :py:class:`PdsTable` for the MOC instrument that uses the</span>
+<span class="sd">    custom :py:class:`MocTableColumn` class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMN_CLASS</span> <span class="o">=</span> <span class="n">MocTableColumn</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The :py:class:`MocTable` class should use :py:class:`MocTableColumn` for</span>
+<span class="sd">    parsing columns</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="parse_table"><a class="viewcode-back" href="../../Modules.html#pdsc.table.parse_table">[docs]</a><span class="k">def</span> <span class="nf">parse_table</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="n">table_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses a PDS cumulative index table</span>
+
+<span class="sd">    :param label_file:</span>
+<span class="sd">        path to the PDS LBL file assocated with the cumulate index</span>
+<span class="sd">    :param table_file:</span>
+<span class="sd">        path to the PDS TAB file assocated with the cumulate index</span>
+
+<span class="sd">    :return: a :py:class:`PdsTable` object containing parsed table metadata</span>
+
+<span class="sd">    This function first uses :py:meth:`determine_instrument` to determine the</span>
+<span class="sd">    instrument name associated with the ``label_file``. Then, the function looks</span>
+<span class="sd">    up the :py:class:`PdsTable` subclass that has been registered to the</span>
+<span class="sd">    instrument and uses this class to parse the table.  See :ref:`Extending</span>
+<span class="sd">    PDSC` for more details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instrument</span> <span class="o">=</span> <span class="n">determine_instrument</span><span class="p">(</span><span class="n">label_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">instrument</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">INSTRUMENT_TABLES</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Table parsing not implemented for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">instrument</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">INSTRUMENT_TABLES</span><span class="p">[</span><span class="n">instrument</span><span class="p">](</span><span class="n">label_file</span><span class="p">,</span> <span class="n">table_file</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, California Institute of Technology.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
