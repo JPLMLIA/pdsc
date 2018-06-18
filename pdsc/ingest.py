@@ -23,6 +23,11 @@ CUMIDX_EXT_PAIRS = (
     ('LBL', 'TAB'),
     ('lbl', 'tab'),
 )
+"""
+The list of valid cumulative index file extension pairs; the first is the
+extension of the label file and the second is the extension of the corresponding
+table file
+"""
 
 def get_idx_file_pair(path):
     """

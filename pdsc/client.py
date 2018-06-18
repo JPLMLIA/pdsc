@@ -15,8 +15,25 @@ from .segment import (SegmentTree, PointQuery, TriSegment,
     SEGMENT_DB_SUFFIX, SEGMENT_TREE_SUFFIX)
 
 DATABASE_DIRECTORY_VAR = 'PDSC_DATABASE_DIR'
+"""
+Environment variable that holds the PDSC ingested database directory
+
+See :ref:`Environment Variables` for details.
+"""
+
 SERVER_VAR = 'PDSC_SERVER_HOST'
+"""
+Environment variable that holds the PDSC server host name
+
+See :ref:`Environment Variables` for details.
+"""
+
 PORT_VAR = 'PDSC_SERVER_PORT'
+"""
+Environment variable that holds the PDSC server port
+
+See :ref:`Environment Variables` for details.
+"""
 
 class PdsClient(object):
     """

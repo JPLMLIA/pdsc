@@ -5,7 +5,15 @@ import json
 from datetime import datetime
 
 METADATA_DB_SUFFIX = '_metadata.db'
+"""
+The suffix used to save metadata SQL database files; the full filename for an
+instrument will be the instrument name followed by the suffix
+"""
+
 TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+"""
+The time format used by PDSC across all instruments
+"""
 
 class PdsMetadata(object):
     """

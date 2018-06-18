@@ -1,5 +1,6 @@
 """
-Decomposes an observation footprint into triangular segments
+Code for decomposing an observation footprint into triangular segments and
+storing these in a tree data structure for efficient querying
 """
 from __future__ import print_function
 import pickle
@@ -14,12 +15,38 @@ from .localization import (
 from .util import standard_progress_bar
 
 SEGMENT_DB_SUFFIX = '_segments.db'
+"""
+The suffix used to save segment SQL database files; the full filename for an
+instrument will be the instrument name followed by the suffix
+"""
+
 SEGMENT_TREE_SUFFIX = '_segment_tree.pkl'
+"""
+The suffix used to save segment tree index files; the full filename for an
+instrument will be the instrument name followed by the suffix
+"""
+
 INCLUSION_EPSILON = 1e-10 # corresponds to < 1 mm error in inclusion check
+"""
+Numerical precision for checking point inclusion in a segment; this is required
+due to floating point error, and corresponds to a roughly 1 mm error on the
+surface of Mars
+"""
 
 class PointQuery(object):
+    """
+    Encapsulates the information corresponding to a point inclusion query
+    """
 
     def __init__(self, lat, lon, radius):
+        """
+        :param lat: latitude in degrees
+        :param lon: east longitude in degrees
+        :param radius: radius in meters
+
+        This query is for all observations that overlap with a circle of the
+        given radius around the specified location on the surface
+        """
         if radius < 0:
             raise ValueError('Radius must be non-negative')
         if lat < -90 or lat > 90:
@@ -30,13 +57,26 @@ class PointQuery(object):
 
     @property
     def xyz(self):
+        """
+        The point on a unit sphere expressed in Cartesian coordinates
+        corresponding to the query point
+        """
         if self._xyz is None:
             self._xyz = latlon2unit(self.latlon)
         return self._xyz
 
 class SegmentTree(object):
+    """
+    Encapsulates a ball tree data structure used to efficiently find all
+    observation segments within some radius of a query point
+    """
 
     def __init__(self, segments, verbose=True):
+        """
+        :param segments: collection of all observation segments
+        :param verbose: if ``True`` display a progress bar as the index is being
+            built
+        """
         progress = standard_progress_bar('Finding segment centers', verbose)
         data = np.deg2rad([
             [s.center_latitude, s.center_longitude]
@@ -53,23 +93,51 @@ class SegmentTree(object):
         if verbose: print('...done.')
 
     def query_point(self, point):
+        """
+        Queries the :py:class:`SegmentTree` for all segments that potentially
+        overlap the given query point
+
+        :param point: a :py:class:`PointQuery`
+
+        :return: a collection of segment ids for segments that satisfy the query
+        """
         total_radius = point.radius + self.max_radius
         haversine_radius = total_radius / MARS_RADIUS_M
         X = np.deg2rad(point.latlon).reshape((1, -1))
         return self.ball_tree.query_radius(X, haversine_radius)[0]
 
     def query_segment(self, segment):
+        """
+        Queries the :py:class:`SegmentTree` for all segments that potentially
+        overlap the given segment
+
+        :param segment: a :py:class:`TriSegment`
+
+        :return: a collection of segment ids for segments that satisfy the query
+        """
         total_radius = segment.radius + self.max_radius
         haversine_radius = total_radius / MARS_RADIUS_M
         X = np.deg2rad([[segment.center_latitude, segment.center_longitude]])
         return self.ball_tree.query_radius(X, haversine_radius)[0]
 
     def save(self, outputfile):
+        """
+        Saves this :py:class:`SegmentTree` to the specified file
+
+        :param outputfile: output file path for pickled :py:class:`SegmentTree`
+        """
         with open(outputfile, 'w+') as f:
             pickle.dump(self, f)
 
     @staticmethod
     def load(inputfile):
+        """
+        Loads a :py:class:`SegmentTree` from the specified file
+
+        :param inputfile: path to pickled :py:class:`SegmentTree`
+
+        :return: parsed :py:class:`SegmentTree` object
+        """
         with open(inputfile, 'r') as f:
             return pickle.load(f)
 
@@ -107,11 +175,24 @@ class TriSegment(object):
         )
 
     def center(self):
+        """
+        Computes the center of this :py:class:`TriSegment` by converting the
+        latitude and longitude of the vertices to Cartesian coordiantes, taking
+        an average, then converting back to spherical coordinates
+
+
+        :return: a :py:class:`numpy.array` containing the latitude and east
+            longitude (in degrees) of the center of this triangular segment
+        """
         xyz_center = np.average(self.xyz_points, axis=0)
         return xyz2latlon(xyz_center)
 
     @property
     def xyz_points(self):
+        """
+        A 3-by-3 :py:class:`numpy.array` where each row contains a vertix of
+        this :py:class:`TriSegment` represented in Cartesian coordinates
+        """
         if self._xyz_points is None:
             self._xyz_points = np.vstack(
                 map(latlon2unit, self.latlon_points))
@@ -119,18 +200,28 @@ class TriSegment(object):
 
     @property
     def center_latitude(self):
+        """
+        The center latitude as compuated via :py:meth:`TriSegment.center`
+        """
         if self._center_latitude is None:
             self._center_latitude, self._center_longitude = self.center()
         return self._center_latitude
 
     @property
     def center_longitude(self):
+        """
+        The center longitude as compuated via :py:meth:`TriSegment.center`
+        """
         if self._center_longitude is None:
             self._center_latitude, self._center_longitude = self.center()
         return self._center_longitude
 
     @property
     def radius(self):
+        """
+        The radius of this :py:class:`TriSegment` in meters: the maximum
+        distance from the center to any vertex
+        """
         if self._radius is None:
             llcenter = np.deg2rad([self.center_latitude, self.center_longitude])
             self._radius = np.min([
@@ -141,6 +232,11 @@ class TriSegment(object):
 
     @property
     def normals(self):
+        """
+        A 3-by-3 :py:class:`numpy.array` where each row contains a normal vector
+        to a plane that passes through two of the vertices of this
+        :py:class:`TriSegment` and the origin
+        """
         if self._normals is None:
             xyz = self.xyz_points
             self._normals = np.cross(
@@ -152,6 +248,11 @@ class TriSegment(object):
 
     @property
     def projection_plane(self):
+        """
+        Returns a 2-by-3 :py:class:`numpy.array` holding two orthonormal vectors
+        defining a plane that is tangent the unit sphere at this segment's
+        center
+        """
         if self._projection_plane is None:
             normal = latlon2unit([self.center_latitude, self.center_longitude])
             I = np.eye(3)
@@ -164,9 +265,33 @@ class TriSegment(object):
         return self._projection_plane
 
     def is_inside(self, xyz):
+        """
+        Returns ``True`` iff the given vector falls within this
+        :py:class:`TriSegment` (i.e., it is on the positive side of every plane
+        defined by :py:meth:`TriSegment.normals`)
+        """
         return np.all(np.dot(self.normals, xyz) >= -INCLUSION_EPSILON)
 
     def distance_to_point(self, xyz):
+        """
+        Computes the distance from the given point in Cartesian coordiantes to
+        this :py:class:`TriSegment`
+
+        If the point falls within the segment, the distance is zero; otherwise,
+        the distance is the minimum geodesic distance between the point and any
+        vertex or edge of the segment.
+
+        The geodesic distance between this point and an edge is approximated as
+        the geodesic distance between this point expressed in spherical
+        coordinates and this point projected onto the edge plane (the plane
+        formed by the two vertices of the edge and the origin), expressed in
+        spherical coordinates.
+
+        :param xyz: query point in Cartesian coordinates
+
+        :return: distance (in meters) between this :py:class:`TriSegment` and
+            the query point
+        """
         if self.is_inside(xyz):
             return 0.0
 
@@ -186,6 +311,15 @@ class TriSegment(object):
         ])
 
     def includes_point(self, point_query):
+        """
+        Determines whether the query point falls within this
+        :py:class:`TriSegment`
+
+        :param point_query: a :py:class:`PointQuery`
+
+        :return: ``True`` iff the query point falls within the specified radius
+            of this :py:class:`TriSegment`
+        """
         if point_query.radius == 0:
             return self.is_inside(point_query.xyz)
         else:
@@ -193,13 +327,33 @@ class TriSegment(object):
             return (dist <= point_query.radius)
 
     def overlaps_segment(self, other):
+        """
+        Determines whether the query segment overlaps with this
+        :py:class:`TriSegment`
+
+        :param other: query :py:class:`TriSegment`
+
+        :return: ``True`` iff the query segment overlaps with this segment
+        """
         p_self = Polygon(np.dot(self.xyz_points, self.projection_plane.T))
         p_other = Polygon(np.dot(other.xyz_points, self.projection_plane.T))
         return ((p_self & p_other).area() > 0)
 
 class SegmentedFootprint(object):
+    """
+    Base class for segmenting an observation footprint
+    """
 
     def __init__(self, metadata, resolution, localizer_kwargs):
+        """
+        :param metadata:
+            a :py:class:`~pdsc.metadata.PdsMetadata` object
+        :param resolution:
+            segmentation resolution (the maximum size of a segment edge)
+        :param localizer_kwargs:
+            the ``kwargs`` passed to the localizer used to convert observation
+            pixel coordinates into real-world coordinates
+        """
         self.metadata = metadata
         self.resolution = resolution
         self.localizer = get_localizer(metadata, **localizer_kwargs)
@@ -216,13 +370,24 @@ class SegmentedFootprint(object):
 
     def _segment(self):
         """
-        Generate segments based on the lat-lon grid
+        Abstract method for generating segments of an observation footprint
         """
         pass
 
 class TriSegmentedFootprint(SegmentedFootprint):
+    """
+    Segments a footprint using triangular segments
+
+    By using triangular segments, each segment is guaranteed to be convex, so
+    determing whether a point falls within a segment can be done more
+    efficiently than with rectangular segments.
+    """
 
     def _segment(self):
+        """
+        Generates :py:class:`TriSegment` objects corresponding to the segments
+        into which this observation footprint has been decomposed
+        """
         L = self.latlon_grid
         for c in range(L.shape[1]-1):
             for r in range(L.shape[0]-1):

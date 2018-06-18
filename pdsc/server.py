@@ -10,7 +10,14 @@ from .client import PdsClient
 from .metadata import json_dumps
 
 DEFAULT_SERVER_PORT = 7372
+"""
+The default PDSC server port (7372 is P-D-S-C on a numeric keypad)
+"""
+
 DEFAULT_SOCKET_TIMEOUT = 10000
+"""
+The default PDSC server socket timeout in seconds
+"""
 
 def content_type(t):
     """
