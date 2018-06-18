@@ -224,7 +224,7 @@ class TriSegment(object):
         """
         if self._radius is None:
             llcenter = np.deg2rad([self.center_latitude, self.center_longitude])
-            self._radius = np.min([
+            self._radius = np.max([
                 geodesic_distance(llcenter, np.deg2rad(ll))
                 for ll in self.latlon_points
             ])
