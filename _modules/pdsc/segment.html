@@ -165,7 +165,8 @@
             
   <h1>Source code for pdsc.segment</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Decomposes an observation footprint into triangular segments</span>
+<span class="sd">Code for decomposing an observation footprint into triangular segments and</span>
+<span class="sd">storing these in a tree data structure for efficient querying</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
@@ -180,12 +181,38 @@
 <span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">standard_progress_bar</span>
 
 <span class="n">SEGMENT_DB_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;_segments.db&#39;</span>
-<span class="n">SEGMENT_TREE_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;_segment_tree.pkl&#39;</span>
-<span class="n">INCLUSION_EPSILON</span> <span class="o">=</span> <span class="mf">1e-10</span> <span class="c1"># corresponds to &lt; 1 mm error in inclusion check</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The suffix used to save segment SQL database files; the full filename for an</span>
+<span class="sd">instrument will be the instrument name followed by the suffix</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">class</span> <span class="nc">PointQuery</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="n">SEGMENT_TREE_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;_segment_tree.pkl&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The suffix used to save segment tree index files; the full filename for an</span>
+<span class="sd">instrument will be the instrument name followed by the suffix</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">INCLUSION_EPSILON</span> <span class="o">=</span> <span class="mf">1e-10</span> <span class="c1"># corresponds to &lt; 1 mm error in inclusion check</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Numerical precision for checking point inclusion in a segment; this is required</span>
+<span class="sd">due to floating point error, and corresponds to a roughly 1 mm error on the</span>
+<span class="sd">surface of Mars</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PointQuery"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.PointQuery">[docs]</a><span class="k">class</span> <span class="nc">PointQuery</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Encapsulates the information corresponding to a point inclusion query</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param lat: latitude in degrees</span>
+<span class="sd">        :param lon: east longitude in degrees</span>
+<span class="sd">        :param radius: radius in meters</span>
+
+<span class="sd">        This query is for all observations that overlap with a circle of the</span>
+<span class="sd">        given radius around the specified location on the surface</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">radius</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Radius must be non-negative&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">lat</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">90</span> <span class="ow">or</span> <span class="n">lat</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">:</span>
@@ -196,13 +223,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The point on a unit sphere expressed in Cartesian coordinates</span>
+<span class="sd">        corresponding to the query point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="o">=</span> <span class="n">latlon2unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latlon</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span></div>
 
-<span class="k">class</span> <span class="nc">SegmentTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SegmentTree"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.SegmentTree">[docs]</a><span class="k">class</span> <span class="nc">SegmentTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Encapsulates a ball tree data structure used to efficiently find all</span>
+<span class="sd">    observation segments within some radius of a query point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segments</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param segments: collection of all observation segments</span>
+<span class="sd">        :param verbose: if ``True`` display a progress bar as the index is being</span>
+<span class="sd">            built</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">standard_progress_bar</span><span class="p">(</span><span class="s1">&#39;Finding segment centers&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">([</span>
             <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">center_latitude</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">center_longitude</span><span class="p">]</span>
@@ -218,26 +258,54 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ball_tree</span> <span class="o">=</span> <span class="n">BallTree</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;haversine&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...done.&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">query_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+<div class="viewcode-block" id="SegmentTree.query_point"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.SegmentTree.query_point">[docs]</a>    <span class="k">def</span> <span class="nf">query_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Queries the :py:class:`SegmentTree` for all segments that potentially</span>
+<span class="sd">        overlap the given query point</span>
+
+<span class="sd">        :param point: a :py:class:`PointQuery`</span>
+
+<span class="sd">        :return: a collection of segment ids for segments that satisfy the query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">total_radius</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">radius</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_radius</span>
         <span class="n">haversine_radius</span> <span class="o">=</span> <span class="n">total_radius</span> <span class="o">/</span> <span class="n">MARS_RADIUS_M</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">latlon</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_tree</span><span class="o">.</span><span class="n">query_radius</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">haversine_radius</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_tree</span><span class="o">.</span><span class="n">query_radius</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">haversine_radius</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="nf">query_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+<div class="viewcode-block" id="SegmentTree.query_segment"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.SegmentTree.query_segment">[docs]</a>    <span class="k">def</span> <span class="nf">query_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Queries the :py:class:`SegmentTree` for all segments that potentially</span>
+<span class="sd">        overlap the given segment</span>
+
+<span class="sd">        :param segment: a :py:class:`TriSegment`</span>
+
+<span class="sd">        :return: a collection of segment ids for segments that satisfy the query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">total_radius</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">radius</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_radius</span>
         <span class="n">haversine_radius</span> <span class="o">=</span> <span class="n">total_radius</span> <span class="o">/</span> <span class="n">MARS_RADIUS_M</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">([[</span><span class="n">segment</span><span class="o">.</span><span class="n">center_latitude</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">center_longitude</span><span class="p">]])</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_tree</span><span class="o">.</span><span class="n">query_radius</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">haversine_radius</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_tree</span><span class="o">.</span><span class="n">query_radius</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">haversine_radius</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">):</span>
+<div class="viewcode-block" id="SegmentTree.save"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.SegmentTree.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves this :py:class:`SegmentTree` to the specified file</span>
+
+<span class="sd">        :param outputfile: output file path for pickled :py:class:`SegmentTree`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="SegmentTree.load"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.SegmentTree.load">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">inputfile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a :py:class:`SegmentTree` from the specified file</span>
+
+<span class="sd">        :param inputfile: path to pickled :py:class:`SegmentTree`</span>
+
+<span class="sd">        :return: parsed :py:class:`SegmentTree` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="TriSegment"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegment">[docs]</a><span class="k">class</span> <span class="nc">TriSegment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -272,12 +340,25 @@
             <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latlon_points</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TriSegment.center"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegment.center">[docs]</a>    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the center of this :py:class:`TriSegment` by converting the</span>
+<span class="sd">        latitude and longitude of the vertices to Cartesian coordiantes, taking</span>
+<span class="sd">        an average, then converting back to spherical coordinates</span>
+
+
+<span class="sd">        :return: a :py:class:`numpy.array` containing the latitude and east</span>
+<span class="sd">            longitude (in degrees) of the center of this triangular segment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">xyz_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz_points</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">xyz2latlon</span><span class="p">(</span><span class="n">xyz_center</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xyz2latlon</span><span class="p">(</span><span class="n">xyz_center</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">xyz_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A 3-by-3 :py:class:`numpy.array` where each row contains a vertix of</span>
+<span class="sd">        this :py:class:`TriSegment` represented in Cartesian coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_xyz_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span><span class="n">latlon2unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latlon_points</span><span class="p">))</span>
@@ -285,18 +366,28 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">center_latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center latitude as compuated via :py:meth:`TriSegment.center`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_latitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_center_latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_longitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_latitude</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">center_longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center longitude as compuated via :py:meth:`TriSegment.center`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_longitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_center_latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_longitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_longitude</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The radius of this :py:class:`TriSegment` in meters: the maximum</span>
+<span class="sd">        distance from the center to any vertex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">llcenter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">center_latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_longitude</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span>
@@ -307,6 +398,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">normals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A 3-by-3 :py:class:`numpy.array` where each row contains a normal vector</span>
+<span class="sd">        to a plane that passes through two of the vertices of this</span>
+<span class="sd">        :py:class:`TriSegment` and the origin</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">xyz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz_points</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span>
@@ -318,6 +414,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">projection_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a 2-by-3 :py:class:`numpy.array` holding two orthonormal vectors</span>
+<span class="sd">        defining a plane that is tangent the unit sphere at this segment&#39;s</span>
+<span class="sd">        center</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projection_plane</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">normal</span> <span class="o">=</span> <span class="n">latlon2unit</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">center_latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_longitude</span><span class="p">])</span>
             <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -329,10 +430,34 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_projection_plane</span> <span class="o">=</span> <span class="p">(</span><span class="n">proj</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="n">norms</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">T</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projection_plane</span>
 
-    <span class="k">def</span> <span class="nf">is_inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normals</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">INCLUSION_EPSILON</span><span class="p">)</span>
+<div class="viewcode-block" id="TriSegment.is_inside"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegment.is_inside">[docs]</a>    <span class="k">def</span> <span class="nf">is_inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns ``True`` iff the given vector falls within this</span>
+<span class="sd">        :py:class:`TriSegment` (i.e., it is on the positive side of every plane</span>
+<span class="sd">        defined by :py:meth:`TriSegment.normals`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normals</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">INCLUSION_EPSILON</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">distance_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">):</span>
+<div class="viewcode-block" id="TriSegment.distance_to_point"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegment.distance_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">distance_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the distance from the given point in Cartesian coordiantes to</span>
+<span class="sd">        this :py:class:`TriSegment`</span>
+
+<span class="sd">        If the point falls within the segment, the distance is zero; otherwise,</span>
+<span class="sd">        the distance is the minimum geodesic distance between the point and any</span>
+<span class="sd">        vertex or edge of the segment.</span>
+
+<span class="sd">        The geodesic distance between this point and an edge is approximated as</span>
+<span class="sd">        the geodesic distance between this point expressed in spherical</span>
+<span class="sd">        coordinates and this point projected onto the edge plane (the plane</span>
+<span class="sd">        formed by the two vertices of the edge and the origin), expressed in</span>
+<span class="sd">        spherical coordinates.</span>
+
+<span class="sd">        :param xyz: query point in Cartesian coordinates</span>
+
+<span class="sd">        :return: distance (in meters) between this :py:class:`TriSegment` and</span>
+<span class="sd">            the query point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_inside</span><span class="p">(</span><span class="n">xyz</span><span class="p">):</span>
             <span class="k">return</span> <span class="mf">0.0</span>
 
@@ -349,23 +474,52 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span>
             <span class="n">geodesic_distance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">pi</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">pi</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">points_to_check</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="p">])</span></div>
 
-    <span class="k">def</span> <span class="nf">includes_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point_query</span><span class="p">):</span>
+<div class="viewcode-block" id="TriSegment.includes_point"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegment.includes_point">[docs]</a>    <span class="k">def</span> <span class="nf">includes_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point_query</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines whether the query point falls within this</span>
+<span class="sd">        :py:class:`TriSegment`</span>
+
+<span class="sd">        :param point_query: a :py:class:`PointQuery`</span>
+
+<span class="sd">        :return: ``True`` iff the query point falls within the specified radius</span>
+<span class="sd">            of this :py:class:`TriSegment`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">point_query</span><span class="o">.</span><span class="n">radius</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_inside</span><span class="p">(</span><span class="n">point_query</span><span class="o">.</span><span class="n">xyz</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">point_query</span><span class="o">.</span><span class="n">xyz</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">point_query</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">point_query</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">overlaps_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="TriSegment.overlaps_segment"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegment.overlaps_segment">[docs]</a>    <span class="k">def</span> <span class="nf">overlaps_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines whether the query segment overlaps with this</span>
+<span class="sd">        :py:class:`TriSegment`</span>
+
+<span class="sd">        :param other: query :py:class:`TriSegment`</span>
+
+<span class="sd">        :return: ``True`` iff the query segment overlaps with this segment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">p_self</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_plane</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
         <span class="n">p_other</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">xyz_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_plane</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">((</span><span class="n">p_self</span> <span class="o">&amp;</span> <span class="n">p_other</span><span class="p">)</span><span class="o">.</span><span class="n">area</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">((</span><span class="n">p_self</span> <span class="o">&amp;</span> <span class="n">p_other</span><span class="p">)</span><span class="o">.</span><span class="n">area</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span></div></div>
 
-<span class="k">class</span> <span class="nc">SegmentedFootprint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SegmentedFootprint"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.SegmentedFootprint">[docs]</a><span class="k">class</span> <span class="nc">SegmentedFootprint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for segmenting an observation footprint</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">localizer_kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param metadata:</span>
+<span class="sd">            a :py:class:`~pdsc.metadata.PdsMetadata` object</span>
+<span class="sd">        :param resolution:</span>
+<span class="sd">            segmentation resolution (the maximum size of a segment edge)</span>
+<span class="sd">        :param localizer_kwargs:</span>
+<span class="sd">            the ``kwargs`` passed to the localizer used to convert observation</span>
+<span class="sd">            pixel coordinates into real-world coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">localizer</span> <span class="o">=</span> <span class="n">get_localizer</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">localizer_kwargs</span><span class="p">)</span>
@@ -382,13 +536,24 @@
 
     <span class="k">def</span> <span class="nf">_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate segments based on the lat-lon grid</span>
+<span class="sd">        Abstract method for generating segments of an observation footprint</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">pass</span></div>
 
-<span class="k">class</span> <span class="nc">TriSegmentedFootprint</span><span class="p">(</span><span class="n">SegmentedFootprint</span><span class="p">):</span>
+<div class="viewcode-block" id="TriSegmentedFootprint"><a class="viewcode-back" href="../../Modules.html#pdsc.segment.TriSegmentedFootprint">[docs]</a><span class="k">class</span> <span class="nc">TriSegmentedFootprint</span><span class="p">(</span><span class="n">SegmentedFootprint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Segments a footprint using triangular segments</span>
+
+<span class="sd">    By using triangular segments, each segment is guaranteed to be convex, so</span>
+<span class="sd">    determing whether a point falls within a segment can be done more</span>
+<span class="sd">    efficiently than with rectangular segments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates :py:class:`TriSegment` objects corresponding to the segments</span>
+<span class="sd">        into which this observation footprint has been decomposed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latlon_grid</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
@@ -397,7 +562,7 @@
                     <span class="k">yield</span> <span class="n">TriSegment</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">TriSegment</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-                    <span class="k">yield</span> <span class="n">TriSegment</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+                    <span class="k">yield</span> <span class="n">TriSegment</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span></div>
 </pre></div>
 
            </div>
