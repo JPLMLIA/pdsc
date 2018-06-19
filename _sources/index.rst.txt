@@ -14,6 +14,7 @@ extensible to other instruments and bodies.
   :caption: Contents
 
   Installation
+  Basics
   Server
   Extending
   Modules
