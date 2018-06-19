@@ -75,6 +75,8 @@ pipeline {
                     sh '''#!/bin/bash
                         source venv_PDSC/bin/activate
                         pytest -c test/doctest.cfg
+                        cd docs
+                        make doctest
                     '''
                 }
             }

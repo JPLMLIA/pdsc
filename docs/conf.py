@@ -33,6 +33,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
@@ -349,3 +350,4 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 autoclass_content = 'both'
+doctest_test_doctest_blocks = ''
