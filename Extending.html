@@ -91,11 +91,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending PDSC</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending PDSC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preliminary-concepts">Preliminary Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instrument-determination">Instrument Determination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata-parsing">Metadata Parsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#localization">Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ingesting-with-extensions">Ingesting with Extensions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Modules.html">Module Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.localization"><code class="docutils literal notranslate"><span class="pre">pdsc.localization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -165,7 +178,144 @@
   <div class="section" id="extending-pdsc">
 <h1>Extending PDSC<a class="headerlink" href="#extending-pdsc" title="Permalink to this headline">¶</a></h1>
 <p>This section describes how to extend PDSC to support other instruments and data
-products.</p>
+products. The basic steps are listed and described in more detail below:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Write a determiner function that recognizes the instrument from the PDS
+cumulative index LBL file</li>
+<li>Sub-class the <a class="reference internal" href="Modules.html#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> and
+<a class="reference internal" href="Modules.html#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> classes, and register the table class
+with the instrument</li>
+<li>Implement and register a localizer that converts pixel coordinates to
+real-world latitude and longitude coordinates</li>
+<li>Write a configuration file that describes how to store PDS cumulative index
+metadata</li>
+</ol>
+</div></blockquote>
+<div class="section" id="preliminary-concepts">
+<h2>Preliminary Concepts<a class="headerlink" href="#preliminary-concepts" title="Permalink to this headline">¶</a></h2>
+<p>There are a few general concepts that are useful for understanding how to extend
+PDSC. First is the concept of an “instrument,” which is central to organizing
+information within PDSC. In PDSC, an “instrument” corresponds to a single data
+product as indexed in the PDS rather than to a piece of hardware. Occasionally,
+these concepts do not align. For example, HiRISE EDR and HiRISE RDR are
+considered two different “instruments” whereas MOC NA and MOC WA are considered
+a single “instrument” because they are indexed together.</p>
+<p>Instrument names are used to generate index and database file names, so they
+should not contain any characters that will confuse the filesystem. By
+convention, all instrument names in PDSC follow <a class="reference external" href="https://en.wikipedia.org/wiki/Snake_case">snake_case</a>.</p>
+<p>The next useful concept is that of “registration.” PDSC defines decorators that
+can be used to “register” functions or classes to an instrument perform various
+parts of the PDSC pipeline. During a stage of the processing pipeline, PDSC
+looks for a function or class that has been registered to the relevant
+instrument to perform that pipeline step.</p>
+</div>
+<div class="section" id="instrument-determination">
+<h2>Instrument Determination<a class="headerlink" href="#instrument-determination" title="Permalink to this headline">¶</a></h2>
+<p>The first step in parsing a PDS cumulative index file is determining the
+instrument to which the index corresponds. The PDSC library does this using
+“determiner” functions. A determiner function for an instrument takes a PDS
+cumulative index label file path and uses the file to determine whether the file
+is for the given instrument.</p>
+<p>An example determiner with registration decorator is shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;hirise_edr&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hirise_edr_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;HiRISE&#39;</span> <span class="ow">in</span> <span class="n">raw</span> <span class="ow">and</span> <span class="s1">&#39;EDR_INDEX_TABLE&#39;</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The determiner simply checks whether the words <code class="docutils literal notranslate"><span class="pre">HiRISE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">EDR_INDEX_TABLE</span></code> appear in the label file. There is also a
+<a class="reference internal" href="Modules.html#pdsc.table.generic_determiner" title="pdsc.table.generic_determiner"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generic_determiner()</span></code></a> method that uses the
+<code class="docutils literal notranslate"><span class="pre">INSTRUMENT_NAME</span></code> header in the label file to determine if the files is for
+the given instrument. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;ctx&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ctx_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">generic_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;CONTEXT CAMERA&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To perform instrument determination, PDSC goes through every determiner that
+has been registered in alphabetical order by instrument name and returns the
+first instrument name for which the determiner returns <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</div>
+<div class="section" id="metadata-parsing">
+<h2>Metadata Parsing<a class="headerlink" href="#metadata-parsing" title="Permalink to this headline">¶</a></h2>
+<p>After determining the instrument associated with a PDS label file, PDSC looks to
+find a subclass of <a class="reference internal" href="Modules.html#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> that has been registered to
+the instrument. This class is used to parse the observation metadata located in
+the PDS label and table file pair.</p>
+<p>The <a class="reference internal" href="Modules.html#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> class has several attributes that a
+subclass can override to control parsing behavior. See the documentation of that
+class for details. One attribute of note is
+<a class="reference internal" href="Modules.html#pdsc.table.PdsTable.COLUMN_CLASS" title="pdsc.table.PdsTable.COLUMN_CLASS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COLUMN_CLASS</span></code></a>. This attribute should specify a
+subclass of <a class="reference internal" href="Modules.html#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> that is used to parse
+individual columns from a PDS table.</p>
+<p>The <a class="reference internal" href="Modules.html#pdsc.table.PdsTableColumn" title="pdsc.table.PdsTableColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTableColumn</span></code></a> also has several attributes that can
+be overridden to control parsing behavior. A key attribute of this class is
+<a class="reference internal" href="Modules.html#pdsc.table.PdsTableColumn.SPECIAL_TYPES" title="pdsc.table.PdsTableColumn.SPECIAL_TYPES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SPECIAL_TYPES</span></code></a>, which controls how data
+from a column is converted to a Python type.</p>
+<p>After defining a <a class="reference internal" href="Modules.html#pdsc.table.PdsTable" title="pdsc.table.PdsTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">PdsTable</span></code></a> subclass for an instrument and
+setting <a class="reference internal" href="Modules.html#pdsc.table.PdsTable.COLUMN_CLASS" title="pdsc.table.PdsTable.COLUMN_CLASS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COLUMN_CLASS</span></code></a> appropriately, the
+<a class="reference internal" href="Modules.html#pdsc.table.register_table" title="pdsc.table.register_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_table()</span></code></a> decorator can be used to register the
+table class to an instrument.</p>
+</div>
+<div class="section" id="localization">
+<h2>Localization<a class="headerlink" href="#localization" title="Permalink to this headline">¶</a></h2>
+<p>Extensions to PDSC must provide the capability to perform localization, the
+mapping of pixels in an observation to real-world latitude and longitude
+coordinates. A localizer must follow the interface defined by the
+<a class="reference internal" href="Modules.html#pdsc.localization.Localizer" title="pdsc.localization.Localizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Localizer</span></code></a> class. Extensions should register a
+subclass of <a class="reference internal" href="Modules.html#pdsc.localization.Localizer" title="pdsc.localization.Localizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Localizer</span></code></a> or a function that returns
+an instance of this type using the
+<a class="reference internal" href="Modules.html#pdsc.localization.register_localizer" title="pdsc.localization.register_localizer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">register_localizer()</span></code></a> decorator.</p>
+<p>Subclasses of <a class="reference internal" href="Modules.html#pdsc.localization.Localizer" title="pdsc.localization.Localizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Localizer</span></code></a> need only implement
+<a class="reference internal" href="Modules.html#pdsc.localization.Localizer.pixel_to_latlon" title="pdsc.localization.Localizer.pixel_to_latlon"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pixel_to_latlon()</span></code></a>; the reverse mapping
+<a class="reference internal" href="Modules.html#pdsc.localization.Localizer.latlon_to_pixel" title="pdsc.localization.Localizer.latlon_to_pixel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">latlon_to_pixel()</span></code></a> is already implemented
+by inverting the forward mapping. However, subclasses are free to implement both
+methods if a more efficient implementation is possible.</p>
+<p>There are several generic localizers already available that cover different
+approaches to localization given the metadata available in the cumulative index
+file. They are as follows (see class documentation for details):</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="Modules.html#pdsc.localization.GeodesicLocalizer" title="pdsc.localization.GeodesicLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeodesicLocalizer</span></code></a></li>
+<li><a class="reference internal" href="Modules.html#pdsc.localization.FourCornerLocalizer" title="pdsc.localization.FourCornerLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">FourCornerLocalizer</span></code></a></li>
+<li><a class="reference internal" href="Modules.html#pdsc.localization.MapLocalizer" title="pdsc.localization.MapLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapLocalizer</span></code></a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the snippets of Python code needed to extend PDSC, a
+configuration file is required to ingest PDS cumulative index files. The
+configuration file should be in YAML format containing the key-value mappings
+required by a couple of methods in <a class="reference internal" href="Modules.html#module-pdsc.ingest" title="pdsc.ingest"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="Modules.html#pdsc.ingest.store_metadata" title="pdsc.ingest.store_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">store_metadata()</span></code></a></li>
+<li><a class="reference internal" href="Modules.html#pdsc.ingest.store_segments" title="pdsc.ingest.store_segments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">store_segments()</span></code></a></li>
+</ul>
+</div></blockquote>
+<p>The documentation of these methods describes the configuration values they
+expect, and there are examples under <code class="docutils literal notranslate"><span class="pre">config</span></code> in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc</span></code> package
+directory.</p>
+</div>
+<div class="section" id="ingesting-with-extensions">
+<h2>Ingesting with Extensions<a class="headerlink" href="#ingesting-with-extensions" title="Permalink to this headline">¶</a></h2>
+<p>To ingest a PDS cumulative index for an instrument supported by an extension,
+the <code class="docutils literal notranslate"><span class="pre">pdsc_ingest</span></code> command-line tool should be invoked with two additional
+arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pdsc_ingest cumulative_index.lbl /path/to/generated/index/dir/
+              -c configfile.yaml -e extension_script.py
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">-c</span></code> option should supply the path to the configuration file, and the
+<code class="docutils literal notranslate"><span class="pre">-e</span></code> option should supply the path to one or more Python scripts in which the
+extensions have been defined. The <code class="docutils literal notranslate"><span class="pre">pdsc_ingest</span></code> script will invoke the
+extension scripts, which should register the appropriate pieces of code with
+PDSC, prior to the ingestion process.</p>
+</div>
 </div>
 
 
