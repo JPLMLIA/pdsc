@@ -38,7 +38,7 @@ columns:
     - [SLANT_DISTANCE, slant_distance, real]
     - [LOCAL_TIME, local_time, real]
     - [SOLAR_LONGITUDE, solar_longitude, real]
-    - [SUB_SOLAR_AZIMUTH, sub_solar_aziumth, real]
+    - [SUB_SOLAR_AZIMUTH, sub_solar_azimuth, real]
 
 scale_factors:
     SAMPLE_RESOLUTION: 1000 # km to m

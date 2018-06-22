@@ -58,7 +58,7 @@ columns:
     - [SPACECRAFT_ALTITUDE, spacecraft_altitude, real]
     - [TARGET_CENTER_DISTANCE, target_center_distance, real]
     - [SLANT_DISTANCE, slant_distance, real]
-    - [SUB_SOLAR_AZIMUTH, sub_solar_aziumth, real]
+    - [SUB_SOLAR_AZIMUTH, sub_solar_azimuth, real]
     - [SUB_SOLAR_LATITUDE, sub_solar_latitude, real]
     - [SUB_SOLAR_LONGITUDE, sub_solar_longitude, real]
     - [SUB_SPACECRAFT_LATITUDE, sub_spacecraft_latitude, real]
