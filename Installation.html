@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Running a Server" href="Server.html" />
+    <link rel="next" title="Basic Usage" href="Basics.html" />
     <link rel="prev" title="PDSC: Planetary Data System Coincidences" href="index.html" /> 
 
   
@@ -90,12 +90,26 @@
 <li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Basics.html">Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#preliminary-concepts">Preliminary Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#instrument-determination">Instrument Determination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#metadata-parsing">Metadata Parsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#localization">Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#ingesting-with-extensions">Ingesting with Extensions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Modules.html">Module Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.localization"><code class="docutils literal notranslate"><span class="pre">pdsc.localization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.metadata"><code class="docutils literal notranslate"><span class="pre">pdsc.metadata</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -169,7 +183,8 @@ required for ingesting and building indices.</p>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>The recommended installation method is to use <code class="docutils literal notranslate"><span class="pre">pip</span></code> as follows from within the
-repository root directory:</p>
+repository root directory after downloading the code or cloning it via <code class="docutils literal notranslate"><span class="pre">git</span>
+<span class="pre">clone</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">process</span><span class="o">-</span><span class="n">dependency</span><span class="o">-</span><span class="n">links</span> <span class="o">.</span>
 </pre></div>
 </div>
@@ -257,7 +272,7 @@ accordance with the schema before attempting to ingest the index.</td></tr>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="Server.html" class="btn btn-neutral float-right" title="Running a Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Basics.html" class="btn btn-neutral float-right" title="Basic Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral" title="PDSC: Planetary Data System Coincidences" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
