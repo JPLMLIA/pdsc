@@ -8,7 +8,8 @@ Installation
 ------------
 
 The recommended installation method is to use ``pip`` as follows from within the
-repository root directory::
+repository root directory after downloading the code or cloning it via ``git
+clone``::
 
     pip install --process-dependency-links .
 
