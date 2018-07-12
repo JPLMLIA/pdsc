@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+from __future__ import print_function
+"""
+Implements PDSC command line utilities
+"""
+import pdsc
+
+SUBCOMMANDS = {
+    'fix_hirise_index': pdsc.fix_hirise_index,
+}
+
+def main(*args, **kwargs):
+    subcommand = kwargs.pop('subcommand')
+    if subcommand not in SUBCOMMANDS:
+        raise ValueError('Unknown subcommand "%s"' % subcommand)
+    SUBCOMMANDS[subcommand](*args, **kwargs)
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    subparsers = parser.add_subparsers(
+        title='subcommands',
+        description='valid subcommands',
+        help='additional help',
+        dest='subcommand'
+    )
+
+    hirise_fix_parser = subparsers.add_parser('fix_hirise_index')
+    hirise_fix_parser.add_argument('idx', help='cumulative index file location')
+    hirise_fix_parser.add_argument('-o', '--outputfile', default=None,
+        help='optional output file location (overwrite index if not specified)')
+    hirise_fix_parser.add_argument('-q', '--quiet', default=False, action='store_true',
+        help='do not display a progress bar')
+
+    args = parser.parse_args()
+    main(**vars(args))

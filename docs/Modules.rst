@@ -43,6 +43,12 @@ Module Documentation
 .. automodule:: pdsc.table
   :members:
 
+:py:mod:`pdsc.tools`
+--------------------
+
+.. automodule:: pdsc.tools
+  :members:
+
 :py:mod:`pdsc.util`
 -------------------
 
