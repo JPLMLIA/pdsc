@@ -16,6 +16,7 @@ extensible to other instruments and bodies.
   Installation
   Basics
   Server
+  Utilities
   Extending
   Modules
 

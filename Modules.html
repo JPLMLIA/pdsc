@@ -89,8 +89,21 @@
 <li class="toctree-l2"><a class="reference internal" href="Installation.html#environment-variables">Environment Variables</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Basics.html">Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Utilities.html">Command Line Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Utilities.html#fixing-hirise-edr-indices">Fixing HiRISE EDR Indices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#preliminary-concepts">Preliminary Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#instrument-determination">Instrument Determination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#metadata-parsing">Metadata Parsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#localization">Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extending.html#ingesting-with-extensions">Ingesting with Extensions</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Module Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.client"><code class="docutils literal notranslate"><span class="pre">pdsc.client</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.ingest"><code class="docutils literal notranslate"><span class="pre">pdsc.ingest</span></code></a></li>
@@ -99,6 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pdsc.tools"><code class="docutils literal notranslate"><span class="pre">pdsc.tools</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
@@ -2694,6 +2708,31 @@ specified detector</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label_file</strong> – PDS cumulative index LBL file</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> iff this label file is for THEMIS VIS products</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pdsc.tools">
+<span id="pdsc-tools"></span><h2><a class="reference internal" href="#module-pdsc.tools" title="pdsc.tools"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pdsc.tools</span></code></a><a class="headerlink" href="#module-pdsc.tools" title="Permalink to this headline">¶</a></h2>
+<p>Implements command line tools for PDSC</p>
+<dl class="function">
+<dt id="pdsc.tools.fix_hirise_index">
+<code class="descclassname">pdsc.tools.</code><code class="descname">fix_hirise_index</code><span class="sig-paren">(</span><em>idx</em>, <em>outputfile</em>, <em>quiet</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/tools.html#fix_hirise_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.tools.fix_hirise_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repairs HiRISE EDR cumulative index files for which the value in
+SCAN_EXPOSURE_DURATION exceeds the available number of bytes for that field</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>idx</strong> – path to one LBL or TAB file from the index file pair</li>
+<li><strong>outputfile</strong> – output file path for the corrected index TAB file; if <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+overwrite the existing file</li>
+<li><strong>quiet</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, do not output progress or results</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>

@@ -91,6 +91,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Basics.html">Basic Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Running a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Utilities.html">Command Line Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Utilities.html#fixing-hirise-edr-indices">Fixing HiRISE EDR Indices</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Extending.html">Extending PDSC</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="Extending.html#preliminary-concepts">Preliminary Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Extending.html#instrument-determination">Instrument Determination</a></li>
@@ -108,6 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.segment"><code class="docutils literal notranslate"><span class="pre">pdsc.segment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.server"><code class="docutils literal notranslate"><span class="pre">pdsc.server</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.table"><code class="docutils literal notranslate"><span class="pre">pdsc.table</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.tools"><code class="docutils literal notranslate"><span class="pre">pdsc.tools</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="Modules.html#module-pdsc.util"><code class="docutils literal notranslate"><span class="pre">pdsc.util</span></code></a></li>
 </ul>
 </li>
@@ -308,9 +313,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Modules.html#pdsc.client.PdsClient.find_observations_of_latlon">find_observations_of_latlon() (pdsc.client.PdsClient method)</a>
 </li>
+      <li><a href="Modules.html#pdsc.client.PdsClient.find_overlapping_observations">find_overlapping_observations() (pdsc.client.PdsClient method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="Modules.html#pdsc.client.PdsClient.find_overlapping_observations">find_overlapping_observations() (pdsc.client.PdsClient method)</a>
+      <li><a href="Modules.html#pdsc.tools.fix_hirise_index">fix_hirise_index() (in module pdsc.tools)</a>
 </li>
       <li><a href="Modules.html#pdsc.localization.FourCornerLocalizer">FourCornerLocalizer (class in pdsc.localization)</a>
 </li>
@@ -500,14 +507,16 @@
 </li>
       <li><a href="Modules.html#module-pdsc.table">pdsc.table (module)</a>
 </li>
+      <li><a href="Modules.html#module-pdsc.tools">pdsc.tools (module)</a>
+</li>
       <li><a href="Modules.html#module-pdsc.util">pdsc.util (module)</a>
 </li>
       <li><a href="Modules.html#pdsc.client.PdsClient">PdsClient (class in pdsc.client)</a>
 </li>
-      <li><a href="Modules.html#pdsc.table.PdsColumnType">PdsColumnType (class in pdsc.table)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="Modules.html#pdsc.table.PdsColumnType">PdsColumnType (class in pdsc.table)</a>
+</li>
       <li><a href="Modules.html#pdsc.client.PdsHttpClient">PdsHttpClient (class in pdsc.client)</a>
 </li>
       <li><a href="Modules.html#pdsc.metadata.PdsMetadata">PdsMetadata (class in pdsc.metadata)</a>

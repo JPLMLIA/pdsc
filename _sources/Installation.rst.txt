@@ -30,7 +30,7 @@ following data products:
 
   - CTX
   - HiRISE (EDR) [1]_
-  - HiRISE (RDR) [1]_
+  - HiRISE (RDR)
   - MOC
   - THEMIS IR
   - THEMIS VIS
@@ -70,7 +70,8 @@ to tell :py:mod:`pdsc` where to look for the files or which server to query (see
 If these environment variables are not set, they can be specified as arguments
 when constructing a client to query metadata.
 
-.. [1] There is a bug in the HiRISE cumulative index files; some values for the
-       ``SCAN_EXPOSURE_DURATION`` column exceed the 9 bytes allocated for that
-       column. The offending values should be modified to bring the data into
-       accordance with the schema before attempting to ingest the index.
+.. [1] There is a bug in the HiRISE EDR cumulative index files; some values for
+       the ``SCAN_EXPOSURE_DURATION`` column exceed the 9 bytes allocated for
+       that column. The offending values should be modified to bring the data
+       into accordance with the schema before attempting to ingest the index.
+       See :ref:`Fixing HiRISE EDR Indices` for instructions.
