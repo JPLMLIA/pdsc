@@ -13,6 +13,19 @@ from .table import parse_table
 from .util import standard_progress_bar
 
 def _resize_scan_exposure_duration(sed, length):
+    """
+    Formats SCAN_EXPOSURE_DURATION with increasing precision until the desired
+    string length is achieved
+
+    :param sed:
+        floating point SCAN_EXPOSURE_DURATION value
+    :param length:
+        desired formatted string length
+
+    :return: a string with the SCAN_EXPOSURE_DURATION formatted with the
+        appropriate length, or ``None`` if even the string is too long even with
+        no digits after the decimal point
+    """
     for i in count():
         new_sed_str = ('%%.%df' % i) % sed
         if len(new_sed_str) == length:
@@ -21,6 +34,18 @@ def _resize_scan_exposure_duration(sed, length):
             return None
 
 def fix_hirise_index(idx, outputfile, quiet):
+    """
+    Repairs HiRISE EDR cumulative index files for which the value in
+    SCAN_EXPOSURE_DURATION exceeds the available number of bytes for that field
+
+    :param idx:
+        path to one LBL or TAB file from the index file pair
+    :param outputfile:
+        output file path for the corrected index TAB file; if ``None``,
+        overwrite the existing file
+    :param quiet:
+        if ``True``, do not output progress or results
+    """
     lblfile, tabfile = get_idx_file_pair(idx)
     if outputfile is None:
         outputfile = tabfile
