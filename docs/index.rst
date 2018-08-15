@@ -26,6 +26,11 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 
+Version
+=======
+
+Latest release: |release|
+
 Copyright
 =========
 

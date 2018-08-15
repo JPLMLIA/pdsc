@@ -1,8 +1,11 @@
 from setuptools import setup
 
+# brings in "version" and "description" vars
+execfile(os.path.join('pytc', 'version.py'))
+
 setup(name='pdsc',
-    version="1.0",
-    description='PDS Coincidences',
+    version=__version__,
+    description=__description__,
     author='Gary Doran',
     author_email='Gary.B.Doran.Jr@jpl.nasa.gov',
     url='https://github-fn.jpl.nasa.gov/COSMIC/COSMIC_PDSC',
