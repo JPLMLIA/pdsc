@@ -183,7 +183,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">progressbar</span> <span class="k">import</span> <span class="n">ProgressBar</span><span class="p">,</span> <span class="n">ETA</span><span class="p">,</span> <span class="n">Bar</span>
 
-<div class="viewcode-block" id="registerer"><a class="viewcode-back" href="../../Modules.html#pdsc.util.registerer">[docs]</a><span class="k">def</span> <span class="nf">registerer</span><span class="p">(</span><span class="n">registration_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="registerer"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.registerer">[docs]</a><span class="k">def</span> <span class="nf">registerer</span><span class="p">(</span><span class="n">registration_dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a decorator that will &quot;register&quot; a method or class to a particular</span>
 <span class="sd">    instrument. The registration decorators are used to extend PDSC to other</span>
@@ -203,7 +203,7 @@
         <span class="k">return</span> <span class="n">decorator</span>
     <span class="k">return</span> <span class="n">register_to_instrument</span></div>
 
-<div class="viewcode-block" id="standard_progress_bar"><a class="viewcode-back" href="../../Modules.html#pdsc.util.standard_progress_bar">[docs]</a><span class="k">def</span> <span class="nf">standard_progress_bar</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="standard_progress_bar"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.standard_progress_bar">[docs]</a><span class="k">def</span> <span class="nf">standard_progress_bar</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optionally constructs a standard :py:class:`progressbar.ProgressBar` used</span>
 <span class="sd">    through PDSC</span>
