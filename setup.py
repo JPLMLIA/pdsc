@@ -1,7 +1,8 @@
+import os
 from setuptools import setup
 
 # brings in "version" and "description" vars
-execfile(os.path.join('pytc', 'version.py'))
+execfile(os.path.join('pdsc', 'version.py'))
 
 setup(name='pdsc',
     version=__version__,
