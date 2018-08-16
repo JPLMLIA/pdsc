@@ -149,7 +149,7 @@ class Localizer(object):
         :param col: image column, starting at 0 at the left of the image
 
         .. Note::
-            if :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer
+            If :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer
             is ``False``, then the pixel coordinates range from zero to one less
             than the number of total rows/columns in the image. Otherwise, the
             pixel coordinates range from zero to one along each dimension.
@@ -235,6 +235,15 @@ class GeodesicLocalizer(Localizer):
             ``flight_direction=1``, then the flight direction is from the the
             top down, whereas ``flight_direction=-1`` indicates a bottom-up
             direction of flight
+
+        .. Note::
+            If :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer
+            is ``True``, then the pixel coordinates range from zero to one.
+            Consequently, the attributes :py:attr:`~GeodesicLocalizer.n_cols`
+            and :py:attr:`~GeodesicLocalizer.n_rows` are both equal to one, and
+            the attributes :py:attr:`~GeodesicLocalizer.pixel_width_m` and
+            :py:attr:`~GeodesicLocalizer.pixel_height_m` are both the width and
+            height of the *entire* observation.
         """
 
         if n_rows <= 0: raise ValueError('No image rows')
