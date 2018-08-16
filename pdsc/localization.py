@@ -140,6 +140,24 @@ class Localizer(object):
     top left and (rows, cols) is the bottom right
     """
 
+    @property
+    def observation_width_m(self):
+        """
+        Total observation width (cross-track) in meters
+        """
+        raise NotImplementedError(
+            'Subclass must implement `observation_width_m`'
+        )
+
+    @property
+    def observation_length_m(self):
+        """
+        Total observation length (along-track) in meters
+        """
+        raise NotImplementedError(
+            'Subclass must implement `observation_length_m`'
+        )
+
     def pixel_to_latlon(self, row, col):
         """
         Converts pixel coordinates to latitude and longitude coordinates within
@@ -149,12 +167,14 @@ class Localizer(object):
         :param col: image column, starting at 0 at the left of the image
 
         .. Note::
-            if :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer
+            If :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer
             is ``False``, then the pixel coordinates range from zero to one less
             than the number of total rows/columns in the image. Otherwise, the
             pixel coordinates range from zero to one along each dimension.
         """
-        pass
+        raise NotImplementedError(
+            'Subclass must implement `pixel_to_latlon`'
+        )
 
     def latlon_to_pixel(self, lat, lon, resolution_m=None, resolution_pix=0.1):
         """
@@ -235,6 +255,15 @@ class GeodesicLocalizer(Localizer):
             ``flight_direction=1``, then the flight direction is from the the
             top down, whereas ``flight_direction=-1`` indicates a bottom-up
             direction of flight
+
+        .. Note::
+            If :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer
+            is ``True``, then the pixel coordinates range from zero to one.
+            Consequently, the attributes :py:attr:`~GeodesicLocalizer.n_cols`
+            and :py:attr:`~GeodesicLocalizer.n_rows` are both equal to one, and
+            the attributes :py:attr:`~GeodesicLocalizer.pixel_width_m` and
+            :py:attr:`~GeodesicLocalizer.pixel_height_m` are both the width and
+            height of the *entire* observation.
         """
 
         if n_rows <= 0: raise ValueError('No image rows')
@@ -256,13 +285,13 @@ class GeodesicLocalizer(Localizer):
         self._width = None
 
     @property
-    def width(self):
+    def observation_width_m(self):
         if self._width is None:
             self._width = self.pixel_width_m*self.n_cols
         return self._width
 
     @property
-    def height(self):
+    def observation_length_m(self):
         if self._height is None:
             self._height = self.pixel_height_m*self.n_rows
         return self._height
@@ -418,7 +447,7 @@ class MapLocalizer(Localizer):
     """
 
     def __init__(self, proj_type, proj_latitude, proj_longitude,
-                 map_scale, row_offset, col_offset):
+                 map_scale, row_offset, col_offset, lines, samples):
         """
         :param proj_type: map projection type
         :param proj_latitude: projection center latitude
@@ -426,6 +455,8 @@ class MapLocalizer(Localizer):
         :param map_scale: projection map scale (meters)
         :param row_offset: projection row offset
         :param col_offset: projection col offset
+        :param lines: total observation lines (rows)
+        :param samples: total observation samples (columns)
 
         See https://hirise-pds.lpl.arizona.edu/PDS/CATALOG/DSMAP.CAT for a
         further description of these parameters.
@@ -436,6 +467,10 @@ class MapLocalizer(Localizer):
         self.map_scale = map_scale
         self.row_offset = row_offset
         self.col_offset = col_offset
+        self.lines = lines
+        self.samples = samples
+        self._width = None
+        self._height = None
 
         a = self.MARS_RADIUS_POLAR*np.cos(self.proj_latitude)
         b = self.MARS_RADIUS_EQUATORIAL*np.sin(self.proj_latitude)
@@ -489,6 +524,18 @@ class MapLocalizer(Localizer):
         row = (-y / self.map_scale) + self.row_offset
         col = (x / self.map_scale) + self.col_offset
         return row, col
+
+    @property
+    def observation_width_m(self):
+        if self._width is None:
+            self._width = self.samples*self.map_scale
+        return self._width
+
+    @property
+    def observation_length_m(self):
+        if self._height is None:
+            self._height = self.lines*self.map_scale
+        return self._height
 
     def pixel_to_latlon(self, row, col):
         if self.proj_type == 'EQUIRECTANGULAR':
@@ -700,6 +747,8 @@ class HiRiseRdrLocalizer(MapLocalizer):
             metadata.map_scale,
             metadata.line_projection_offset,
             metadata.sample_projection_offset,
+            metadata.lines,
+            metadata.samples
         )
 
 class HiRiseRdrBrowseLocalizer(HiRiseRdrLocalizer):

@@ -357,8 +357,12 @@ class SegmentedFootprint(object):
         self.metadata = metadata
         self.resolution = resolution
         self.localizer = get_localizer(metadata, **localizer_kwargs)
-        n_row_chunks = int(np.ceil(self.localizer.height / resolution))
-        n_col_chunks = int(np.ceil(self.localizer.width / resolution))
+        n_row_chunks = int(np.ceil(
+            self.localizer.observation_length_m / resolution
+        ))
+        n_col_chunks = int(np.ceil(
+            self.localizer.observation_width_m / resolution
+        ))
         row_idx = np.linspace(0, self.localizer.n_rows, n_row_chunks + 1)
         col_idx = np.linspace(0, self.localizer.n_cols, n_col_chunks + 1)
         xx, yy = np.meshgrid(row_idx, col_idx)
