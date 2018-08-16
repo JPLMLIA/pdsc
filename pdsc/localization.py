@@ -265,13 +265,19 @@ class GeodesicLocalizer(Localizer):
         self._width = None
 
     @property
-    def width(self):
+    def observation_width_m(self):
+        """
+        Total observation width (cross-track) in meters
+        """
         if self._width is None:
             self._width = self.pixel_width_m*self.n_cols
         return self._width
 
     @property
-    def height(self):
+    def observation_length_m(self):
+        """
+        Total observation length (along-track) in meters
+        """
         if self._height is None:
             self._height = self.pixel_height_m*self.n_rows
         return self._height
