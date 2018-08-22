@@ -11,7 +11,7 @@ from numpy.testing import (
 from cosmic_test_tools import unit, Approximately
 
 from pdsc.segment import (
-    PointQuery, TriSegment, SegmentTree
+    PointQuery, TriSegment, SegmentTree, SegmentedFootprint
 )
 
 @unit
@@ -112,3 +112,8 @@ def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_op
     assert SegmentTree.load('input') == 'object'
     mock_open.assert_called_with('input', 'r')
     mock_pickle_load.assert_called_once_with(mock.ANY)
+
+@unit
+def test_abstract_method():
+    with pytest.raises(TypeError):
+        seg = SegmentedFootprint(None, None, None)

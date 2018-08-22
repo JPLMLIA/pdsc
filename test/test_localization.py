@@ -1126,14 +1126,6 @@ def test_hiriserdrlocalizer_polarstereographic_latlon_to_pixel_southpole():
     assert_allclose(p5_pixel, p5_pixel_expected, atol=TOLERANCE_PIXEL)
 
 @unit
-def test_unimplemented_methods():
-    localizer = Localizer()
-
-    with pytest.raises(NotImplementedError):
-        localizer.observation_length_m
-
-    with pytest.raises(NotImplementedError):
-        localizer.observation_width_m
-
-    with pytest.raises(NotImplementedError):
-        localizer.pixel_to_latlon(0, 0)
+def test_abstract_methods():
+    with pytest.raises(TypeError):
+        localizer = Localizer()

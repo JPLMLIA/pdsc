@@ -3,6 +3,8 @@ Code for decomposing an observation footprint into triangular segments and
 storing these in a tree data structure for efficient querying
 """
 from __future__ import print_function
+from future.utils import with_metaclass
+import abc
 import pickle
 import numpy as np
 from sklearn.neighbors import BallTree
@@ -339,7 +341,7 @@ class TriSegment(object):
         p_other = Polygon(np.dot(other.xyz_points, self.projection_plane.T))
         return ((p_self & p_other).area() > 0)
 
-class SegmentedFootprint(object):
+class SegmentedFootprint(with_metaclass(abc.ABCMeta, object)):
     """
     Base class for segmenting an observation footprint
     """
@@ -372,6 +374,7 @@ class SegmentedFootprint(object):
 
         self.segments = list(self._segment())
 
+    @abc.abstractmethod
     def _segment(self):
         """
         Abstract method for generating segments of an observation footprint

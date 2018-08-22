@@ -16,6 +16,8 @@ are columns.
     Therefore, PDSC localization often relies on assumptions that introduce
     errors whose magnitudes vary across instruments.
 """
+from future.utils import with_metaclass
+import abc
 import numpy as np
 from scipy.ndimage import zoom
 from scipy.optimize import fmin
@@ -110,7 +112,7 @@ def xyz2latlon(xyz):
         np.arctan2(y, x)
     ])
 
-class Localizer(object):
+class Localizer(with_metaclass(abc.ABCMeta, object)):
     """
     Base class for all localizers
 
@@ -140,24 +142,21 @@ class Localizer(object):
     top left and (rows, cols) is the bottom right
     """
 
-    @property
+    @abc.abstractproperty
     def observation_width_m(self):
         """
         Total observation width (cross-track) in meters
         """
-        raise NotImplementedError(
-            'Subclass must implement `observation_width_m`'
-        )
+        pass
 
-    @property
+    @abc.abstractproperty
     def observation_length_m(self):
         """
         Total observation length (along-track) in meters
         """
-        raise NotImplementedError(
-            'Subclass must implement `observation_length_m`'
-        )
+        pass
 
+    @abc.abstractmethod
     def pixel_to_latlon(self, row, col):
         """
         Converts pixel coordinates to latitude and longitude coordinates within
@@ -172,9 +171,7 @@ class Localizer(object):
             than the number of total rows/columns in the image. Otherwise, the
             pixel coordinates range from zero to one along each dimension.
         """
-        raise NotImplementedError(
-            'Subclass must implement `pixel_to_latlon`'
-        )
+        pass
 
     def latlon_to_pixel(self, lat, lon, resolution_m=None, resolution_pix=0.1):
         """
