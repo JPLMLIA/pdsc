@@ -7,7 +7,7 @@ from pdsc.metadata import PdsMetadata
 from cosmic_test_tools import unit
 from numpy.testing import assert_allclose
 from pdsc.localization import (
-    MapLocalizer, HiRiseRdrLocalizer, HiRiseRdrBrowseLocalizer        
+    MapLocalizer, HiRiseRdrLocalizer, HiRiseRdrBrowseLocalizer, Localizer
 )
 
 # tolerance value defined in pixel.
@@ -16,12 +16,15 @@ TOLERANCE_PIXEL = 5.0
 # tolerance value defined in degree
 TOLERANCE_DEG = 5 * 1e-4
 
+# tolerance value for size in meters
+TOLERANCE_M = 1e-3
+
 @unit
 def test_hiriserdrbrowselocalizer_equirectangular_pixel_to_latlon():
     '''
     Test case 1:
     Test pixel to lat/lon conversion for equirectangular projection.
-    
+
     Image id: ESP_050016_1870
 
     Run ISIS mappt to convert points to latitude and longitude:
@@ -41,6 +44,7 @@ def test_hiriserdrbrowselocalizer_equirectangular_pixel_to_latlon():
 
     # full size HiRISE image size
     full_size = (23798.0, 22023.0)
+    map_scale = 0.25
 
     # ratio between full size and browse image
     ratio = full_size[1] / 2048.0
@@ -61,13 +65,24 @@ def test_hiriserdrbrowselocalizer_equirectangular_pixel_to_latlon():
     center_latlon_expected = [6.9435687855433, 70.032512183339]
 
     # invoke localizer object
-    metadata = PdsMetadata('hirise_rdr', map_projection_type='EQUIRECTANGULAR', 
-                           projection_center_latitude=5.0, 
-                           projection_center_longitude=180.0, 
-                           map_scale=0.25, line_projection_offset=1658135.5, 
-                           sample_projection_offset=25983782.0, 
-                           samples=full_size[1])
+    metadata = PdsMetadata('hirise_rdr', map_projection_type='EQUIRECTANGULAR',
+                           projection_center_latitude=5.0,
+                           projection_center_longitude=180.0,
+                           map_scale=map_scale, line_projection_offset=1658135.5,
+                           sample_projection_offset=25983782.0,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrBrowseLocalizer(metadata, 2048)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert pixel to lat/lon
     ul_latlon = localizer.pixel_to_latlon(ul_pixel[0], ul_pixel[1])
@@ -100,7 +115,7 @@ def test_hiriserdrbrowselocalizer_equirectangular_pixel_to_latlon():
     # test bottom left corner
     assert_allclose(bl_latlon, bl_latlon_expected, atol=TOLERANCE_DEG)
 
-    # test center 
+    # test center
     assert_allclose(center_latlon, center_latlon_expected, atol=TOLERANCE_DEG)
 
 @unit
@@ -112,19 +127,19 @@ def test_hiriserdrbrowselocalizer_equirectangular_latlon_to_pixel():
     Image id: ESP_050062_1345
 
     Run ISIS mapt to convert 5 points to line and sample:
-    1. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-44.949798974587  
+    1. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-44.949798974587
              LONGITUDE=260.83910415798
-    2. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-44.949798974587  
+    2. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-44.949798974587
              LONGITUDE=260.95959132319
-    3. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-45.042204321234  
+    3. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-45.042204321234
              LONGITUDE=260.95959132319
-    4. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-45.042204321234  
+    4. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-45.042204321234
              LONGITUDE=260.83910415798
-    5. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-44.996001647910504  
+    5. mappt FROM=ESP_050062_1345_RED.cub TYPE=GROUND LATITUDE=-44.99600164791050
              LONGITUDE=260.899347740585
 
     Results:
-    1. lat=-44.949798974587, lon=260.83910415798     ==> line=1.9730653911829, 
+    1. lat=-44.949798974587, lon=260.83910415798     ==> line=1.9730653911829,
                                                          samp=2.033464346081
     2. lat=-44.949798974587, lon=260.95959132319     ==> line=1.9730653911829,
                                                          samp=21832.404278895
@@ -138,6 +153,7 @@ def test_hiriserdrbrowselocalizer_equirectangular_latlon_to_pixel():
 
     # full size HiRISE image size
     full_size = (21856.0, 21831.0)
+    map_scale = 0.25
 
     # ratio between full size and browse image
     ratio = full_size[1] / 2048.0
@@ -161,17 +177,28 @@ def test_hiriserdrbrowselocalizer_equirectangular_latlon_to_pixel():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='EQUIRECTANGULAR',
                            projection_center_latitude=-40.0,
                            projection_center_longitude=180.0,
-                           map_scale=0.25, line_projection_offset=-10631488.0,
+                           map_scale=map_scale, line_projection_offset=-10631488.0,
                            sample_projection_offset=-14646768.0,
-                           samples=full_size[1])
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrBrowseLocalizer(metadata, 2048)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert lat/lon to pixel
     ul_pixel = localizer.latlon_to_pixel(ul_latlon[0], ul_latlon[1])
     ur_pixel = localizer.latlon_to_pixel(ur_latlon[0], ur_latlon[1])
     br_pixel = localizer.latlon_to_pixel(br_latlon[0], br_latlon[1])
     bl_pixel = localizer.latlon_to_pixel(bl_latlon[0], bl_latlon[1])
-    center_pixel = localizer.latlon_to_pixel(center_latlon[0], 
+    center_pixel = localizer.latlon_to_pixel(center_latlon[0],
                                              center_latlon[1])
 
     # test upper left corner
@@ -187,14 +214,14 @@ def test_hiriserdrbrowselocalizer_equirectangular_latlon_to_pixel():
     assert_allclose(bl_pixel, bl_pixel_expected, atol=TOLERANCE_PIXEL)
 
     # test center
-    assert_allclose(center_pixel, center_pixel_expected, 
+    assert_allclose(center_pixel, center_pixel_expected,
                     atol=TOLERANCE_PIXEL)
 
 @unit
 def test_hiriserdrbrowselocalizer_polarstereographic_pixel_to_latlon_northpole():
     '''
     Test case 3:
-    Test pixel to lat/lon conversion for polarstereographic projection using 
+    Test pixel to lat/lon conversion for polarstereographic projection using
     image near north pole.
 
     Image id: ESP_045245_2675
@@ -216,6 +243,7 @@ def test_hiriserdrbrowselocalizer_polarstereographic_pixel_to_latlon_northpole()
 
     # full size HiRISE image size
     full_size = (32073.0, 11385.0)
+    map_scale = 0.25
 
     # ratio between full size and browse image
     ratio = full_size[1] / 2048.0
@@ -239,10 +267,21 @@ def test_hiriserdrbrowselocalizer_polarstereographic_pixel_to_latlon_northpole()
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.25, line_projection_offset=-282320.0,
+                           map_scale=map_scale, line_projection_offset=-282320.0,
                            sample_projection_offset=579212.0,
-                           samples=full_size[1])
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrBrowseLocalizer(metadata, 2048)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert pixel to lat/lon
     p1_latlon = localizer.pixel_to_latlon(p1_pixel[0], p1_pixel[1])
@@ -274,38 +313,39 @@ def test_hiriserdrbrowselocalizer_polarstereographic_pixel_to_latlon_northpole()
 def test_hiriserdrbrowselocalizer_polarstereographic_latlon_to_pixel_northpole():
     '''
     Test case 4:
-    Test lat/lon to pixel conversion for polarstereographic projection using 
+    Test lat/lon to pixel conversion for polarstereographic projection using
     image near north pole.
 
     Image id: ESP_050054_2565
 
     Run ISIS mappt to convert 5 points to line and sample:
-    1. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.0918 
-             LONGITUDE=95.545 
-    2. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.0818 
+    1. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.0918
+             LONGITUDE=95.545
+    2. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.0818
              LONGITUDE=95.3689
-    3. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.291 
+    3. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.291
              LONGITUDE=95.1579
-    4. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.3011 
+    4. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.3011
              LONGITUDE=95.3366
-    5. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.19145 
+    5. mappt FROM=ESP_050054_2565_RED.cub TYPE=GROUND LATITUDE=76.19145
              LONGITUDE=95.3515
 
     Results:
-    1. lat=76.0918, lon=95.545   ==> line=3.3481906144007, 
+    1. lat=76.0918, lon=95.545   ==> line=3.3481906144007,
                                      sample=24353.96564842
-    2. lat=76.0818, lon=95.3689  ==> line=4931.2083980744, 
+    2. lat=76.0818, lon=95.3689  ==> line=4931.2083980744,
                                      sample=26026.240391183
-    3. lat=76.291, lon=95.1579   ==> line=13225.079025231, 
+    3. lat=76.291, lon=95.1579   ==> line=13225.079025231,
                                      sample=1667.938772222
-    4. lat=76.3011, lon=95.3366  ==> line=8295.4296541251, 
+    4. lat=76.3011, lon=95.3366  ==> line=8295.4296541251,
                                      sample=2.6312731597573
-    5. lat=76.19145, lon=95.3515 ==> line=6652.6553750653, 
+    5. lat=76.19145, lon=95.3515 ==> line=6652.6553750653,
                                      sample=13016.659884301
     '''
 
     # full size HiRISE image size
     full_size = (13224.0, 26027.0)
+    map_scale = 0.5
 
     # ratio between full size and browse image
     ratio = full_size[1] / 2048.0
@@ -329,10 +369,21 @@ def test_hiriserdrbrowselocalizer_polarstereographic_latlon_to_pixel_northpole()
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.5, line_projection_offset=159167.5,
+                           map_scale=map_scale, line_projection_offset=159167.5,
                            sample_projection_offset=-1615142.5,
-                           samples=full_size[1])
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrBrowseLocalizer(metadata, 2048)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert lat/lon to pixel
     p1_pixel = localizer.latlon_to_pixel(p1_latlon[0], p1_latlon[1])
@@ -374,6 +425,7 @@ def test_hiriserdrbrowselocalizer_polarstereographic_pixel_to_latlon_southpole()
 
     # full size HiRISE image size
     full_size = (10375.0, 30226.0)
+    map_scale = 0.25
 
     # ratio between full size and browse image
     ratio = full_size[1] / 2048.0
@@ -397,10 +449,21 @@ def test_hiriserdrbrowselocalizer_polarstereographic_pixel_to_latlon_southpole()
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=-90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.25, line_projection_offset=-657861.5,
+                           map_scale=map_scale, line_projection_offset=-657861.5,
                            sample_projection_offset=-265537.5,
-                           samples=full_size[1])
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrBrowseLocalizer(metadata, 2048)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert pixel to lat/lon
     p1_latlon = localizer.pixel_to_latlon(p1_pixel[0], p1_pixel[1])
@@ -438,32 +501,33 @@ def test_hiriserdrbrowselocalizer_polarstereographic_latlon_to_pixel_southpole()
     Image id: ESP_050042_1000
 
     Run ISIS mappt to convert 5 points to line and sample:
-    1. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.7669 
+    1. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.7669
              LONGITUDE=101.843
-    2. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.7874 
+    2. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.7874
              LONGITUDE=101.43
-    3. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.625 
+    3. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.625
              LONGITUDE=101.179
-    4. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.6047 
+    4. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.6047
              LONGITUDE=101.587
-    5. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.69605 
+    5. mappt FROM=ESP_050042_1000_RED.cub TYPE=GROUND LATITUDE=-79.69605
              LONGITUDE=101.511
 
     Results:
-    1. lat=-79.7669, lon=101.843  ==> line=10463.328397211, 
+    1. lat=-79.7669, lon=101.843  ==> line=10463.328397211,
                                       sample=628.5909773563
-    2. lat=-79.7874, lon=101.43   ==> line=1443.6864533564, 
+    2. lat=-79.7874, lon=101.43   ==> line=1443.6864533564,
                                       sample=-0.33655633684248
-    3. lat=-79.625, lon=101.179   ==> line=0.37412327560014, 
+    3. lat=-79.625, lon=101.179   ==> line=0.37412327560014,
                                       sample=19964.313501756
-    4. lat=-79.6047, lon=101.587  ==> line=9043.8461438996, 
+    4. lat=-79.6047, lon=101.587  ==> line=9043.8461438996,
                                       sample=20604.159140396
-    5. lat=-79.69605, lon=101.511 ==> line=5281.32804386, 
+    5. lat=-79.69605, lon=101.511 ==> line=5281.32804386,
                                       sample=10294.632151381
     '''
 
     # full size HiRISE image size
     full_size = (10462.0, 20597.0)
+    map_scale = 0.5
 
     # ratio between full size and browse image
     ratio = full_size[1] / 2048.0
@@ -487,10 +551,21 @@ def test_hiriserdrbrowselocalizer_polarstereographic_latlon_to_pixel_southpole()
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=-90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.5, line_projection_offset=-237703.5,
+                           map_scale=map_scale, line_projection_offset=-237703.5,
                            sample_projection_offset=-1182837.5,
-                           samples=full_size[1])
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrBrowseLocalizer(metadata, 2048)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert lat/lon to pixel
     p1_pixel = localizer.latlon_to_pixel(p1_latlon[0], p1_latlon[1])
@@ -531,6 +606,7 @@ def test_hiriserdrlocalizer_equirectangular_pixel_to_latlon():
 
     # full size HiRISE image size
     full_size = (23798.0, 22023.0)
+    map_scale = 0.25
 
     # points to test
     # the following points are line/samp values defined in full size image
@@ -551,9 +627,21 @@ def test_hiriserdrlocalizer_equirectangular_pixel_to_latlon():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='EQUIRECTANGULAR',
                            projection_center_latitude=5.0,
                            projection_center_longitude=180.0,
-                           map_scale=0.25, line_projection_offset=1658135.5,
-                           sample_projection_offset=25983782.0)
+                           map_scale=map_scale, line_projection_offset=1658135.5,
+                           sample_projection_offset=25983782.0,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrLocalizer(metadata)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert pixel to lat/lon
     ul_latlon = localizer.pixel_to_latlon(ul_pixel[0], ul_pixel[1])
@@ -624,6 +712,7 @@ def test_hiriserdrlocalizer_equirectangular_latlon_to_pixel():
 
     # full size HiRISE image size
     full_size = (21856.0, 21831.0)
+    map_scale = 0.25
 
     # points to test
     # the following points are lat/lon values
@@ -644,9 +733,21 @@ def test_hiriserdrlocalizer_equirectangular_latlon_to_pixel():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='EQUIRECTANGULAR',
                            projection_center_latitude=-40.0,
                            projection_center_longitude=180.0,
-                           map_scale=0.25, line_projection_offset=-10631488.0,
-                           sample_projection_offset=-14646768.0)
+                           map_scale=map_scale, line_projection_offset=-10631488.0,
+                           sample_projection_offset=-14646768.0,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrLocalizer(metadata)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert lat/lon to pixel
     ul_pixel = localizer.latlon_to_pixel(ul_latlon[0], ul_latlon[1])
@@ -698,6 +799,7 @@ def test_hiriserdrlocalizer_polarstereographic_pixel_to_latlon_northpole():
 
     # full size HiRISE image size
     full_size = (32073.0, 11385.0)
+    map_scale = 0.25
 
     # points to test
     # the following points are line/samp values defined in full size image
@@ -718,9 +820,21 @@ def test_hiriserdrlocalizer_polarstereographic_pixel_to_latlon_northpole():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.25, line_projection_offset=-282320.0,
-                           sample_projection_offset=579212.0)
+                           map_scale=map_scale, line_projection_offset=-282320.0,
+                           sample_projection_offset=579212.0,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrLocalizer(metadata)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert pixel to lat/lon
     p1_latlon = localizer.pixel_to_latlon(p1_pixel[0], p1_pixel[1])
@@ -784,6 +898,7 @@ def test_hiriserdrlocalizer_polarstereographic_latlon_to_pixel_northpole():
 
     # full size HiRISE image size
     full_size = (13224.0, 26027.0)
+    map_scale = 0.5
 
     # points to test
     # the following points are lat/lon values
@@ -804,9 +919,21 @@ def test_hiriserdrlocalizer_polarstereographic_latlon_to_pixel_northpole():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.5, line_projection_offset=159167.5,
-                           sample_projection_offset=-1615142.5)
+                           map_scale=map_scale, line_projection_offset=159167.5,
+                           sample_projection_offset=-1615142.5,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrLocalizer(metadata)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert lat/lon to pixel
     p1_pixel = localizer.latlon_to_pixel(p1_latlon[0], p1_latlon[1])
@@ -848,6 +975,7 @@ def test_hiriserdrlocalizer_polarstereographic_pixel_to_latlon_southpole():
 
     # full size HiRISE image size
     full_size = (10375.0, 30226.0)
+    map_scale = 0.25
 
     # points to test
     # the following points are line/samp values defined in browse image
@@ -868,9 +996,21 @@ def test_hiriserdrlocalizer_polarstereographic_pixel_to_latlon_southpole():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=-90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.25, line_projection_offset=-657861.5,
-                           sample_projection_offset=-265537.5)
+                           map_scale=map_scale, line_projection_offset=-657861.5,
+                           sample_projection_offset=-265537.5,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrLocalizer(metadata)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert pixel to lat/lon
     p1_latlon = localizer.pixel_to_latlon(p1_pixel[0], p1_pixel[1])
@@ -934,6 +1074,7 @@ def test_hiriserdrlocalizer_polarstereographic_latlon_to_pixel_southpole():
 
     # full size HiRISE image size
     full_size = (10462.0, 20597.0)
+    map_scale = 0.5
 
     # points to test
     # the following points are lat/lon values
@@ -954,9 +1095,21 @@ def test_hiriserdrlocalizer_polarstereographic_latlon_to_pixel_southpole():
     metadata = PdsMetadata('hirise_rdr', map_projection_type='POLAR STEREOGRAPHIC',
                            projection_center_latitude=-90.0,
                            projection_center_longitude=0.0,
-                           map_scale=0.5, line_projection_offset=-237703.5,
-                           sample_projection_offset=-1182837.5)
+                           map_scale=map_scale, line_projection_offset=-237703.5,
+                           sample_projection_offset=-1182837.5,
+                           samples=full_size[1], lines=full_size[0])
     localizer = HiRiseRdrLocalizer(metadata)
+
+    assert_allclose(
+        localizer.observation_width_m,
+        map_scale*full_size[1],
+        atol=TOLERANCE_M
+    )
+    assert_allclose(
+        localizer.observation_length_m,
+        map_scale*full_size[0],
+        atol=TOLERANCE_M
+    )
 
     # convert lat/lon to pixel
     p1_pixel = localizer.latlon_to_pixel(p1_latlon[0], p1_latlon[1])
@@ -971,3 +1124,8 @@ def test_hiriserdrlocalizer_polarstereographic_latlon_to_pixel_southpole():
     assert_allclose(p3_pixel, p3_pixel_expected, atol=TOLERANCE_PIXEL)
     assert_allclose(p4_pixel, p4_pixel_expected, atol=TOLERANCE_PIXEL)
     assert_allclose(p5_pixel, p5_pixel_expected, atol=TOLERANCE_PIXEL)
+
+@unit
+def test_abstract_methods():
+    with pytest.raises(TypeError):
+        localizer = Localizer()
