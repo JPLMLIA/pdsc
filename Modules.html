@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Module Documentation &mdash; PDSC 1.1.0 documentation</title>
+  <title>Module Documentation &mdash; PDSC 1.2.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -675,7 +675,7 @@ an observation</p>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+<p class="last">If <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
 is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
 than the number of total rows/columns in the image. Otherwise, the
 pixel coordinates range from zero to one along each dimension.</p>
@@ -720,6 +720,16 @@ direction of flight</li>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the pixel coordinates range from zero to one.
+Consequently, the attributes <code class="xref py py-attr docutils literal notranslate"><span class="pre">n_cols</span></code>
+and <code class="xref py py-attr docutils literal notranslate"><span class="pre">n_rows</span></code> are both equal to one, and
+the attributes <code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_width_m</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_height_m</span></code> are both the width and
+height of the <em>entire</em> observation.</p>
+</div>
 <dl class="attribute">
 <dt id="pdsc.localization.GeodesicLocalizer.BODY">
 <code class="descname">BODY</code><em class="property"> = &lt;geographiclib.geodesic.Geodesic object&gt;</em><a class="headerlink" href="#pdsc.localization.GeodesicLocalizer.BODY" title="Permalink to this definition">¶</a></dt>
@@ -780,7 +790,7 @@ an observation</p>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+<p class="last">If <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
 is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
 than the number of total rows/columns in the image. Otherwise, the
 pixel coordinates range from zero to one along each dimension.</p>
@@ -901,7 +911,7 @@ an observation</p>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+<p class="last">If <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
 is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
 than the number of total rows/columns in the image. Otherwise, the
 pixel coordinates range from zero to one along each dimension.</p>
@@ -1019,6 +1029,18 @@ location to within the stricter of the two resolution requirements</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pdsc.localization.Localizer.observation_length_m">
+<code class="descname">observation_length_m</code><a class="headerlink" href="#pdsc.localization.Localizer.observation_length_m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total observation length (along-track) in meters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pdsc.localization.Localizer.observation_width_m">
+<code class="descname">observation_width_m</code><a class="headerlink" href="#pdsc.localization.Localizer.observation_width_m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total observation width (cross-track) in meters</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="pdsc.localization.Localizer.pixel_to_latlon">
 <code class="descname">pixel_to_latlon</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#Localizer.pixel_to_latlon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.Localizer.pixel_to_latlon" title="Permalink to this definition">¶</a></dt>
@@ -1038,7 +1060,7 @@ an observation</p>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+<p class="last">If <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
 is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
 than the number of total rows/columns in the image. Otherwise, the
 pixel coordinates range from zero to one along each dimension.</p>
@@ -1049,7 +1071,7 @@ pixel coordinates range from zero to one along each dimension.</p>
 
 <dl class="class">
 <dt id="pdsc.localization.MapLocalizer">
-<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">MapLocalizer</code><span class="sig-paren">(</span><em>proj_type</em>, <em>proj_latitude</em>, <em>proj_longitude</em>, <em>map_scale</em>, <em>row_offset</em>, <em>col_offset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#MapLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.MapLocalizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pdsc.localization.</code><code class="descname">MapLocalizer</code><span class="sig-paren">(</span><em>proj_type</em>, <em>proj_latitude</em>, <em>proj_longitude</em>, <em>map_scale</em>, <em>row_offset</em>, <em>col_offset</em>, <em>lines</em>, <em>samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pdsc/localization.html#MapLocalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pdsc.localization.MapLocalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <a class="reference internal" href="#pdsc.localization.MapLocalizer" title="pdsc.localization.MapLocalizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapLocalizer</span></code></a> supports map-projected observations.
 Specifically, it supports the EQUIRECTANGULAR and POLAR STEREOGRAPHIC
 projection types used for HiRISE observations.</p>
@@ -1064,6 +1086,8 @@ projection types used for HiRISE observations.</p>
 <li><strong>map_scale</strong> – projection map scale (meters)</li>
 <li><strong>row_offset</strong> – projection row offset</li>
 <li><strong>col_offset</strong> – projection col offset</li>
+<li><strong>lines</strong> – total observation lines (rows)</li>
+<li><strong>samples</strong> – total observation samples (columns)</li>
 </ul>
 </td>
 </tr>
@@ -1130,7 +1154,7 @@ an observation</p>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">if <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
+<p class="last">If <a class="reference internal" href="#pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE" title="pdsc.localization.Localizer.NORMALIZED_PIXEL_SPACE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NORMALIZED_PIXEL_SPACE</span></code></a> for this localizer
 is <code class="docutils literal notranslate"><span class="pre">False</span></code>, then the pixel coordinates range from zero to one less
 than the number of total rows/columns in the image. Otherwise, the
 pixel coordinates range from zero to one along each dimension.</p>
@@ -2828,7 +2852,7 @@ or an identify function that can be used to omit progress</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

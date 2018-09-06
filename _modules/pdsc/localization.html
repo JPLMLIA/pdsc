@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pdsc.localization &mdash; PDSC 1.1.0 documentation</title>
+  <title>pdsc.localization &mdash; PDSC 1.2.0 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.1
+                1.2
               </div>
             
           
@@ -196,6 +196,8 @@
 <span class="sd">    Therefore, PDSC localization often relies on assumptions that introduce</span>
 <span class="sd">    errors whose magnitudes vary across instruments.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">with_metaclass</span>
+<span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">zoom</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">fmin</span>
@@ -290,7 +292,7 @@
         <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
     <span class="p">])</span></div>
 
-<div class="viewcode-block" id="Localizer"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.Localizer">[docs]</a><span class="k">class</span> <span class="nc">Localizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Localizer"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.Localizer">[docs]</a><span class="k">class</span> <span class="nc">Localizer</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for all localizers</span>
 
@@ -320,7 +322,22 @@
 <span class="sd">    top left and (rows, cols) is the bottom right</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Localizer.pixel_to_latlon"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.Localizer.pixel_to_latlon">[docs]</a>    <span class="k">def</span> <span class="nf">pixel_to_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="k">def</span> <span class="nf">observation_width_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Total observation width (cross-track) in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="k">def</span> <span class="nf">observation_length_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Total observation length (along-track) in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Localizer.pixel_to_latlon"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.Localizer.pixel_to_latlon">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">pixel_to_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts pixel coordinates to latitude and longitude coordinates within</span>
 <span class="sd">        an observation</span>
@@ -329,7 +346,7 @@
 <span class="sd">        :param col: image column, starting at 0 at the left of the image</span>
 
 <span class="sd">        .. Note::</span>
-<span class="sd">            if :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer</span>
+<span class="sd">            If :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer</span>
 <span class="sd">            is ``False``, then the pixel coordinates range from zero to one less</span>
 <span class="sd">            than the number of total rows/columns in the image. Otherwise, the</span>
 <span class="sd">            pixel coordinates range from zero to one along each dimension.</span>
@@ -415,6 +432,15 @@
 <span class="sd">            ``flight_direction=1``, then the flight direction is from the the</span>
 <span class="sd">            top down, whereas ``flight_direction=-1`` indicates a bottom-up</span>
 <span class="sd">            direction of flight</span>
+
+<span class="sd">        .. Note::</span>
+<span class="sd">            If :py:attr:`~Localizer.NORMALIZED_PIXEL_SPACE` for this localizer</span>
+<span class="sd">            is ``True``, then the pixel coordinates range from zero to one.</span>
+<span class="sd">            Consequently, the attributes :py:attr:`~GeodesicLocalizer.n_cols`</span>
+<span class="sd">            and :py:attr:`~GeodesicLocalizer.n_rows` are both equal to one, and</span>
+<span class="sd">            the attributes :py:attr:`~GeodesicLocalizer.pixel_width_m` and</span>
+<span class="sd">            :py:attr:`~GeodesicLocalizer.pixel_height_m` are both the width and</span>
+<span class="sd">            height of the *entire* observation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">n_rows</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No image rows&#39;</span><span class="p">)</span>
@@ -436,13 +462,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">observation_width_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_width_m</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">observation_length_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_height_m</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span>
@@ -598,7 +624,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proj_type</span><span class="p">,</span> <span class="n">proj_latitude</span><span class="p">,</span> <span class="n">proj_longitude</span><span class="p">,</span>
-                 <span class="n">map_scale</span><span class="p">,</span> <span class="n">row_offset</span><span class="p">,</span> <span class="n">col_offset</span><span class="p">):</span>
+                 <span class="n">map_scale</span><span class="p">,</span> <span class="n">row_offset</span><span class="p">,</span> <span class="n">col_offset</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param proj_type: map projection type</span>
 <span class="sd">        :param proj_latitude: projection center latitude</span>
@@ -606,6 +632,8 @@
 <span class="sd">        :param map_scale: projection map scale (meters)</span>
 <span class="sd">        :param row_offset: projection row offset</span>
 <span class="sd">        :param col_offset: projection col offset</span>
+<span class="sd">        :param lines: total observation lines (rows)</span>
+<span class="sd">        :param samples: total observation samples (columns)</span>
 
 <span class="sd">        See https://hirise-pds.lpl.arizona.edu/PDS/CATALOG/DSMAP.CAT for a</span>
 <span class="sd">        further description of these parameters.</span>
@@ -616,6 +644,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">map_scale</span> <span class="o">=</span> <span class="n">map_scale</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">row_offset</span> <span class="o">=</span> <span class="n">row_offset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">col_offset</span> <span class="o">=</span> <span class="n">col_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MARS_RADIUS_POLAR</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_latitude</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MARS_RADIUS_EQUATORIAL</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_latitude</span><span class="p">)</span>
@@ -669,6 +701,18 @@
         <span class="n">row</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">y</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_scale</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_offset</span>
         <span class="n">col</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_scale</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_offset</span>
         <span class="k">return</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">observation_width_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">map_scale</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">observation_length_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">map_scale</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span>
 
 <div class="viewcode-block" id="MapLocalizer.pixel_to_latlon"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.MapLocalizer.pixel_to_latlon">[docs]</a>    <span class="k">def</span> <span class="nf">pixel_to_latlon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_type</span> <span class="o">==</span> <span class="s1">&#39;EQUIRECTANGULAR&#39;</span><span class="p">:</span>
@@ -880,6 +924,8 @@
             <span class="n">metadata</span><span class="o">.</span><span class="n">map_scale</span><span class="p">,</span>
             <span class="n">metadata</span><span class="o">.</span><span class="n">line_projection_offset</span><span class="p">,</span>
             <span class="n">metadata</span><span class="o">.</span><span class="n">sample_projection_offset</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">samples</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="HiRiseRdrBrowseLocalizer"><a class="viewcode-back" href="../../Modules.html#pdsc.localization.HiRiseRdrBrowseLocalizer">[docs]</a><span class="k">class</span> <span class="nc">HiRiseRdrBrowseLocalizer</span><span class="p">(</span><span class="n">HiRiseRdrLocalizer</span><span class="p">):</span>
@@ -1032,7 +1078,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
