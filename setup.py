@@ -29,6 +29,7 @@ setup(name='pdsc',
         'geographiclib',
         'CherryPy',
         'requests',
+        'future',
     ],
     dependency_links=[
         'git+https://github.com/RyanBalfanz/PyPDS.git#egg=PyPDS-1.0.1'
