@@ -39,6 +39,7 @@ pipeline {
             steps {
                 sh '''#!/bin/bash
                     source venv_PDSC/bin/activate
+                    pip install --force-reinstall "pip<19.0.0"
                     pip install --process-dependency-links --upgrade .[devel]
                 '''
             }
