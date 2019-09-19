@@ -4,7 +4,6 @@ Parses PDS cumulative index files into an internal table representation
 import re
 import numpy as np
 from datetime import datetime
-from pds.core.parser import Parser
 
 from .util import registerer, standard_progress_bar
 
@@ -140,17 +139,36 @@ def themis_determiner(label_file, detector_name):
         specified detector
     """
     with open(label_file, 'r') as f:
-        try:
-            parser = Parser()
-            labels = parser.parse(f)
-            instrument = labels.get('INSTRUMENT_NAME', None)
-            detector = labels.get('DETECTOR_ID', None)
-            return (
-                'THERMAL EMISSION IMAGING SYSTEM' in instrument
-                and detector_name in detector
-            )
-        except:
-            return False
+        raw = f.read()
+        instrument = parse_simple_label(raw, 'INSTRUMENT_NAME')
+        detector = parse_simple_label(raw, 'DETECTOR_ID')
+        print instrument
+        print detector
+        return (
+            instrument is not None and detector is not None and
+            'THERMAL EMISSION IMAGING SYSTEM' in instrument
+            and detector_name in detector
+        )
+
+def parse_simple_label(label_contents, key):
+    """
+    Retrieves the value of a "simple" PDS header entry corresponding to the
+    given key. Simple entries are string-valued entries that do not split
+    across lines.
+
+    :param label_contents: string contents of the PDS LBL file
+    :param key: entry key to search for in PDS label
+    :return: entry value string or ``None`` if not found
+    """
+    for line in label_contents.splitlines(False):
+        match = re.match(r'^\s*(\w+)\s*=\s*"?([^"]+)"?\s*$', line)
+        if match is not None:
+            k = match.group(1)
+            v = match.group(2)
+            if key == k:
+                return v
+
+    return None
 
 def generic_determiner(label_file, instrument_name):
     """
@@ -166,13 +184,9 @@ def generic_determiner(label_file, instrument_name):
     ``INSTRUMENT_NAME`` header.
     """
     with open(label_file, 'r') as f:
-        try:
-            parser = Parser()
-            labels = parser.parse(f)
-            instrument = labels.get('INSTRUMENT_NAME', None)
-            return (instrument_name in instrument)
-        except:
-            return False
+        raw = f.read()
+        instrument = parse_simple_label(raw, 'INSTRUMENT_NAME')
+        return (instrument is not None and instrument_name in instrument)
 
 @register_determiner('themis_vis')
 def themis_vis_determiner(label_file):
