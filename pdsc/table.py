@@ -251,7 +251,6 @@ class PdsTableColumn(object):
         'START_BYTE': ('start_byte', int),
         'BYTES': ('length', int),
         'NOT_APPLICABLE_CONSTANT': ('unknown_constant', str),
-        'UNIT' : ('unit', str),
     }
     """
     Information for parsing table columns; each column contains associated
@@ -290,7 +289,6 @@ class PdsTableColumn(object):
         self.start_byte = None
         self.length = None
         self.unknown_constant = None
-        self.unit = None
 
         success = self._parse(fpointer)
         if not success:
@@ -316,7 +314,7 @@ class PdsTableColumn(object):
                 if 'END_OBJECT' in line:
                     return True
                 else:
-                    continue
+                    continue # pragma: no cover
             key = match.group(1)
             val = match.group(2)
             if key == 'END_OBJECT' and val == 'COLUMN':
@@ -411,7 +409,7 @@ class PdsTable(object):
                 if in_table and 'END_OBJECT' in line:
                     return columns
                 else:
-                    continue
+                    continue # pragma: no cover
             key = match.group(1)
             val = match.group(2)
 
@@ -451,7 +449,7 @@ class PdsTable(object):
         """
         for i, c in enumerate(self.columns):
             if c.name == column_name: return i
-        return IndexError('Column name "%s" not found' % str(column_name))
+        raise IndexError('Column name "%s" not found' % str(column_name))
 
     def get_column(self, column_name_or_idx, progress=True, cache=True):
         """
@@ -554,7 +552,6 @@ class ThemisTableColumn(PdsTableColumn):
         'START_BYTE': ('start_byte', int),
         'BYTES': ('length', int),
         'UNKNOWN_CONSTANT': ('unknown_constant', str),
-        'UNIT' : ('unit', str),
     }
     """
     Override column metadata, which follows a slightly different convention for
