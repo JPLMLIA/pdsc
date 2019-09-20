@@ -142,8 +142,6 @@ def themis_determiner(label_file, detector_name):
         raw = f.read()
         instrument = parse_simple_label(raw, 'INSTRUMENT_NAME')
         detector = parse_simple_label(raw, 'DETECTOR_ID')
-        print instrument
-        print detector
         return (
             instrument is not None and detector is not None and
             'THERMAL EMISSION IMAGING SYSTEM' in instrument
