@@ -42,16 +42,14 @@ Instrument Determination
 The first step in parsing a PDS cumulative index file is determining the
 instrument to which the index corresponds. The PDSC library does this using
 "determiner" functions. A determiner function for an instrument takes a PDS
-cumulative index label file path and uses the file to determine whether the file
+cumulative index label file and uses the file to determine whether the file
 is for the given instrument.
 
 An example determiner with registration decorator is shown below::
 
     @register_determiner('hirise_edr')
-    def hirise_edr_determiner(label_file):
-        with open(label_file, 'r') as f:
-            raw = f.read()
-            return ('HiRISE' in raw and 'EDR_INDEX_TABLE' in raw)
+    def hirise_edr_determiner(label_contents):
+          return ('HiRISE' in label_contents and 'EDR_INDEX_TABLE' in label_contents)
 
 The determiner simply checks whether the words ``HiRISE`` and
 ``EDR_INDEX_TABLE`` appear in the label file. There is also a
@@ -60,8 +58,8 @@ The determiner simply checks whether the words ``HiRISE`` and
 the given instrument. For example::
 
     @register_determiner('ctx')
-    def ctx_determiner(label_file):
-        return generic_determiner(label_file, 'CONTEXT CAMERA')
+    def ctx_determiner(label_contents):
+        return generic_determiner(label_contents, 'CONTEXT CAMERA')
 
 To perform instrument determination, PDSC goes through every determiner that
 has been registered in alphabetical order by instrument name and returns the
