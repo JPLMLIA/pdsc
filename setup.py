@@ -21,20 +21,16 @@ setup(name='pdsc',
     install_requires=[
         'tempora<=1.13',
         'more-itertools<5.0.0',
-        'numpy',
-        'scipy',
+        'numpy<=1.16',
+        'scipy==0.13.3',
         'scikit-learn<0.20.0',
         'Polygon2',
         'progressbar',
-        'PyPDS>=1.0.1',
         'PyYAML',
         'geographiclib',
         'CherryPy<18.0.0',
         'requests',
         'future',
-    ],
-    dependency_links=[
-        'git+https://github.com/RyanBalfanz/PyPDS.git#egg=PyPDS-1.0.1'
     ],
     provides=[
         'pdsc',

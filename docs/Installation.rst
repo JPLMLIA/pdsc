@@ -11,10 +11,7 @@ The recommended installation method is to use ``pip`` as follows from within the
 repository root directory after downloading the code or cloning it via ``git
 clone``::
 
-    pip install --process-dependency-links .
-
-The ``--process-dependency-links`` flag is needed to install :py:mod:`PyPDS`,
-which follows a version numbering scheme incompatible with PyPI.
+    pip install .
 
 Ingesting Cumulative Indices
 ----------------------------
