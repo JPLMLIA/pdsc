@@ -97,7 +97,10 @@ class PdsServer(object):
             conditions
         """
         instrument = str(instrument)
-        conditions = json.loads(conditions)
+        if conditions is None:
+            conditions = []
+        else:
+            conditions = json.loads(conditions)
         metadata = self.client.query(instrument, conditions)
         return json_dumps(metadata)
 
