@@ -28,7 +28,7 @@ from geographiclib.geodesic import Geodesic
 from .util import registerer, standard_progress_bar
 
 # https://tharsis.gsfc.nasa.gov/geodesy.html
-MARS_RADIUS_M = 3396200
+MARS_RADIUS_M = 3396200.
 MARS_FLATTENING = 1.0 / 169.8
 
 LOCALIZERS = {}
@@ -342,12 +342,12 @@ class GeodesicLocalizer(Localizer):
         L = np.array([
             [self.pixel_to_latlon(r, c)
                 for c in np.linspace(0, self.n_cols - 1, ncols)]
-            for r in progress(np.linspace(0, self.n_rows, nrows))
+            for r in progress(np.linspace(0, self.n_rows - 1, nrows))
         ])
         if reinterpolate:
             zoom_factor = (
-                float(self.n_rows) / L.shape[1],
-                float(self.n_cols) / L.shape[0]
+                float(self.n_rows) / L.shape[0],
+                float(self.n_cols) / L.shape[1]
             )
             L = np.dstack([
                 zoom(L[..., 0], zoom_factor, order=1, mode='nearest'),
@@ -590,6 +590,11 @@ class ThemisLocalizer(GeodesicLocalizer):
     """
     A localizer for the THEMIS VIS and IR instruments (subclass of
     :py:class:`GeodesicLocalizer`)
+    """
+
+    DEFAULT_RESOLUTION_M = 1e-3
+    """
+    Sets the default resolution for THEMIS localization
     """
 
     def __init__(self, metadata):

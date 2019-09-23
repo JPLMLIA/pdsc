@@ -8,7 +8,7 @@ from cosmic_test_tools import unit
 from numpy.testing import assert_allclose
 from pdsc.localization import (
     MapLocalizer, HiRiseRdrLocalizer, HiRiseRdrBrowseLocalizer, Localizer,
-    xyz2latlon, get_localizer
+    xyz2latlon, get_localizer, GeodesicLocalizer, MARS_RADIUS_M
 )
 
 # tolerance value defined in pixel.
@@ -299,6 +299,42 @@ MOC_M0000110_TEST_CASE = [
     ((-51.16540002433904, -159.74652039353282), (0, 0)),
 ]
 
+THEMIS_IR_I34619017_META = PdsMetadata(
+    'themis_ir',
+    center_latitude=-54.121, center_longitude=202.748,
+    lines=272, samples=320, north_azimuth=100.239,
+    pixel_aspect_ratio=0.845, pixel_height=102.0, pixel_width=120.0,
+)
+THEMIS_IR_I34619017_TEST_CASE = [
+    ((-53.94804265851535, -157.86154852611733), (272, 320)),
+    ((-53.83349019671131, -156.78373360980942), (272, 0)),
+    ((-54.29083103668251, -156.63740954256997), (0, 0)),
+]
+
+CTX_P06_003181_0946_XI_85S260W_META = PdsMetadata(
+    'ctx', north_azimuth=179.85,
+    center_latitude=-85.42, center_longitude=-260.56,
+    image_height=86490.0, image_width=31440.0,
+    lines=14336, samples=5056, usage_note=u'F',
+)
+CTX_P06_003181_0946_XI_85S260W_TEST_CASE = [
+    ((-85.10207160374867, 90.85528333927553), (14336, 5056)),
+    ((-85.0985004494083, 108.00199482283183), (0, 5056)),
+    ((-85.62209854254696, 109.05122054313493), (0, 0)),
+]
+
+CTX_T01_000849_1676_XI_12S069W_META = PdsMetadata(
+    'ctx', north_azimuth=276.93,
+    center_latitude=-12.45, center_longitude=-69.29,
+    image_height=43530.0, image_width=25970.0,
+    lines=7168, samples=5056, usage_note=u'N',
+)
+CTX_T01_000849_1676_XI_12S069W_TEST_CASE = [
+    ((-12.111797753021992, -69.55772674321044), (7168, 0)),
+    ((-12.059007889850992, -69.11293214267153), (7168, 5056)),
+    ((-12.78793820020455, -69.02157480900689), (0, 5056)),
+]
+
 @unit
 @pytest.mark.parametrize(
     'metadata, latlons_pixels',
@@ -311,6 +347,11 @@ MOC_M0000110_TEST_CASE = [
         (HIRISE_ESP_050042_1000_META, HIRISE_ESP_050042_1000_TEST_CASE),
         (MOC_S2200304_META, MOC_S2200304_TEST_CASE),
         (MOC_M0000110_META, MOC_M0000110_TEST_CASE),
+        (THEMIS_IR_I34619017_META, THEMIS_IR_I34619017_TEST_CASE),
+        (CTX_P06_003181_0946_XI_85S260W_META,
+            CTX_P06_003181_0946_XI_85S260W_TEST_CASE),
+        (CTX_T01_000849_1676_XI_12S069W_META,
+            CTX_T01_000849_1676_XI_12S069W_TEST_CASE),
     ]
 )
 def test_localizer(metadata, latlons_pixels, browse=False):
@@ -430,3 +471,30 @@ def test_hirise_localizer_types():
         ValueError, get_localizer, metadata,
         nomap=False, browse=True, browse_width=0
     )
+
+@unit
+def test_location_mask():
+    size = MARS_RADIUS_M / 360.
+    loc = GeodesicLocalizer(
+        center_row=5.5, center_col=2.5,
+        center_lat=0.0, center_lon=0.0,
+        n_rows=11, n_cols=5,
+        pixel_height_m=size, pixel_width_m=size,
+        north_azimuth_deg=90.0)
+
+    mask = loc.location_mask(1, 1, reinterpolate=False)
+    assert mask.shape == (11, 5, 2)
+    assert_allclose(mask[0, 0, :], loc.pixel_to_latlon(0, 0))
+    assert_allclose(mask[10, 4, :], loc.pixel_to_latlon(10, 4))
+    center = (mask[5, 2, :] + mask[6, 3]) / 2.0
+    assert_allclose(center, (0, 0))
+
+    mask2 = loc.location_mask(2, 2, reinterpolate=False)
+    assert mask2.shape == (5, 2, 2)
+    assert_allclose(mask[0, 0, :], mask2[0, 0, :])
+
+    mask3 = loc.location_mask(2, 2, reinterpolate=True)
+    assert mask.shape == (11, 5, 2)
+    assert_allclose(mask[0, 0, :], mask3[0, 0, :])
+    center = (mask3[5, 2, :] + mask3[6, 3]) / 2.0
+    assert_allclose(center, (0, 0), atol=1e-6)
