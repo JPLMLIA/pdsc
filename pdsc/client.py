@@ -105,27 +105,26 @@ class PdsClient(object):
         if instrument not in self.instruments:
             raise ValueError('Instrument "%s" not found' % instrument)
 
-        if conditions is None:
-            conditions = tuple()
-
-        for t in conditions:
-            if len(t) != 3:
-                raise ValueError('Invalid condition "%s"' % str(t))
-            if t[1] not in ('<', '=', '>', '>=', '<='):
-                raise ValueError('Invalid comparator "%s"' % t[1])
-
         query_str = 'SELECT * FROM metadata'
-        parts, values = zip(*[
-            ('%s%s?' % (col, comp), val)
-            for col, comp, val in conditions
-        ])
-        if len(parts) > 0:
+
+        if conditions is None or len(conditions) == 0:
+            query_tup = (query_str,)
+
+        else:
+            for t in conditions:
+                if len(t) != 3:
+                    raise ValueError('Invalid condition "%s"' % str(t))
+                if t[1] not in ('<', '=', '>', '>=', '<='):
+                    raise ValueError('Invalid comparator "%s"' % t[1])
+
+            parts, values = zip(*[
+                ('%s%s?' % (col, comp), val)
+                for col, comp, val in conditions
+            ])
             query_str += ' WHERE %s' % (
                 ' and '.join(parts)
             )
             query_tup = (query_str, values)
-        else:
-            query_tup = (query_str,)
 
         db_file = self._db_files[instrument]
         params = {'detect_types': sqlite3.PARSE_DECLTYPES}
