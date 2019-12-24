@@ -5,11 +5,9 @@ import os
 import mock
 import pytest
 import json
-import sqlite3
 import numpy as np
-from contextlib import contextmanager
 
-from cosmic_test_tools import unit
+from cosmic_test_tools import unit, MockDbManager
 
 from pdsc.client import (
     PdsClient, PdsHttpClient, PORT_VAR, SERVER_VAR,
@@ -47,39 +45,6 @@ class MockSegmentTree(object):
     @staticmethod
     def load(inputfile):
         return MockSegmentTree(len(TEST_SEGMENTS))
-
-class MockDbManager(object):
-
-    def __init__(self):
-        self._connections = {}
-
-    @contextmanager
-    def __call__(self, filename, *args, **kwargs):
-        """
-        Implements the mock ``sqlite3.connect`` functionality; use a
-        contextmanager so we can keep the connection to the in-memory database
-        open until after the tests have completed.
-        """
-
-        # Database must have already been initialized
-        assert filename in self._connections
-
-        try:
-            yield self._connections[filename]
-        finally:
-            # *Don't* close the connection
-            pass
-
-    def new_connection(self, filename):
-        conn = sqlite3.connect(
-            ':memory:', detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        self._connections[filename] = conn
-        return conn
-
-    def close(self):
-        for c in self._connections.values():
-            c.close()
 
 @pytest.fixture()
 def mock_db_manager():
