@@ -130,7 +130,7 @@ class PdsServer(object):
             observation_ids = str(observation_ids)
 
         if type(observation_ids) == list:
-            observation_ids = map(str, observation_ids)
+            observation_ids = list(map(str, observation_ids))
         else:
             observation_ids = str(observation_ids)
         metadata = self.client.query_by_observation_id(

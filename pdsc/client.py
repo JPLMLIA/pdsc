@@ -419,7 +419,7 @@ class PdsHttpClient(object):
         }
         response = requests.get(url, params=params)
         response.raise_for_status()
-        return map(str, response.json())
+        return list(map(str, response.json()))
 
     def find_overlapping_observations(self, instrument, observation_id, other_instrument):
         url = self.base_url + 'queryByOverlap'
@@ -430,4 +430,4 @@ class PdsHttpClient(object):
         }
         response = requests.get(url, params=params)
         response.raise_for_status()
-        return map(str, response.json())
+        return list(map(str, response.json()))

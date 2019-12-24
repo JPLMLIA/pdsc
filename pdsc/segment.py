@@ -197,7 +197,7 @@ class TriSegment(object):
         """
         if self._xyz_points is None:
             self._xyz_points = np.vstack(
-                map(latlon2unit, self.latlon_points))
+                list(map(latlon2unit, self.latlon_points)))
         return self._xyz_points
 
     @property
