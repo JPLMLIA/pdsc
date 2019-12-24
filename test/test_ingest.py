@@ -87,7 +87,7 @@ class TestIngest(TestCase):
             '-e', os.path.join(TEST_DATA, 'test_extension.py')
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdoutdata, stderrdata = process.communicate()
-        self.assertEquals(process.poll(), os.EX_OK)
+        self.assertEqual(process.poll(), os.EX_OK)
 
     def tearDown(self):
         rmtree(self.outputdir)
