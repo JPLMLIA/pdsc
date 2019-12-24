@@ -6,11 +6,14 @@ import pytest
 import builtins
 import datetime
 import numpy as np
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from contextlib import contextmanager
 from numpy.testing import assert_equal
 
-from cosmic_test_tools import unit, mock_open
+from .cosmic_test_tools import unit, mock_open
 
 import pdsc
 from pdsc.table import (

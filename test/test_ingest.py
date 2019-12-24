@@ -10,7 +10,7 @@ from tempfile import mkdtemp
 from shutil import rmtree
 import numpy as np
 
-from cosmic_test_tools import functional, unit, MockDbManager
+from .cosmic_test_tools import functional, unit, MockDbManager
 
 from pdsc.metadata import PdsMetadata
 from pdsc.segment import TriSegmentedFootprint

@@ -6,7 +6,10 @@ from numbers import Number
 import pytest
 import sqlite3
 from contextlib import contextmanager
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 unit = pytest.mark.unit
 functional = pytest.mark.functional

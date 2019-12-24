@@ -5,7 +5,7 @@ import pytest
 import datetime
 import json
 
-from cosmic_test_tools import unit
+from .cosmic_test_tools import unit
 
 from pdsc.metadata import (
     PdsMetadata, date_decoder, json_dumps, json_loads

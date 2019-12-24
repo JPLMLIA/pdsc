@@ -7,7 +7,7 @@ import pytest
 import json
 import numpy as np
 
-from cosmic_test_tools import unit, MockDbManager
+from .cosmic_test_tools import unit, MockDbManager
 
 from pdsc.client import (
     PdsClient, PdsHttpClient, PORT_VAR, SERVER_VAR,

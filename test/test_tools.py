@@ -3,9 +3,12 @@ Test of PDSC tools
 """
 import mock
 import pytest
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
-from cosmic_test_tools import unit, mock_open
+from .cosmic_test_tools import unit, mock_open
 
 from pdsc.tools import _resize_scan_exposure_duration, fix_hirise_index
 

@@ -4,12 +4,13 @@ Unit tests for Localization code
 import pytest
 import numpy as np
 from pdsc.metadata import PdsMetadata
-from cosmic_test_tools import unit
 from numpy.testing import assert_allclose
 from pdsc.localization import (
     MapLocalizer, HiRiseRdrLocalizer, HiRiseRdrBrowseLocalizer, Localizer,
     xyz2latlon, get_localizer, GeodesicLocalizer, MARS_RADIUS_M
 )
+
+from .cosmic_test_tools import unit
 
 # tolerance value defined in pixel.
 TOLERANCE_PIXEL = 5.0

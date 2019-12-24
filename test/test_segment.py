@@ -8,7 +8,7 @@ from numpy.testing import (
     assert_allclose, assert_almost_equal
 )
 
-from cosmic_test_tools import unit, Approximately
+from .cosmic_test_tools import unit, Approximately
 
 from pdsc.segment import (
     PointQuery, TriSegment, SegmentTree, SegmentedFootprint,

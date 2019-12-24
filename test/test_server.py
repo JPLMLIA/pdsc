@@ -5,7 +5,7 @@ import mock
 import pytest
 import json
 
-from cosmic_test_tools import unit
+from .cosmic_test_tools import unit
 
 from pdsc.server import PdsServer, content_type
 
