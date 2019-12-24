@@ -253,7 +253,7 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
         )
 
     with open(configfile, 'r') as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     outputfile = os.path.join(
         outputdir,
