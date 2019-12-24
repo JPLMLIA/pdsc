@@ -242,7 +242,7 @@ class PdsClient(object):
         with sqlite3.connect(db_file) as conn:
             cur = conn.cursor()
             values = []
-            for sid in segment_ids:
+            for sid in segment_ids.tolist():
                 cur.execute(
                     'SELECT * FROM segments WHERE segment_id=?', (sid,)
                 )

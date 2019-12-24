@@ -95,11 +95,12 @@ def store_metadata(outputfile, instrument, table, config):
     index = config.get('index', [])
     columns = config.get('columns', [])
 
-    values = zip(*[
+    converted_columns = [
         table.get_column(c[0]) if c[0] not in scale_factors else
         scale_factors[c[0]]*table.get_column(c[0])
         for c in columns
-    ])
+    ]
+    values = zip(*map(lambda a: a.tolist(), converted_columns))
 
     if os.path.exists(outputfile):
         os.remove(outputfile)
