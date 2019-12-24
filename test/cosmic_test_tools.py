@@ -6,6 +6,7 @@ from numbers import Number
 import pytest
 import sqlite3
 from contextlib import contextmanager
+from StringIO import StringIO
 
 unit = pytest.mark.unit
 functional = pytest.mark.functional
@@ -61,3 +62,12 @@ class MockDbManager(object):
     def close(self):
         for c in self._connections.values():
             c.close()
+
+@contextmanager
+def mock_open(fname, mode):
+    assert mode == 'r'
+    try:
+        io = StringIO(fname)
+        yield io
+    finally:
+        io.close()

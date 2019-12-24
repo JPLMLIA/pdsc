@@ -10,7 +10,7 @@ from StringIO import StringIO
 from contextlib import contextmanager
 from numpy.testing import assert_equal
 
-from cosmic_test_tools import unit
+from cosmic_test_tools import unit, mock_open
 
 import pdsc
 from pdsc.table import (
@@ -288,15 +288,6 @@ THEMIS_TBL_EXAMPLE = """
 "V00816002",2002-02-19T19:00:29.623, 37.534
 "V00816005",2002-02-19T19:11:18.520,  32767
 """.strip()
-
-@contextmanager
-def mock_open(fname, mode):
-    assert mode == 'r'
-    try:
-        io = StringIO(fname)
-        yield io
-    finally:
-        io.close()
 
 @unit
 @mock.patch('pdsc.table.open', mock_open)
