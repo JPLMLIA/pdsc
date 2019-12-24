@@ -4,7 +4,6 @@ Parses PDS cumulative index files into an internal table representation
 import re
 import numpy as np
 from datetime import datetime
-from pds.core.parser import Parser
 
 from .util import registerer, standard_progress_bar
 
@@ -107,57 +106,74 @@ def moc_observation_id(s):
     return s.replace('/', '')
 
 @register_determiner('hirise_edr')
-def hirise_edr_determiner(label_file):
+def hirise_edr_determiner(label_contents):
     """
     Determines whether a cumulative index file is for HiRISE EDR products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for HiRISE EDR products
     """
-    with open(label_file, 'r') as f:
-        raw = f.read()
-        return ('HiRISE' in raw and 'EDR_INDEX_TABLE' in raw)
+    return (
+        'HiRISE' in label_contents and
+        'EDR_INDEX_TABLE' in label_contents
+    )
 
 @register_determiner('hirise_rdr')
-def hirise_rdr_determiner(label_file):
+def hirise_rdr_determiner(label_contents):
     """
     Determines whether a cumulative index file is for HiRISE RDR products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for HiRISE RDR products
     """
-    with open(label_file, 'r') as f:
-        raw = f.read()
-        return ('HiRISE' in raw and 'RDR_INDEX_TABLE' in raw)
+    return (
+        'HiRISE' in label_contents and
+        'RDR_INDEX_TABLE' in label_contents
+    )
 
-def themis_determiner(label_file, detector_name):
+def themis_determiner(label_contents, detector_name):
     """
     Determines whether a cumulative index file is for generic THEMIS products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :param detector_name: THEMIS detector name (either ``'VIS'`` or ``'IR'``)
     :return: ``True`` iff this label file is for THEMIS products with the
         specified detector
     """
-    with open(label_file, 'r') as f:
-        try:
-            parser = Parser()
-            labels = parser.parse(f)
-            instrument = labels.get('INSTRUMENT_NAME', None)
-            detector = labels.get('DETECTOR_ID', None)
-            return (
-                'THERMAL EMISSION IMAGING SYSTEM' in instrument
-                and detector_name in detector
-            )
-        except:
-            return False
+    instrument = parse_simple_label(label_contents, 'INSTRUMENT_NAME')
+    detector = parse_simple_label(label_contents, 'DETECTOR_ID')
+    return (
+        instrument is not None and detector is not None and
+        'THERMAL EMISSION IMAGING SYSTEM' in instrument
+        and detector_name in detector
+    )
 
-def generic_determiner(label_file, instrument_name):
+def parse_simple_label(label_contents, key):
+    """
+    Retrieves the value of a "simple" PDS header entry corresponding to the
+    given key. Simple entries are string-valued entries that do not split
+    across lines.
+
+    :param label_contents: string contents of the PDS LBL file
+    :param key: entry key to search for in PDS label
+    :return: entry value string or ``None`` if not found
+    """
+    for line in label_contents.splitlines(False):
+        match = re.match(r'^\s*(\w+)\s*=\s*"?([^"]+)"?\s*$', line)
+        if match is not None:
+            k = match.group(1)
+            v = match.group(2)
+            if key == k:
+                return v
+
+    return None
+
+def generic_determiner(label_contents, instrument_name):
     """
     Determines whether a cumulative index file is for an instrument with the
     specified name
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :param instrument_name: instrument name as reported in the cumulative index
         ``INSTRUMENT_NAME`` header
     :return: ``True`` iff this label file is for the specified instrument
@@ -165,67 +181,61 @@ def generic_determiner(label_file, instrument_name):
     This determiner works for cumulative index files that have an explicit
     ``INSTRUMENT_NAME`` header.
     """
-    with open(label_file, 'r') as f:
-        try:
-            parser = Parser()
-            labels = parser.parse(f)
-            instrument = labels.get('INSTRUMENT_NAME', None)
-            return (instrument_name in instrument)
-        except:
-            return False
+    instrument = parse_simple_label(label_contents, 'INSTRUMENT_NAME')
+    return (instrument is not None and instrument_name in instrument)
 
 @register_determiner('themis_vis')
-def themis_vis_determiner(label_file):
+def themis_vis_determiner(label_contents):
     """
     Determines whether a cumulative index file is for THEMIS VIS products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for THEMIS VIS products
     """
-    return themis_determiner(label_file, 'VIS')
+    return themis_determiner(label_contents, 'VIS')
 
 @register_determiner('themis_ir')
-def themis_ir_determiner(label_file):
+def themis_ir_determiner(label_contents):
     """
     Determines whether a cumulative index file is for THEMIS IR products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for THEMIS IR products
     """
-    return themis_determiner(label_file, 'IR')
+    return themis_determiner(label_contents, 'IR')
 
 @register_determiner('ctx')
-def ctx_determiner(label_file):
+def ctx_determiner(label_contents):
     """
     Determines whether a cumulative index file is for CTX products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for CTX products
     """
-    return generic_determiner(label_file, 'CONTEXT CAMERA')
+    return generic_determiner(label_contents, 'CONTEXT CAMERA')
 
 @register_determiner('moc')
-def moc_determiner(label_file):
+def moc_determiner(label_contents):
     """
     Determines whether a cumulative index file is for MOC products
 
-    :param label_file: PDS cumulative index LBL file
+    :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for MOC products
     """
-    return generic_determiner(label_file, 'MARS ORBITER CAMERA')
+    return generic_determiner(label_contents, 'MARS ORBITER CAMERA')
 
-def determine_instrument(label_file):
+def determine_instrument(label_contents):
     """
     Determines the PDSC instrument name associated with a PDS cumulative index
     LBL file
 
-    :param label_file: path to PDS cumulative index LBL file
+    :param label_contents: contents of the PDS cumulative index LBL file
     :return: the instrument name corresponding to the first registered
         "determiner" function that returns ``True``; instruments are checked in
         alphabetical order by name
     """
     for iname, determiner in sorted(INSTRUMENT_DETERMINERS.items()):
-        if determiner(label_file): return iname
+        if determiner(label_contents): return iname
     raise ValueError('Could not determine instrument')
 
 class PdsTableColumn(object):
@@ -241,7 +251,6 @@ class PdsTableColumn(object):
         'START_BYTE': ('start_byte', int),
         'BYTES': ('length', int),
         'NOT_APPLICABLE_CONSTANT': ('unknown_constant', str),
-        'UNIT' : ('unit', str),
     }
     """
     Information for parsing table columns; each column contains associated
@@ -280,7 +289,6 @@ class PdsTableColumn(object):
         self.start_byte = None
         self.length = None
         self.unknown_constant = None
-        self.unit = None
 
         success = self._parse(fpointer)
         if not success:
@@ -306,7 +314,7 @@ class PdsTableColumn(object):
                 if 'END_OBJECT' in line:
                     return True
                 else:
-                    continue
+                    continue # pragma: no cover
             key = match.group(1)
             val = match.group(2)
             if key == 'END_OBJECT' and val == 'COLUMN':
@@ -401,7 +409,7 @@ class PdsTable(object):
                 if in_table and 'END_OBJECT' in line:
                     return columns
                 else:
-                    continue
+                    continue # pragma: no cover
             key = match.group(1)
             val = match.group(2)
 
@@ -441,7 +449,7 @@ class PdsTable(object):
         """
         for i, c in enumerate(self.columns):
             if c.name == column_name: return i
-        return IndexError('Column name "%s" not found' % str(column_name))
+        raise IndexError('Column name "%s" not found' % str(column_name))
 
     def get_column(self, column_name_or_idx, progress=True, cache=True):
         """
@@ -544,7 +552,6 @@ class ThemisTableColumn(PdsTableColumn):
         'START_BYTE': ('start_byte', int),
         'BYTES': ('length', int),
         'UNKNOWN_CONSTANT': ('unknown_constant', str),
-        'UNIT' : ('unit', str),
     }
     """
     Override column metadata, which follows a slightly different convention for
@@ -697,7 +704,9 @@ def parse_table(label_file, table_file):
     instrument and uses this class to parse the table.  See :ref:`Extending
     PDSC` for more details.
     """
-    instrument = determine_instrument(label_file)
+    with open(label_file, 'r') as f:
+        instrument = determine_instrument(f.read())
+
     if instrument not in INSTRUMENT_TABLES:
         raise ValueError('Table parsing not implemented for %s' % instrument)
 

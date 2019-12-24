@@ -1,8 +1,44 @@
 import os
+import sys
 from setuptools import setup
 
 # brings in "version" and "description" vars
-execfile(os.path.join('pdsc', 'version.py'))
+versionfile = 'version.py'
+versionpath = os.path.join('pdsc', versionfile)
+with open(versionpath, 'r') as f:
+    code = compile(f.read(), versionfile, 'exec')
+    exec(code)
+
+if sys.version_info[0] == 2:
+    install_requires=[
+        'tempora<=1.11',
+        'more-itertools<5.0.0',
+        'numpy<=1.16',
+        'scipy==0.13.3',
+        'scikit-learn<0.20.0',
+        'Polygon2',
+        'progressbar',
+        'PyYAML',
+        'geographiclib',
+        'cheroot==6.1.0',
+        'CherryPy==14.0.1',
+        'requests',
+        'future',
+    ]
+
+elif sys.version_info[0] == 3:
+    install_requires=[
+        'numpy',
+        'scipy',
+        'scikit-learn',
+        'Polygon3',
+        'progressbar',
+        'PyYAML',
+        'geographiclib',
+        'CherryPy',
+        'requests',
+        'future',
+    ]
 
 setup(name='pdsc',
     version=__version__,
@@ -13,29 +49,13 @@ setup(name='pdsc',
     license="BSD compatable (see the LICENSE file)",
     packages=['pdsc'],
     platforms=['unix'],
+    python_requires='>=2.7',
     scripts=[
         'bin/pdsc_util',
         'bin/pdsc_ingest',
         'bin/pdsc_server',
     ],
-    install_requires=[
-        'tempora<=1.13',
-        'more-itertools<5.0.0',
-        'numpy',
-        'scipy',
-        'scikit-learn<0.20.0',
-        'Polygon2',
-        'progressbar',
-        'PyPDS>=1.0.1',
-        'PyYAML',
-        'geographiclib',
-        'CherryPy<18.0.0',
-        'requests',
-        'future',
-    ],
-    dependency_links=[
-        'git+https://github.com/RyanBalfanz/PyPDS.git#egg=PyPDS-1.0.1'
-    ],
+    install_requires=install_requires,
     provides=[
         'pdsc',
     ],

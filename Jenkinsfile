@@ -69,7 +69,7 @@ pipeline {
         stage('Documentation Tests') {
             steps {
                 withEnv([
-                    'PDSC_DATABASE_DIR=/data/users/gdoran/pdsc_indices',
+                    'PDSC_DATABASE_DIR=/proj/COSMIC/pdsc_indices',
                     'PDSC_SERVER_HOST=localhost',
                     'PDSC_SERVER_PORT=7372'
                 ]) {

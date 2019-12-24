@@ -128,7 +128,7 @@ class SegmentTree(object):
 
         :param outputfile: output file path for pickled :py:class:`SegmentTree`
         """
-        with open(outputfile, 'w+') as f:
+        with open(outputfile, 'wb+') as f:
             pickle.dump(self, f)
 
     @staticmethod
@@ -140,7 +140,7 @@ class SegmentTree(object):
 
         :return: parsed :py:class:`SegmentTree` object
         """
-        with open(inputfile, 'r') as f:
+        with open(inputfile, 'rb') as f:
             return pickle.load(f)
 
 class TriSegment(object):
@@ -197,7 +197,7 @@ class TriSegment(object):
         """
         if self._xyz_points is None:
             self._xyz_points = np.vstack(
-                map(latlon2unit, self.latlon_points))
+                list(map(latlon2unit, self.latlon_points)))
         return self._xyz_points
 
     @property
@@ -258,12 +258,11 @@ class TriSegment(object):
         if self._projection_plane is None:
             normal = latlon2unit([self.center_latitude, self.center_longitude])
             I = np.eye(3)
-            proj = I - np.outer(np.dot(I, normal), normal)
-            norms = np.linalg.norm(proj, axis=1)
-            idx = np.argsort(norms)
-            proj = proj[idx]
-            norms = norms[idx]
-            self._projection_plane = (proj[1:].T / norms[1:]).T
+            idx = np.argmin(np.abs(np.dot(I, normal)))
+            u = np.cross(I[idx], normal)
+            v = np.cross(u, normal)
+            uv = np.vstack([u, v])
+            self._projection_plane = (uv.T / np.linalg.norm(uv, axis=1)).T
         return self._projection_plane
 
     def is_inside(self, xyz):
@@ -303,7 +302,7 @@ class TriSegment(object):
 
         projections = xyz - (self.normals.T*np.dot(self.normals, xyz)).T
         for pi in projections:
-            if self.is_inside(pi):
+            if np.sum(pi) != 0 and self.is_inside(pi):
                 points_to_check.append(xyz2latlon(pi))
 
         p = np.deg2rad(xyz2latlon(xyz))
@@ -379,7 +378,7 @@ class SegmentedFootprint(with_metaclass(abc.ABCMeta, object)):
         """
         Abstract method for generating segments of an observation footprint
         """
-        pass
+        pass # pragma: no cover
 
 class TriSegmentedFootprint(SegmentedFootprint):
     """

@@ -16,6 +16,7 @@ are columns.
     Therefore, PDSC localization often relies on assumptions that introduce
     errors whose magnitudes vary across instruments.
 """
+from __future__ import division
 from future.utils import with_metaclass
 import abc
 import numpy as np
@@ -28,7 +29,7 @@ from geographiclib.geodesic import Geodesic
 from .util import registerer, standard_progress_bar
 
 # https://tharsis.gsfc.nasa.gov/geodesy.html
-MARS_RADIUS_M = 3396200
+MARS_RADIUS_M = 3396200.
 MARS_FLATTENING = 1.0 / 169.8
 
 LOCALIZERS = {}
@@ -147,14 +148,14 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
         """
         Total observation width (cross-track) in meters
         """
-        pass
+        pass # pragma: no cover
 
     @abc.abstractproperty
     def observation_length_m(self):
         """
         Total observation length (along-track) in meters
         """
-        pass
+        pass # pragma: no cover
 
     @abc.abstractmethod
     def pixel_to_latlon(self, row, col):
@@ -171,7 +172,7 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
             than the number of total rows/columns in the image. Otherwise, the
             pixel coordinates range from zero to one along each dimension.
         """
-        pass
+        pass # pragma: no cover
 
     def latlon_to_pixel(self, lat, lon, resolution_m=None, resolution_pix=0.1):
         """
@@ -335,19 +336,19 @@ class GeodesicLocalizer(Localizer):
             correctly handle discontinuities that arise near the "date line" or
             the poles.
         """
-        nrows = int(np.ceil(self.n_rows / subsample_rows))
-        ncols = int(np.ceil(self.n_cols / subsample_cols))
+        nrows = int(np.ceil(self.n_rows // subsample_rows))
+        ncols = int(np.ceil(self.n_cols // subsample_cols))
 
         progress = standard_progress_bar('Computing Location Mask', verbose)
         L = np.array([
             [self.pixel_to_latlon(r, c)
                 for c in np.linspace(0, self.n_cols - 1, ncols)]
-            for r in progress(np.linspace(0, self.n_rows, nrows))
+            for r in progress(np.linspace(0, self.n_rows - 1, nrows))
         ])
         if reinterpolate:
             zoom_factor = (
-                float(self.n_rows) / L.shape[1],
-                float(self.n_cols) / L.shape[0]
+                float(self.n_rows) / L.shape[0],
+                float(self.n_cols) / L.shape[1]
             )
             L = np.dstack([
                 zoom(L[..., 0], zoom_factor, order=1, mode='nearest'),
@@ -592,6 +593,11 @@ class ThemisLocalizer(GeodesicLocalizer):
     :py:class:`GeodesicLocalizer`)
     """
 
+    DEFAULT_RESOLUTION_M = 1e-3
+    """
+    Sets the default resolution for THEMIS localization
+    """
+
     def __init__(self, metadata):
         """
         :param metadata:
@@ -818,6 +824,11 @@ class MocLocalizer(GeodesicLocalizer):
     :py:class:`GeodesicLocalizer`)
     """
 
+    DEFAULT_RESOLUTION_M = 1e-3
+    """
+    Sets the default resolution for MOC localization
+    """
+
     BODY = Geodesic(MARS_RADIUS_M, 0.0)
     """
     Uses a Geodesic model for MOC that assumes Mars is spherical, which seems to
@@ -829,15 +840,13 @@ class MocLocalizer(GeodesicLocalizer):
         :param metadata:
             "moc" :py:class:`~pdsc.metadata.PdsMetadata` object
         """
-        flipped_na = (180 - metadata.north_azimuth
-            if metadata.usage_note == 'F' else metadata.north_azimuth)
         super(MocLocalizer, self).__init__(
             metadata.lines / 2.0, metadata.samples / 2.0,
             metadata.center_latitude, metadata.center_longitude,
             metadata.lines, metadata.samples,
             metadata.image_height / metadata.lines,
             metadata.image_width / metadata.samples,
-            flipped_na, -1
+            metadata.north_azimuth, 1
         )
 
 def get_localizer(metadata, *args, **kwargs):
