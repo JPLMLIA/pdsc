@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extending PDSC &mdash; PDSC 1.3.0 documentation</title>
+  <title>Extending PDSC &mdash; PDSC 1.4.0 documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Module Documentation" href="Modules.html" />
     <link rel="prev" title="Command Line Utilities" href="Utilities.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +60,7 @@
             
             
               <div class="version">
-                1.3
+                1.4
               </div>
             
           
@@ -221,14 +223,12 @@ instrument to perform that pipeline step.</p>
 <p>The first step in parsing a PDS cumulative index file is determining the
 instrument to which the index corresponds. The PDSC library does this using
 “determiner” functions. A determiner function for an instrument takes a PDS
-cumulative index label file path and uses the file to determine whether the file
+cumulative index label file and uses the file to determine whether the file
 is for the given instrument.</p>
 <p>An example determiner with registration decorator is shown below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;hirise_edr&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hirise_edr_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;HiRISE&#39;</span> <span class="ow">in</span> <span class="n">raw</span> <span class="ow">and</span> <span class="s1">&#39;EDR_INDEX_TABLE&#39;</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hirise_edr_determiner</span><span class="p">(</span><span class="n">label_contents</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;HiRISE&#39;</span> <span class="ow">in</span> <span class="n">label_contents</span> <span class="ow">and</span> <span class="s1">&#39;EDR_INDEX_TABLE&#39;</span> <span class="ow">in</span> <span class="n">label_contents</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The determiner simply checks whether the words <code class="docutils literal notranslate"><span class="pre">HiRISE</span></code> and
@@ -237,8 +237,8 @@ is for the given instrument.</p>
 <code class="docutils literal notranslate"><span class="pre">INSTRUMENT_NAME</span></code> header in the label file to determine if the files is for
 the given instrument. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_determiner</span><span class="p">(</span><span class="s1">&#39;ctx&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">ctx_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">generic_determiner</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s1">&#39;CONTEXT CAMERA&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ctx_determiner</span><span class="p">(</span><span class="n">label_contents</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">generic_determiner</span><span class="p">(</span><span class="n">label_contents</span><span class="p">,</span> <span class="s1">&#39;CONTEXT CAMERA&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To perform instrument determination, PDSC goes through every determiner that
@@ -335,7 +335,7 @@ PDSC, prior to the ingestion process.</p>
         <a href="Modules.html" class="btn btn-neutral float-right" title="Module Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Utilities.html" class="btn btn-neutral" title="Command Line Utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Utilities.html" class="btn btn-neutral float-left" title="Command Line Utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -361,26 +361,16 @@ PDSC, prior to the ingestion process.</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(false);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
