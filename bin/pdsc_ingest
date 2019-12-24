@@ -10,7 +10,9 @@ import pdsc
 def main(idx, outputdir, configfile, extensions):
 
     for e in extensions:
-        execfile(e)
+        with open(e, 'r') as f:
+            code = compile(f.read(), os.path.basename(e), 'exec')
+            exec(code)
 
     lfile, tfile = pdsc.get_idx_file_pair(idx)
 
