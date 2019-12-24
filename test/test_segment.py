@@ -175,13 +175,13 @@ def test_segment_tree(mock_pickle_load, mock_pickle_dump, mock_balltree, mock_op
 
     # Test saving object
     assert tree.save('output') is None
-    mock_open.assert_called_with('output', 'w+')
+    mock_open.assert_called_with('output', 'wb+')
     mock_pickle_dump.assert_called_once_with(tree, mock.ANY)
 
     # Test loading object
     mock_pickle_load.return_value = 'object'
     assert SegmentTree.load('input') == 'object'
-    mock_open.assert_called_with('input', 'r')
+    mock_open.assert_called_with('input', 'rb')
     mock_pickle_load.assert_called_once_with(mock.ANY)
 
 @unit

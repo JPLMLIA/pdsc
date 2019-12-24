@@ -128,7 +128,7 @@ class SegmentTree(object):
 
         :param outputfile: output file path for pickled :py:class:`SegmentTree`
         """
-        with open(outputfile, 'w+') as f:
+        with open(outputfile, 'wb+') as f:
             pickle.dump(self, f)
 
     @staticmethod
@@ -140,7 +140,7 @@ class SegmentTree(object):
 
         :return: parsed :py:class:`SegmentTree` object
         """
-        with open(inputfile, 'r') as f:
+        with open(inputfile, 'rb') as f:
             return pickle.load(f)
 
 class TriSegment(object):
