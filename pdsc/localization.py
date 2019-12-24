@@ -16,6 +16,7 @@ are columns.
     Therefore, PDSC localization often relies on assumptions that introduce
     errors whose magnitudes vary across instruments.
 """
+from __future__ import division
 from future.utils import with_metaclass
 import abc
 import numpy as np
@@ -335,8 +336,8 @@ class GeodesicLocalizer(Localizer):
             correctly handle discontinuities that arise near the "date line" or
             the poles.
         """
-        nrows = int(np.ceil(self.n_rows / subsample_rows))
-        ncols = int(np.ceil(self.n_cols / subsample_cols))
+        nrows = int(np.ceil(self.n_rows // subsample_rows))
+        ncols = int(np.ceil(self.n_cols // subsample_cols))
 
         progress = standard_progress_bar('Computing Location Mask', verbose)
         L = np.array([
