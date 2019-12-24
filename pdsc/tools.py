@@ -78,7 +78,7 @@ def fix_hirise_index(idx, outputfile, quiet):
                     end = line.find(',', start_idx)
                     sed_str = line[start_idx:end]
 
-                    if sed_str <= length:
+                    if len(sed_str) <= length:
                         raise RuntimeError(
                             'Unexpected cause of length discrepancy for line %d'
                             % i
