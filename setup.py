@@ -11,7 +11,7 @@ with open(versionpath, 'r') as f:
 
 if sys.version_info[0] == 2:
     install_requires=[
-        'tempora<=1.13',
+        'tempora<=1.11',
         'more-itertools<5.0.0',
         'numpy<=1.16',
         'scipy==0.13.3',
@@ -20,7 +20,8 @@ if sys.version_info[0] == 2:
         'progressbar',
         'PyYAML',
         'geographiclib',
-        'CherryPy<18.0.0',
+        'cheroot==6.1.0',
+        'CherryPy==14.0.1',
         'requests',
         'future',
     ]
