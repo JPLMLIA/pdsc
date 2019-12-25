@@ -9,6 +9,9 @@ with open(versionpath, 'r') as f:
     code = compile(f.read(), versionfile, 'exec')
     exec(code)
 
+with open('README.md', 'r') as f:
+    long_description = f.read()
+
 if sys.version_info[0] == 2:
     install_requires=[
         'tempora<=1.11',
@@ -47,6 +50,8 @@ setup(name='pdsc',
     author_email='Gary.B.Doran.Jr@jpl.nasa.gov',
     url='https://github.com/JPLMLIA/pdsc',
     license="BSD compatable (see the LICENSE file)",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=['pdsc'],
     platforms=['unix'],
     python_requires='>=2.7',
