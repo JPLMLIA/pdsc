@@ -17,34 +17,32 @@
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
+  
+  
     
 
   
+
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -260,9 +258,9 @@
 <span class="c1">######################################################################</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">geographiclib.geomath</span> <span class="kn">import</span> <span class="n">Math</span>
-<span class="kn">from</span> <span class="nn">geographiclib.constants</span> <span class="kn">import</span> <span class="n">Constants</span>
-<span class="kn">from</span> <span class="nn">geographiclib.geodesiccapability</span> <span class="kn">import</span> <span class="n">GeodesicCapability</span>
+<span class="kn">from</span> <span class="nn">geographiclib.geomath</span> <span class="k">import</span> <span class="n">Math</span>
+<span class="kn">from</span> <span class="nn">geographiclib.constants</span> <span class="k">import</span> <span class="n">Constants</span>
+<span class="kn">from</span> <span class="nn">geographiclib.geodesiccapability</span> <span class="k">import</span> <span class="n">GeodesicCapability</span>
 
 <span class="k">class</span> <span class="nc">Geodesic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Solve geodesic problems&quot;&quot;&quot;</span>
@@ -453,7 +451,7 @@
       <span class="n">d</span> <span class="o">*=</span> <span class="n">eps</span>
   <span class="n">_C2f</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_C2f</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Construct a Geodesic object</span>
 
 <span class="sd">    :param a: the equatorial radius of the ellipsoid in meters</span>
@@ -1241,7 +1239,7 @@
   <span class="c1"># return a12, lat2, lon2, azi2, s12, m12, M12, M21, S12</span>
   <span class="k">def</span> <span class="nf">_GenDirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">azi1</span><span class="p">,</span> <span class="n">arcmode</span><span class="p">,</span> <span class="n">s12_a12</span><span class="p">,</span> <span class="n">outmask</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Private: General version of direct problem&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="kn">import</span> <span class="n">GeodesicLine</span>
+    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="k">import</span> <span class="n">GeodesicLine</span>
     <span class="c1"># Automatically supply DISTANCE_IN if necessary</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">arcmode</span><span class="p">:</span> <span class="n">outmask</span> <span class="o">|=</span> <span class="n">Geodesic</span><span class="o">.</span><span class="n">DISTANCE_IN</span>
     <span class="n">line</span> <span class="o">=</span> <span class="n">GeodesicLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">azi1</span><span class="p">,</span> <span class="n">outmask</span><span class="p">)</span>
@@ -1339,14 +1337,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="kn">import</span> <span class="n">GeodesicLine</span>
+    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="k">import</span> <span class="n">GeodesicLine</span>
     <span class="k">return</span> <span class="n">GeodesicLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">azi1</span><span class="p">,</span> <span class="n">caps</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_GenDirectLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">azi1</span><span class="p">,</span> <span class="n">arcmode</span><span class="p">,</span> <span class="n">s12_a12</span><span class="p">,</span>
                      <span class="n">caps</span> <span class="o">=</span> <span class="n">GeodesicCapability</span><span class="o">.</span><span class="n">STANDARD</span> <span class="o">|</span>
                      <span class="n">GeodesicCapability</span><span class="o">.</span><span class="n">DISTANCE_IN</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Private: general form of DirectLine&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="kn">import</span> <span class="n">GeodesicLine</span>
+    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="k">import</span> <span class="n">GeodesicLine</span>
     <span class="c1"># Automatically supply DISTANCE_IN if necessary</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">arcmode</span><span class="p">:</span> <span class="n">caps</span> <span class="o">|=</span> <span class="n">Geodesic</span><span class="o">.</span><span class="n">DISTANCE_IN</span>
     <span class="n">line</span> <span class="o">=</span> <span class="n">GeodesicLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">azi1</span><span class="p">,</span> <span class="n">caps</span><span class="p">)</span>
@@ -1421,7 +1419,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="kn">import</span> <span class="n">GeodesicLine</span>
+    <span class="kn">from</span> <span class="nn">geographiclib.geodesicline</span> <span class="k">import</span> <span class="n">GeodesicLine</span>
     <span class="n">a12</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">salp1</span><span class="p">,</span> <span class="n">calp1</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GenInverse</span><span class="p">(</span>
       <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">azi1</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="n">atan2d</span><span class="p">(</span><span class="n">salp1</span><span class="p">,</span> <span class="n">calp1</span><span class="p">)</span>
@@ -1440,7 +1438,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">geographiclib.polygonarea</span> <span class="kn">import</span> <span class="n">PolygonArea</span>
+    <span class="kn">from</span> <span class="nn">geographiclib.polygonarea</span> <span class="k">import</span> <span class="n">PolygonArea</span>
     <span class="k">return</span> <span class="n">PolygonArea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyline</span><span class="p">)</span>
 
   <span class="n">EMPTY</span>         <span class="o">=</span> <span class="n">GeodesicCapability</span><span class="o">.</span><span class="n">EMPTY</span>
@@ -1486,7 +1484,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, California Institute of Technology
+        &copy; Copyright 2018, California Institute of Technology.
 
     </p>
   </div>
@@ -1503,16 +1501,33 @@
   
 
 
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.4.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(false);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
