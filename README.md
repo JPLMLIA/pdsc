@@ -9,19 +9,12 @@ transforming between pixel and world coordinate systems. Currently, only
 several instruments from Mars orbiters are supported, but the system is
 designed to be extensible to other instruments and bodies.
 
-Please refer to the
-[documentation](https://github-fn.jpl.nasa.gov/pages/COSMIC/COSMIC_PDSC/) for
+Please refer to the [documentation](https://jplmlia.github.io/pdsc/) for
 instructions on installation, setup, and usage.
 
 ---
 
-Copyright 2018, by the California Institute of Technology. ALL RIGHTS RESERVED.
+Copyright 2019, by the California Institute of Technology. ALL RIGHTS RESERVED.
 United States Government Sponsorship acknowledged. Any commercial use must be
 negotiated with the Office of Technology Transfer at the California Institute
 of Technology.
-
-This software may be subject to U.S. export control laws. By accepting this
-software, the user agrees to comply with all applicable U.S. export laws and
-regulations. User has the responsibility to obtain export licenses, or other
-export authority as may be required before exporting such information to
-foreign countries or providing access to foreign persons.
