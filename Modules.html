@@ -17,33 +17,35 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Extending PDSC" href="Extending.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -244,7 +246,7 @@ radius of the given location.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">find_observations_of_latlon</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="s1">&#39;hirise_rdr&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">137.4</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">0</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> <span class="c1"># doctest: +ELLIPSIS</span>
 <span class="go">[u&#39;ESP_018854_1755&#39;, u&#39;ESP_018920_1755&#39;, ..., u&#39;PSP_010639_1755&#39;]</span>
 </pre></div>
 </div>
@@ -277,7 +279,7 @@ overlapping the given observation</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">find_overlapping_observations</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="s1">&#39;ctx&#39;</span><span class="p">,</span> <span class="s1">&#39;P09_004477_1906_XN_10N100W&#39;</span><span class="p">,</span> <span class="s1">&#39;hirise_rdr&#39;</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation_ids</span> <span class="c1"># doctest: +ELLIPSIS</span>
 <span class="go">[u&#39;ESP_015909_1890&#39;, u&#39;ESP_016832_1885&#39;, ..., u&#39;PSP_007246_1890&#39;]</span>
 </pre></div>
 </div>
@@ -2856,7 +2858,7 @@ or an identify function that can be used to omit progress</p>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="Extending.html" class="btn btn-neutral" title="Extending PDSC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="Extending.html" class="btn btn-neutral float-left" title="Extending PDSC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -2865,7 +2867,7 @@ or an identify function that can be used to omit progress</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, California Institute of Technology.
+        &copy; Copyright 2018, California Institute of Technology
 
     </p>
   </div>
@@ -2882,33 +2884,16 @@ or an identify function that can be used to omit progress</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.4.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(false);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

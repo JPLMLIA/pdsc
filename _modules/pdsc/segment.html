@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -182,19 +184,19 @@
 <span class="sd">Code for decomposing an observation footprint into triangular segments and</span>
 <span class="sd">storing these in a tree data structure for efficient querying</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
-<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">with_metaclass</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="kn">import</span> <span class="n">with_metaclass</span>
 <span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">BallTree</span>
-<span class="kn">from</span> <span class="nn">Polygon</span> <span class="k">import</span> <span class="n">Polygon</span> <span class="c1"># (the Polygon2 package)</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">BallTree</span>
+<span class="kn">from</span> <span class="nn">Polygon</span> <span class="kn">import</span> <span class="n">Polygon</span> <span class="c1"># (the Polygon2 package)</span>
 
-<span class="kn">from</span> <span class="nn">.localization</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">.localization</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MARS_RADIUS_M</span><span class="p">,</span> <span class="n">geodesic_distance</span><span class="p">,</span> <span class="n">get_localizer</span><span class="p">,</span>
     <span class="n">latlon2unit</span><span class="p">,</span> <span class="n">xyz2latlon</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">standard_progress_bar</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">standard_progress_bar</span>
 
 <span class="n">SEGMENT_DB_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;_segments.db&#39;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -220,7 +222,7 @@
 <span class="sd">    Encapsulates the information corresponding to a point inclusion query</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param lat: latitude in degrees</span>
 <span class="sd">        :param lon: east longitude in degrees</span>
@@ -253,7 +255,7 @@
 <span class="sd">    observation segments within some radius of a query point</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segments</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segments</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param segments: collection of all observation segments</span>
 <span class="sd">        :param verbose: if ``True`` display a progress bar as the index is being</span>
@@ -329,7 +331,7 @@
 <span class="sd">    for indexing and efficient querying.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latlon0</span><span class="p">,</span> <span class="n">latlon1</span><span class="p">,</span> <span class="n">latlon2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latlon0</span><span class="p">,</span> <span class="n">latlon1</span><span class="p">,</span> <span class="n">latlon2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The three points of the triangular segment are enumerated in</span>
 <span class="sd">        *counterclockwise* order looking down on the surface. Each point is a</span>
@@ -350,7 +352,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_normals</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_projection_plane</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s1">&#39;TriSegment(laton0=(</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">), laton1=(</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">), latlon2=(</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">))&#39;</span>
             <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latlon_points</span><span class="o">.</span><span class="n">flat</span><span class="p">)</span>
@@ -525,7 +527,7 @@
 <span class="sd">    Base class for segmenting an observation footprint</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">localizer_kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">localizer_kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param metadata:</span>
 <span class="sd">            a :py:class:`~pdsc.metadata.PdsMetadata` object</span>
@@ -595,7 +597,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, California Institute of Technology.
+        &copy; Copyright 2018, California Institute of Technology
 
     </p>
   </div>
@@ -612,33 +614,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'1.4.1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(false);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
