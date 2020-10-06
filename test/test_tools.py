@@ -11,6 +11,7 @@ except ImportError:
 from .cosmic_test_tools import unit, mock_open
 
 from pdsc.tools import _resize_scan_exposure_duration, fix_hirise_index
+from pdsc.tools import fix_hirise_idxlbl
 
 HIRISE_LBL_EXAMPLE = """
 PDS_VERSION_ID = PDS3
@@ -51,6 +52,60 @@ OBJECT = EDR_INDEX_TABLE
 END_OBJECT
 END
 """
+
+HIRISE_RDR_LBL_EXAMPLE = """
+PDS_VERSION_ID = PDS3
+RECORD_TYPE = FIXED_LENGTH
+RECORD_BYTES = 821
+FILE_RECORDS = 2
+^RDR_INDEX_TABLE = "RDRCUMINDEX.TAB"
+OBJECT = RDR_INDEX_TABLE
+    INDEX_TYPE = SINGLE
+    INTERCHANGE_FORMAT = ASCII
+    ROWS = 2
+    ROW_BYTES = 821
+    COLUMNS = 1
+    OBJECT = COLUMN
+        NAME = VOLUME_ID
+        DATA_TYPE = CHARACTER
+        START_BYTE = 2
+        BYTES = 10
+        FORMAT = "A10"
+        DESCRIPTION = "HiRISE Volume identification"
+    END_OBJECT
+END_OBJECT
+END
+"""
+
+HIRISE_RDR_LBL_EXPECTED = """
+PDS_VERSION_ID = PDS3
+RECORD_TYPE = FIXED_LENGTH
+RECORD_BYTES = 821
+FILE_RECORDS = 3
+^RDR_INDEX_TABLE = "RDRCUMINDEX.TAB"
+OBJECT = RDR_INDEX_TABLE
+    INDEX_TYPE = SINGLE
+    INTERCHANGE_FORMAT = ASCII
+    ROWS = 3
+    ROW_BYTES = 821
+    COLUMNS = 1
+    OBJECT = COLUMN
+        NAME = VOLUME_ID
+        DATA_TYPE = CHARACTER
+        START_BYTE = 2
+        BYTES = 10
+        FORMAT = "A10"
+        DESCRIPTION = "HiRISE Volume identification"
+    END_OBJECT
+END_OBJECT
+END
+"""
+
+HIRISE_RDR_TAB_EXAMPLE = """
+A, B, C
+A, B, C
+A, B, C
+""".lstrip()
 
 HIRISE_TBL_EXAMPLE = """
 "MROHR_0001",1438.5000,"A"
@@ -200,3 +255,19 @@ def test_fix_hirise_index_errors(mock_idx_pair, mock_move):
         fix_hirise_index('idx', None, True)
     mocked_tmp_file = MockTempFile.MOCKED_FILES.pop(0)
     assert mocked_tmp_file.contents.getvalue() == HIRISE_TBL_EXPECTED
+
+@unit
+@mock.patch('pdsc.table.open', mock_open)
+@mock.patch('pdsc.tools.open', mock_open)
+@mock.patch('pdsc.tools.NamedTemporaryFile', MockTempFile)
+@mock.patch('pdsc.tools.move', autospec=True)
+@mock.patch('pdsc.tools.get_idx_file_pair', autospec=True)
+def test_fix_hirise_idxlbl(mock_idx_pair, mock_move):
+    MockTempFile.reset()
+    mock_idx_pair.return_value = (
+        HIRISE_RDR_LBL_EXAMPLE, HIRISE_RDR_TAB_EXAMPLE
+    )
+    fix_hirise_idxlbl('idx', 'outputfile', True)
+    mocked_tmp_file = MockTempFile.MOCKED_FILES.pop(0)
+
+    assert mocked_tmp_file.contents.getvalue() == HIRISE_RDR_LBL_EXPECTED
