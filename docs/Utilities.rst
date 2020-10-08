@@ -2,8 +2,8 @@ Command Line Utilities
 ======================
 
 PDSC provides some command line utilties to provide useful functionality.
-Currently, only one utility is implemented to fix HiRISE EDR cumulative index
-files prior to ingesting them.
+Currently, two utilities are implemented to fix HiRISE EDR abd RDR cumulative
+index files prior to ingesting them.
 
 Fixing HiRISE EDR Indices
 -------------------------
