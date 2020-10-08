@@ -26,7 +26,7 @@ Fixing HiRISE RDR Indices
 There are some inconsistencies between the HiRISE RDR cumulative index file
 (.TAB) and its metadata file (.LBL). The number of lines in the cumulative
 index file doesn't match the entries of ``FILE_RECORDS`` and ``ROWS`` in the
-metadata file. The values of ``FILE_RECORDS`` and ```ROWS` should be modified
+metadata file. The values of ``FILE_RECORDS`` and ``ROWS`` should be modified
 with respect to the actual number of lines in the cumulative index file. This
 can be accomplished using the following command::
 
