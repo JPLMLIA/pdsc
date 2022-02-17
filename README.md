@@ -18,3 +18,32 @@ Copyright 2019, by the California Institute of Technology. ALL RIGHTS RESERVED.
 United States Government Sponsorship acknowledged. Any commercial use must be
 negotiated with the Office of Technology Transfer at the California Institute
 of Technology.
+
+
+----
+
+# Usage
+
+First, create and activate a barebones env using python 3.7:
+
+```bash
+conda env create -f env/bare_env.yml
+conda activate p37
+```
+
+## HiRISE Example
+
+# Download HiRISE Label and Tablel files:
+
+```bash
+wget -O RDRCUMINDEX.LBL https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX.LBL
+wget -O RDRCUMINDEX.TAB https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX.TAB
+```
+
+To ingest indices:
+
+```bash
+pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputshirise/
+```
+
+
