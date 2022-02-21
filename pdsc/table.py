@@ -109,7 +109,7 @@ def moc_observation_id(s):
 @register_determiner('lroc_cdr')
 def lroc_cdr_determiner(label_contents):
     """ 
-    Determines whether a cumulative index file is for HiRISE EDR products
+    Determines whether a cumulative index file is for LROC CDR products
     :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for LROC CDR products
     """

@@ -31,9 +31,13 @@ conda env create -f env/bare_env.yml
 conda activate p37
 ```
 
+I have also tried with python2, but when doing pip install, I got an error with incompatible numpy versions, but python 3 works, so recommend to use that.
+
+Note: I created full and mini examples (a subset of rows) for the cases. If you take a subset of the rows, you must also update the label file with the reduced number of rows.
+
 ## HiRISE Example
 
-# Download HiRISE Label and Tablel files:
+# Download HiRISE Label and Table files:
 
 ```bash
 wget -O RDRCUMINDEX.LBL https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX.LBL
@@ -46,4 +50,14 @@ To ingest indices:
 pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputshirise/
 ```
 
+# CTX example:
 
+```
+pdsc_ingest /pds/pdsfs2/pdsdata/mro/ctx/mrox_4098/index/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputsctx/ 
+```
+
+Or, a mini example (I took a subset of rows from the table file and updated the index accordingly):
+
+```
+pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputsctxmini/
+```
