@@ -1,3 +1,5 @@
+inputs/*/*.TAB
+inputs/*/*.tab
 *.pyc
 *.sw*
 build

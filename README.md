@@ -47,17 +47,23 @@ wget -O RDRCUMINDEX.TAB https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX
 To ingest indices:
 
 ```bash
-pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputshirise/
+pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise/
+```
+
+Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly):
+
+```
+pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise_mini/
 ```
 
 # CTX example:
 
 ```
-pdsc_ingest /pds/pdsfs2/pdsdata/mro/ctx/mrox_4098/index/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputsctx/ 
+pdsc_ingest /pds/pdsfs2/pdsdata/mro/ctx/mrox_4098/index/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputs_ctx/ 
 ```
 
 Or, a mini example (I took a subset of rows from the table file and updated the index accordingly):
 
 ```
-pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputsctxmini/
+pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputs_ctx_mini/
 ```
