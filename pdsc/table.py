@@ -73,14 +73,13 @@ def lroc_datetime(s):
     """
     Parses date/time format found in lroc cumulative index files
 
-    :param s: datetime string
+    :param s: string
     :return: :py:class:`datetime.datetime` object
 
     >>> lroc_datetime('1985-10-26 01:20:00')
     datetime.datetime(1985, 10, 26, 1, 20)
     """
-    return datetime.strptime(s.strip(), '%Y-%m-%d %H:%M:%S')
-
+    return datetime.strptime(s.strip(), '%Y-%m-%d %H:%M:%S.%f')
 
 def hirise_datetime(s):
     """

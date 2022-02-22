@@ -1,5 +1,5 @@
 columns:
-    - [PRODUCT_ID, observation_id, text]
+    - [PRODUCT_ID, product_id, text]
     - [LINE_SAMPLES, samples, integer]
     - [IMAGE_LINES, lines, integer]
     - [CENTER_LATITUDE, center_latitude, real]
@@ -17,7 +17,6 @@ columns:
     - [STOP_TIME, stop_time, text]
     - [SPACECRAFT_CLOCK_START_COUNT, sclk_start, real]
     - [SPACECRAFT_CLOCK_STOP_COUNT, sclk_stop, real]
-    - [FILTER_NAME, filter_name, text]
     - [EMISSION_ANGLE, emission_angle, real]
     - [INCIDENCE_ANGLE, incidence_angle, real]
     - [PHASE_ANGLE, phase_angle, real]
