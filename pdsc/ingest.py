@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import yaml
 import sqlite3
+import pdb
 
 from .table import parse_table
 from .metadata import PdsMetadata, METADATA_DB_SUFFIX
@@ -175,8 +176,12 @@ def store_segments(outputfile, metadata, config):
             s = TriSegmentedFootprint(m, resolution, localizer_kwargs)
             for si in s.segments:
                 segments.append(si)
-                observation_ids.append(s.metadata.observation_id)
-
+                # erd: check if observation_id attribute exists
+                if hasattr(s.metadata, 'observation_id'):
+                    observation_ids.append(s.metadata.observation_id)
+                else:
+                    # erd: lroc does not have observation_id
+                    observation_ids.append(s.metadata.file_specification_name)
         except (TypeError, ValueError):
             continue
 

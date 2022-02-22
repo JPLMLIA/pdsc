@@ -27,10 +27,15 @@ from sklearn.neighbors import DistanceMetric
 from geographiclib.geodesic import Geodesic
 
 from .util import registerer, standard_progress_bar
+import pdb
 
 # https://tharsis.gsfc.nasa.gov/geodesy.html
 MARS_RADIUS_M = 3396200.
 MARS_FLATTENING = 1.0 / 169.8
+
+#https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+MOON_RADIUS_M = 1736000
+MOON_FLATTENING = 0.0012
 
 LOCALIZERS = {}
 
@@ -63,6 +68,10 @@ def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):
     >>> geodesic_distance((0, 0), (0, np.pi))
     10669476.970121656
     """
+    print('The moons radius is: 1736000')
+    print('Radius used is: ')
+    print(radius)
+    pdb.set_trace()
     haversine = DistanceMetric.get_metric('haversine')
     return float(radius*haversine.pairwise([latlon1], [latlon2]))
 
@@ -198,6 +207,8 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
 
         loc = np.deg2rad([lat, lon])
 
+        print('Inside latlon_to_pixel')
+        print(self.BODY_RADIUS)
         def f(u):
             loc_u = np.deg2rad(self.pixel_to_latlon(*u))
             return geodesic_distance(loc, loc_u, self.BODY_RADIUS)
@@ -609,6 +620,43 @@ class ThemisLocalizer(GeodesicLocalizer):
             metadata.center_latitude, metadata.center_longitude,
             metadata.lines, metadata.samples,
             metadata.pixel_aspect_ratio*metadata.pixel_width,
+            metadata.pixel_width,
+            metadata.north_azimuth, 1
+        )
+
+@register_localizer('lroc_cdr')
+class LrocLocalizer(GeodesicLocalizer):
+    """
+    A localizer for the Lroc CDR observations (subclass of
+    :py:class:`GeodesicLocalizer`)
+    """
+
+    DEFAULT_RESOLUTION_M = 1e-6
+    """
+    Sets the default resolution for lroc CDR localization
+    """
+
+    BODY_RADIUS = MOON_RADIUS_M
+    BODY = Geodesic(MOON_RADIUS_M, MOON_FLATTENING)
+
+    def __init__(self, metadata):
+        """
+        :param metadata:
+        """
+        helper_localizer = GeodesicLocalizer(
+            metadata.lines / 2.0, metadata.samples / 2.0,
+            metadata.center_latitude, metadata.center_longitude,
+            metadata.lines, metadata.samples,
+            metadata.pixel_width,
+            metadata.pixel_width,
+            metadata.north_azimuth, 1
+        )
+
+        super(LrocLocalizer, self).__init__(
+            metadata.lines / 2.0, metadata.samples / 2.0,
+            metadata.center_latitude, metadata.center_longitude,
+            metadata.lines, metadata.samples,
+            metadata.pixel_width,
             metadata.pixel_width,
             metadata.north_azimuth, 1
         )

@@ -7,7 +7,7 @@ columns:
     - [NORTH_AZIMUTH, north_azimuth, real]
     - [SCALED_PIXEL_WIDTH, pixel_width, real]
     - [VOLUME_ID, volume_id, text]
-    - [FILE_SPECIFICATION_NAME, file_name_specification, text]
+    - [FILE_SPECIFICATION_NAME, file_specification_name, text]
     - [PRODUCT_VERSION_ID, product_version_id, text]
     - [TARGET_NAME, target_name, text]
     - [ORBIT_NUMBER, orbit_number, integer]
@@ -35,7 +35,7 @@ scale_factors:
     SOLAR_DISTANCE: 1000 # km to m
 
 index:
-    - product_id
+    - file_specification_name
 
 segmentation:
     resolution: 50000
