@@ -33,6 +33,7 @@ import pdb
 MARS_RADIUS_M = 3396200.
 MARS_FLATTENING = 1.0 / 169.8
 
+# erd: added moon info (before, assumed Mars only)
 #https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
 MOON_RADIUS_M = 1736000
 MOON_FLATTENING = 0.0012
@@ -68,10 +69,10 @@ def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):
     >>> geodesic_distance((0, 0), (0, np.pi))
     10669476.970121656
     """
-    print('The moons radius is: 1736000')
-    print('Radius used is: ')
-    print(radius)
-    pdb.set_trace()
+    #print('The moons radius is: 1736000')
+    #print('Radius used is: ')
+    #print(radius)
+    #print('------')
     haversine = DistanceMetric.get_metric('haversine')
     return float(radius*haversine.pairwise([latlon1], [latlon2]))
 
