@@ -69,6 +69,19 @@ def themis_datetime(s):
     """
     return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%f')
 
+def lroc_datetime(s):
+    """
+    Parses date/time format found in lroc cumulative index files
+
+    :param s: datetime string
+    :return: :py:class:`datetime.datetime` object
+
+    >>> lroc_datetime('1985-10-26 01:20:00')
+    datetime.datetime(1985, 10, 26, 1, 20)
+    """
+    return datetime.strptime(s.strip(), '%Y-%m-%d %H:%M:%S')
+
+
 def hirise_datetime(s):
     """
     Parses date/time format found in HiRISE cumulative index files
@@ -636,8 +649,8 @@ class LrocTableColumn(PdsTableColumn):
     """
 
     SPECIAL_TYPES = {
-        'START_TIME': PdsColumnType(hirise_datetime),
-        'STOP_TIME': PdsColumnType(hirise_datetime),
+        'START_TIME': PdsColumnType(lroc_datetime),
+        'STOP_TIME': PdsColumnType(lroc_datetime),
         'SPACECRAFT_CLOCK_START_COUNT': PdsColumnType(ctx_sclk),
         'SPACECRAFT_CLOCK_STOP_COUNT': PdsColumnType(ctx_sclk),
     }
@@ -707,7 +720,7 @@ class LrocCdrTable(PdsTable):
     :py:class:`LrocTableColumn` for parsing columns
     """
 
-    TABLE_OBJECT_NAME = 'Lroc_CDR_INDEX_TABLE'
+    TABLE_OBJECT_NAME = 'INDEX_TABLE'
     """
     The Lroc CDR table has a custom name
     """

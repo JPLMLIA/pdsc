@@ -53,7 +53,7 @@ pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/
 Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly):
 
 ```
-pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise_mini/
+pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise_mini/
 ```
 
 # CTX example:
@@ -67,3 +67,14 @@ Or, a mini example (I took a subset of rows from the table file and updated the 
 ```
 pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputs_ctx_mini/
 ```
+
+
+# LROC
+
+Working on this
+
+```
+pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
+```
+
+
