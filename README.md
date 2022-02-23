@@ -77,4 +77,13 @@ Here is a mini example for lroc:
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
 ```
 
+# Basic Usage
+
+Follow the docs for basic usage, but make sure you're in the python prompt:
+
+```
+python
+>>> import pdsc
+```
+
 
