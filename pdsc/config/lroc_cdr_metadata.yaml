@@ -1,5 +1,5 @@
 columns:
-    - [PRODUCT_ID, product_id, text]
+    - [PRODUCT_ID, observation_id, text]
     - [LINE_SAMPLES, samples, integer]
     - [IMAGE_LINES, lines, integer]
     - [CENTER_LATITUDE, center_latitude, real]
@@ -35,7 +35,7 @@ scale_factors:
     SOLAR_DISTANCE: 1000 # km to m
 
 index:
-    - file_specification_name
+    - observation_id
 
 segmentation:
     resolution: 50000

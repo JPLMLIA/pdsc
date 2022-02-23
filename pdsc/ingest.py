@@ -185,8 +185,9 @@ def store_segments(outputfile, metadata, config, body_radius):
                 if hasattr(s.metadata, 'observation_id'):
                     observation_ids.append(s.metadata.observation_id)
                 else:
+                    raise ValueError('Please rename your index col to observation_id in the config file')
                     # erd: lroc does not have observation_id
-                    observation_ids.append(s.metadata.file_specification_name)
+                    #observation_ids.append(s.metadata.file_specification_name)
         except (TypeError, ValueError):
             continue
 
