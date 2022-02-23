@@ -626,14 +626,16 @@ class ThemisLocalizer(GeodesicLocalizer):
         )
 
 @register_localizer('lroc_cdr')
-class LrocLocalizer(GeodesicLocalizer):
+class LrocCdrLocalizer(GeodesicLocalizer):
     """
     A localizer for the Lroc CDR observations (subclass of
     :py:class:`GeodesicLocalizer`)
+    erd: Note, in progress
     """
 
     DEFAULT_RESOLUTION_M = 1e-6
     """
+    erd: Need to check this value
     Sets the default resolution for lroc CDR localization
     """
 
@@ -653,7 +655,7 @@ class LrocLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
-        super(LrocLocalizer, self).__init__(
+        super(LrocCdrLocalizer, self).__init__(
             metadata.lines / 2.0, metadata.samples / 2.0,
             metadata.center_latitude, metadata.center_longitude,
             metadata.lines, metadata.samples,
@@ -661,6 +663,33 @@ class LrocLocalizer(GeodesicLocalizer):
             metadata.pixel_width,
             metadata.north_azimuth, 1
         )
+
+class LrocCdrBrowseLocalizer(LrocCdrLocalizer):
+    """
+    erd: A localizer for the Lroc CDR "browse" images (subclass of
+    :py:class:`LrocCdrLocalizer`)
+    This classifier is included for convenience; it simply scales the pixel
+    coordinates of the browse image to/from those of the full image before/after
+    calling the super-class implementation.
+    """
+
+    def __init__(self, metadata):
+        """
+        :param metadata:
+            "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        """
+        super(LrocCdrBrowseLocalizer, self).__init__(metadata)
+        self.scale_factor = 0.5 # browse images are at half the resolution
+
+    def pixel_to_latlon(self, row, col):
+        return super(LrocCdrBrowseLocalizer, self).pixel_to_latlon(
+            row / self.scale_factor, col / self.scale_factor
+        )
+
+    def latlon_to_pixel(self, lat, lon):
+        pix = super(LrocCdrBrowseLocalizer, self).latlon_to_pixel(lat, lon)
+        return pix[0]*self.scale_factor, pix[1]*self.scale_factor
+
 
 @register_localizer('hirise_edr')
 class HiRiseLocalizer(GeodesicLocalizer):
