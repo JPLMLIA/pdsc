@@ -625,7 +625,26 @@ class ThemisLocalizer(GeodesicLocalizer):
             metadata.north_azimuth, 1
         )
 
+
+
 @register_localizer('lroc_cdr')
+def hirise_rdr_localizer(metadata, browse=False):
+    """
+    Constructs the appropriate LROC CDR localizer for the desired data
+    product type
+
+    :param metadata:
+        "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+    :param browse:
+        construct localizer for the BROWSE data product
+
+    :return: a :py:class:`Localizer` for the appropriate data product
+    """
+    if browse:
+        return LrocCdrBrowseLocalizer(metadata)
+    else:
+        return LrocCdrLocalizer(metadata)
+
 class LrocCdrLocalizer(GeodesicLocalizer):
     """
     A localizer for the Lroc CDR observations (subclass of

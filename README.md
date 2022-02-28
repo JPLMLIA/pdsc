@@ -71,6 +71,12 @@ pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/
 
 # LROC
 
+Full lroc database:
+
+```
+pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
+```
+
 Here is a mini example for lroc:
 
 ```
@@ -82,8 +88,15 @@ pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pd
 Follow the docs for basic usage, but make sure you're in the python prompt:
 
 ```
+# set the directory where the database is stored:
+export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
 python
 >>> import pdsc
+>>> pds_client = pdsc.PdsClient()
+>>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101014437RC')
+>>> mydata = metadata[0]
+>>> localizer = pdsc.get_localizer(mydata, browse=True)
+>>> lat, lon = localizer.pixel_to_latlon(10, 10)
 ```
 
 
