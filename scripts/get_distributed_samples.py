@@ -77,17 +77,21 @@ def main(outputfile, number):
 
     # get the number of NAC observations
     num_obs = len(nac_data)
-    print('Number of observations = ', num_obs)
+    print('Total number of observations = ', num_obs)
 
     # loop through the nac data and get the lat/lon
+    print('Getting every lat/lon')
     latlon = np.array([get_latlon(row) for row in nac_data])
+    print('Getting every filename')
     ids = np.array([row.file_specification_name for row in nac_data])
  
     # start with a random observation
+    print('Selected 0th observation')
     selected = [np.random.choice(num_obs)]
 
     # select the maximally distance image 
-    for ii in range(number):
+    for ii in range(1, number):
+        print('Getting observation #: ', ii)
         selected.append(pick_next(selected, latlon))
 
     selected = np.array(selected)
