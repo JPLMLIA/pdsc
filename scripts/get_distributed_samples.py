@@ -81,7 +81,7 @@ def main(outputfile, number):
 
     # loop through the nac data and get the lat/lon
     latlon = np.array([get_latlon(row) for row in nac_data])
-    ids = np.array([row.file_specification_name for row in full_data])
+    ids = np.array([row.file_specification_name for row in nac_data])
  
     # start with a random observation
     selected = [np.random.choice(num_obs)]
@@ -93,7 +93,6 @@ def main(outputfile, number):
     selected = np.array(selected)
     # filenames of selected cases
     selected_ids = ids[selected]
-
     with open(outputfile, 'w') as f:
         for i in selected_ids:
             f.write('%s\n' % (i))
