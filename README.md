@@ -22,6 +22,11 @@ of Technology.
 
 ----
 
+# Updates
+
+Emily Dunkel: updated for LROC
+
+
 # Usage
 
 First, create and activate a barebones env using python 3.7:
@@ -83,6 +88,9 @@ Here is a mini example for lroc:
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
 ```
 
+Note: I need to check SIS documentation for localization function coordinate system, but PDSC is now able to handle bodies other than just Mars (was originally hard-coded).
+
+
 # Basic Usage
 
 Follow the docs for basic usage, but make sure you're in the python prompt:
@@ -99,4 +107,11 @@ python
 >>> lat, lon = localizer.pixel_to_latlon(10, 10)
 ```
 
+# Scripts
 
+To get lroc distributed samples around the globe, you can call get_distritubed_samples.py. Either pass in parameters from the command line, or update the defaults in the script. Here is a calling example:
+
+```
+export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc_mini/
+python scripts/get_distributed_samples.py
+```
