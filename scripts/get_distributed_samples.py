@@ -72,7 +72,9 @@ def main(outputfile, number):
     client = pdsc.PdsClient()
 
     # get the lroc NAC data
+    print('Querying the data')
     full_data = client.query('lroc_cdr')
+    print('Selecting the NAC rows')
     nac_data = [row for row in full_data if ('NAC' in row.file_specification_name and 'MOON' in row.target_name)]
 
     # get the number of NAC observations
@@ -105,7 +107,8 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
 
-    outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/selected.txt'    
+    #outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/selected.txt'    
+    outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/selected.txt'
 
     parser.add_argument('-o', '--outputfile', default=outputfile_d, type=str)
     parser.add_argument('-n', '--number', default=10, type=int)
