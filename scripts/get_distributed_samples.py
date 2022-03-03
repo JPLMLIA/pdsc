@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     #outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/selected.txt'    
     outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/selected.txt'
-    num_d = 5
+    num_d = 20
 
     parser.add_argument('-o', '--outputfile', default=outputfile_d, type=str)
     parser.add_argument('-n', '--number', default=num_d, type=int)

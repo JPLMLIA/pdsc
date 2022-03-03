@@ -112,6 +112,7 @@ python
 To get lroc distributed samples around the globe, you can call get_distritubed_samples.py. Either pass in parameters from the command line, or update the defaults in the script. Here is a calling example:
 
 ```
-export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc_mini/
+conda activate p37
+export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
 python scripts/get_distributed_samples.py
 ```
