@@ -86,11 +86,13 @@ def main(outputfile, number):
     latlon = np.array([get_latlon(row) for row in nac_data])
     print('Getting every filename')
     ids = np.array([row.file_specification_name for row in nac_data])
- 
+    print('Getting every solar angle')
+    solar = np.array([row.sub_solar_azimuth for row in nac_data])
     # start with a random observation
     print('Selected 0th observation')
     selected = [np.random.choice(num_obs)]
 
+    pdb.set_trace()
     # select the maximally distance image 
     for ii in range(1, number):
         print('Getting observation #: ', ii)
@@ -99,17 +101,18 @@ def main(outputfile, number):
     selected = np.array(selected)
     # filenames of selected cases
     selected_ids = ids[selected]
+    selected_solar = solar[selected]
     with open(outputfile, 'w') as f:
-        for i in selected_ids:
-            f.write('%s\n' % (i))
+        for i, sun in zip(selected_ids, selected_solar):
+            f.write('%s, %s\n' % (i, sun))
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
 
     #outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/selected.txt'    
-    outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/selected.txt'
-    num_d = 20
+    outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/selected_withsun.txt'
+    num_d = 15
 
     parser.add_argument('-o', '--outputfile', default=outputfile_d, type=str)
     parser.add_argument('-n', '--number', default=num_d, type=int)
