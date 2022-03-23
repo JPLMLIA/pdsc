@@ -116,3 +116,7 @@ conda activate p37
 export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
 python scripts/get_distributed_samples.py
 ```
+
+This will print a list of examples with their sun angle (which helps with labeling, since craters look different depending on where the sun is).
+
+I have a script to assemble the data from this list in the deep learning repository here: https://github.jpl.nasa.gov/PDSIMG/deep-learning/blob/master/src/lroc/salience/scripts/assemble_data.py
