@@ -92,7 +92,6 @@ def main(outputfile, number):
     print('Selected 0th observation')
     selected = [np.random.choice(num_obs)]
 
-    pdb.set_trace()
     # select the maximally distance image 
     for ii in range(1, number):
         print('Getting observation #: ', ii)
