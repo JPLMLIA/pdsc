@@ -113,8 +113,9 @@ To get lroc distributed samples around the globe, you can call get_distritubed_s
 
 ```
 conda activate p37
+# point to database
 export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
-python scripts/get_distributed_samples.py
+python scripts/get_distributed_samples.py -o OUTPUT/FILE -n NUM_SAMPLES
 ```
 
 This will print a list of examples with their sun angle (which helps with labeling, since craters look different depending on where the sun is).

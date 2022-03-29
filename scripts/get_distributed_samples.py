@@ -111,8 +111,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
 
     #outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/selected.txt'    
-    outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/selected_withsun.txt'
-    num_d = 15
+    outputfile_d = '/home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/selected_withsun_250.txt'
+    num_d = 250
 
     parser.add_argument('-o', '--outputfile', default=outputfile_d, type=str)
     parser.add_argument('-n', '--number', default=num_d, type=int)
