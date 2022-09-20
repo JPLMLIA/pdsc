@@ -3,6 +3,7 @@ Parses PDS cumulative index files into an internal table representation
 """
 import re
 import numpy as np
+import pdb
 from datetime import datetime
 
 from .util import registerer, standard_progress_bar
@@ -68,6 +69,18 @@ def themis_datetime(s):
     """
     return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%f')
 
+def lroc_datetime(s):
+    """
+    Parses date/time format found in lroc cumulative index files
+
+    :param s: string
+    :return: :py:class:`datetime.datetime` object
+
+    >>> lroc_datetime('1985-10-26 01:20:00')
+    datetime.datetime(1985, 10, 26, 1, 20)
+    """
+    return datetime.strptime(s.strip(), '%Y-%m-%d %H:%M:%S.%f')
+
 def hirise_datetime(s):
     """
     Parses date/time format found in HiRISE cumulative index files
@@ -104,6 +117,21 @@ def moc_observation_id(s):
     'FHA00469'
     """
     return s.replace('/', '')
+
+@register_determiner('lroc_cdr')
+def lroc_cdr_determiner(label_contents):
+    """ 
+    Determines whether a cumulative index file is for LROC CDR products
+    :param label_contents: PDS cumulative index LBL file contents
+    :return: ``True`` iff this label file is for LROC CDR products
+    """
+    print('LROC CDR')
+
+    return (
+        'LROC' in label_contents and
+        'CDR_CATALOG_INDEX' in label_contents
+    )
+
 
 @register_determiner('hirise_edr')
 def hirise_edr_determiner(label_contents):
@@ -385,7 +413,6 @@ class PdsTable(object):
 
         with open(label_file, 'r') as f:
             columns = self._parse(f)
-
         if columns is None:
             raise RuntimeError('Error parsing table')
 
@@ -485,7 +512,6 @@ class PdsTable(object):
                     f.seek(r*self.row_bytes + column.start_byte - 1)
                     value = f.read(column.length)
                     values.append(value)
-
             try:
                 data_column = np.array(values, dtype=column.dtype)
             except TypeError:
@@ -610,6 +636,27 @@ class HiRiseTableColumn(PdsTableColumn):
     Defines special types for the HiRISE observation metadata
     """
 
+# ****************************************************************************
+# LROC
+# ****************************************************************************
+
+class LrocTableColumn(PdsTableColumn):
+    """
+    A subclass of :py:class:`PdsTableColumn` for the LROC NAC instrument to define
+    some special types
+    Datetimes follow those of HiRISE
+    """
+
+    SPECIAL_TYPES = {
+        'START_TIME': PdsColumnType(lroc_datetime),
+        'STOP_TIME': PdsColumnType(lroc_datetime),
+        'SPACECRAFT_CLOCK_START_COUNT': PdsColumnType(ctx_sclk),
+        'SPACECRAFT_CLOCK_STOP_COUNT': PdsColumnType(ctx_sclk),
+    }
+    """
+    Defines special types for the LROC observation metadata
+    """
+
 @register_table('hirise_edr')
 class HiRiseEdrTable(PdsTable):
     """
@@ -653,6 +700,28 @@ class HiRiseRdrTable(PdsTable):
     TABLE_OBJECT_NAME = 'RDR_INDEX_TABLE'
     """
     The HiRISE RDR table has a custom name
+    """
+
+# ****************************************************************************
+# LROC CDR
+# ****************************************************************************
+
+@register_table('lroc_cdr')
+class LrocCdrTable(PdsTable):
+    """
+    A subclass of :py:class:`PdsTable` for the LROC NAC instrument that uses the
+    custom :py:class:`LrocTableColumn` class
+    """
+
+    COLUMN_CLASS = LrocTableColumn
+    """
+    The :py:class:`LrocCdrTable` class should use
+    :py:class:`LrocTableColumn` for parsing columns
+    """
+
+    TABLE_OBJECT_NAME = 'INDEX_TABLE'
+    """
+    The Lroc CDR table has a custom name
     """
 
 # ****************************************************************************
@@ -709,5 +778,4 @@ def parse_table(label_file, table_file):
 
     if instrument not in INSTRUMENT_TABLES:
         raise ValueError('Table parsing not implemented for %s' % instrument)
-
     return instrument, INSTRUMENT_TABLES[instrument](label_file, table_file)

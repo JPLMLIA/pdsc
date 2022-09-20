@@ -27,10 +27,16 @@ from sklearn.neighbors import DistanceMetric
 from geographiclib.geodesic import Geodesic
 
 from .util import registerer, standard_progress_bar
+import pdb
 
 # https://tharsis.gsfc.nasa.gov/geodesy.html
 MARS_RADIUS_M = 3396200.
 MARS_FLATTENING = 1.0 / 169.8
+
+# erd: added moon info (before, assumed Mars only)
+#https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+MOON_RADIUS_M = 1736000
+MOON_FLATTENING = 0.0012
 
 LOCALIZERS = {}
 
@@ -63,6 +69,10 @@ def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):
     >>> geodesic_distance((0, 0), (0, np.pi))
     10669476.970121656
     """
+    #print('The moons radius is: 1736000')
+    #print('Radius used is: ')
+    #print(radius)
+    #print('------')
     haversine = DistanceMetric.get_metric('haversine')
     return float(radius*haversine.pairwise([latlon1], [latlon2]))
 
@@ -198,6 +208,8 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
 
         loc = np.deg2rad([lat, lon])
 
+        print('Inside latlon_to_pixel')
+        print(self.BODY_RADIUS)
         def f(u):
             loc_u = np.deg2rad(self.pixel_to_latlon(*u))
             return geodesic_distance(loc, loc_u, self.BODY_RADIUS)
@@ -612,6 +624,91 @@ class ThemisLocalizer(GeodesicLocalizer):
             metadata.pixel_width,
             metadata.north_azimuth, 1
         )
+
+
+
+@register_localizer('lroc_cdr')
+def hirise_rdr_localizer(metadata, browse=False):
+    """
+    Constructs the appropriate LROC CDR localizer for the desired data
+    product type
+
+    :param metadata:
+        "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+    :param browse:
+        construct localizer for the BROWSE data product
+
+    :return: a :py:class:`Localizer` for the appropriate data product
+    """
+    if browse:
+        return LrocCdrBrowseLocalizer(metadata)
+    else:
+        return LrocCdrLocalizer(metadata)
+
+class LrocCdrLocalizer(GeodesicLocalizer):
+    """
+    A localizer for the Lroc CDR observations (subclass of
+    :py:class:`GeodesicLocalizer`)
+    erd: Note, in progress
+    """
+
+    DEFAULT_RESOLUTION_M = 1e-6
+    """
+    erd: Need to check this value
+    Sets the default resolution for lroc CDR localization
+    """
+
+    BODY_RADIUS = MOON_RADIUS_M
+    BODY = Geodesic(MOON_RADIUS_M, MOON_FLATTENING)
+
+    def __init__(self, metadata):
+        """
+        :param metadata:
+        """
+        helper_localizer = GeodesicLocalizer(
+            metadata.lines / 2.0, metadata.samples / 2.0,
+            metadata.center_latitude, metadata.center_longitude,
+            metadata.lines, metadata.samples,
+            metadata.pixel_width,
+            metadata.pixel_width,
+            metadata.north_azimuth, 1
+        )
+
+        super(LrocCdrLocalizer, self).__init__(
+            metadata.lines / 2.0, metadata.samples / 2.0,
+            metadata.center_latitude, metadata.center_longitude,
+            metadata.lines, metadata.samples,
+            metadata.pixel_width,
+            metadata.pixel_width,
+            metadata.north_azimuth, 1
+        )
+
+class LrocCdrBrowseLocalizer(LrocCdrLocalizer):
+    """
+    erd: A localizer for the Lroc CDR "browse" images (subclass of
+    :py:class:`LrocCdrLocalizer`)
+    This classifier is included for convenience; it simply scales the pixel
+    coordinates of the browse image to/from those of the full image before/after
+    calling the super-class implementation.
+    """
+
+    def __init__(self, metadata):
+        """
+        :param metadata:
+            "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        """
+        super(LrocCdrBrowseLocalizer, self).__init__(metadata)
+        self.scale_factor = 0.5 # browse images are at half the resolution
+
+    def pixel_to_latlon(self, row, col):
+        return super(LrocCdrBrowseLocalizer, self).pixel_to_latlon(
+            row / self.scale_factor, col / self.scale_factor
+        )
+
+    def latlon_to_pixel(self, lat, lon):
+        pix = super(LrocCdrBrowseLocalizer, self).latlon_to_pixel(lat, lon)
+        return pix[0]*self.scale_factor, pix[1]*self.scale_factor
+
 
 @register_localizer('hirise_edr')
 class HiRiseLocalizer(GeodesicLocalizer):
