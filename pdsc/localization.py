@@ -628,7 +628,7 @@ class ThemisLocalizer(GeodesicLocalizer):
 
 
 @register_localizer('lroc_cdr')
-def hirise_rdr_localizer(metadata, browse=False):
+def lroc_cdr_localizer(metadata, browse=False):
     """
     Constructs the appropriate LROC CDR localizer for the desired data
     product type
@@ -652,7 +652,7 @@ class LrocCdrLocalizer(GeodesicLocalizer):
     erd: Note, in progress
     """
 
-    DEFAULT_RESOLUTION_M = 1e-6
+    DEFAULT_RESOLUTION_M = 1/3*(1e-6)
     """
     erd: Need to check this value
     Sets the default resolution for lroc CDR localization
