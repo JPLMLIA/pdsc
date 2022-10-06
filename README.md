@@ -29,11 +29,16 @@ Emily Dunkel: updated for LROC
 
 # Usage
 
-First, create and activate a barebones env using python 3.7:
+First, create and activate a bare-bones env using python 3.7:
 
 ```bash
 conda env create -f env/bare_env.yml
 conda activate p37
+```
+Then, do a pip install:
+
+```bash
+pip install .
 ```
 
 I have also tried with python2, but when doing pip install, I got an error with incompatible numpy versions, but python 3 works, so recommend to use that.
@@ -86,6 +91,10 @@ Here is a mini example for lroc:
 
 ```
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
+
+# on my mac:
+# pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /Users/edunkel/Documents/Projects/PDS/LROC/PDSIMG_repos/pdsc/inputs_mini/lroc/CUMINDEX.LBL /Users/edunkel/Documents/Projects/PDS/LROC/PDSIMG_repos/pdsc/outputs_lroc_mini/
+
 ```
 
 Note: I need to check SIS documentation for localization function coordinate system, but PDSC is now able to handle bodies other than just Mars (was originally hard-coded).
@@ -98,10 +107,14 @@ Follow the docs for basic usage, but make sure you're in the python prompt:
 ```
 # set the directory where the database is stored:
 export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
+# on my mac, for minidatabase:
+# export PDSC_DATABASE_DIR=/Users/edunkel/Documents/Projects/PDS/LROC/PDSIMG_repos/pdsc/outputs_lroc_mini/
 python
 >>> import pdsc
 >>> pds_client = pdsc.PdsClient()
 >>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101014437RC')
+# or, for minidatabase:
+#>>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101013931LC')
 >>> mydata = metadata[0]
 >>> localizer = pdsc.get_localizer(mydata, browse=True)
 >>> lat, lon = localizer.pixel_to_latlon(10, 10)
