@@ -140,7 +140,7 @@ def store_metadata(outputfile, instrument, table, config):
             for v in progress(cur.fetchall())
         ]
 
-def store_segments(outputfile, metadata, config, body_radius):
+def store_segments(outputfile, metadata, config, body_radius=MARS_RADIUS_M):
     """
     Segments observations corresponding to each entry in ``metadata``, and
     stores these segments in a SQL database
@@ -165,6 +165,8 @@ def store_segments(outputfile, metadata, config, body_radius):
                 - ``localizer_kwargs``: the ``kwargs`` that will be supplied to
                   the :py:meth:`~pdsc.localization.get_localizer` function for
                   determining observation footprints
+    :param body_radius:
+        radius of planet, default is mars
 
     :return: a list of :py:class:`~pdsc.segment.TriSegment` objects for segments
         across all observations
@@ -219,7 +221,7 @@ def store_segments(outputfile, metadata, config, body_radius):
 
     return segments
 
-def store_segment_tree(outputfile, segments, body_radius):
+def store_segment_tree(outputfile, segments, body_radius=MARS_RADIUS_M):
     """
     Constructs a ball tree index for segmented observations and saves the
     resulting data structure to the specified output file.
@@ -229,6 +231,9 @@ def store_segment_tree(outputfile, segments, body_radius):
 
     :param segments:
         a collection of :py:class:`~pdsc.segment.TriSegment` objects
+
+    :body_radius:
+        celestial body radius, default is Mars
     """
     tree = SegmentTree(segments, body_radius)
     tree.save(outputfile)
