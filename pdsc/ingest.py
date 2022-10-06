@@ -184,7 +184,7 @@ def store_segments(outputfile, metadata, config, body_radius=MARS_RADIUS_M):
             if body_radius == MARS_RADIUS_M:
                 s = TriSegmentedFootprint(m, resolution, localizer_kwargs)
             else:
-                s = TriSegmentedFootprint(m, resolution, body_radius, localizer_kwargs)
+                s = TriSegmentedFootprint(m, resolution, localizer_kwargs, body_radius)
             for si in s.segments:
                 segments.append(si)
                 # erd: check if observation_id attribute exists
