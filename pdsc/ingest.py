@@ -166,7 +166,7 @@ def store_segments(outputfile, metadata, config, body_radius=MARS_RADIUS_M):
                   the :py:meth:`~pdsc.localization.get_localizer` function for
                   determining observation footprints
     :param body_radius:
-        radius of planet, default is mars
+        radius of celestial body, default is mars
 
     :return: a list of :py:class:`~pdsc.segment.TriSegment` objects for segments
         across all observations
@@ -180,7 +180,11 @@ def store_segments(outputfile, metadata, config, body_radius=MARS_RADIUS_M):
     progress = standard_progress_bar('Segmenting footprints')
     for m in progress(metadata):
         try:
-            s = TriSegmentedFootprint(m, resolution, body_radius, localizer_kwargs)
+            # erd: if not Mars, store body radius
+            if body_radius == MARS_RADIUS_M:
+                s = TriSegmentedFootprint(m, resolution, localizer_kwargs)
+            else:
+                s = TriSegmentedFootprint(m, resolution, body_radius, localizer_kwargs)
             for si in s.segments:
                 segments.append(si)
                 # erd: check if observation_id attribute exists
@@ -235,7 +239,10 @@ def store_segment_tree(outputfile, segments, body_radius=MARS_RADIUS_M):
     :body_radius:
         celestial body radius, default is Mars
     """
-    tree = SegmentTree(segments, body_radius)
+    if body_radius == MARS_RADIUS_M:
+        tree = SegmentTree(segments)
+    else:
+        tree = SegmentTree(segments, True, body_radius)
     tree.save(outputfile)
 
 def ingest_idx(label_file, table_file, configpath, outputdir):
@@ -294,10 +301,16 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
         outputdir,
         '%s%s' % (instrument, SEGMENT_DB_SUFFIX)
     )
-    segments = store_segments(outputfile, metadata, config, body_radius)
+    if body_radius == MARS_RADIUS_M:
+        segments = store_segments(outputfile, metadata, config)
+    else:
+        segments = store_segments(outputfile, metadata, config, body_radius)
 
     outputfile = os.path.join(
         outputdir,
         '%s%s' % (instrument, SEGMENT_TREE_SUFFIX)
     )
-    store_segment_tree(outputfile, segments, body_radius)
+    if body_radius == MARS_RADIUS_M:
+        store_segment_tree(outputfile, segments)
+    else:
+        store_segment_tree(outputfile, segments, body_radius)

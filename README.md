@@ -45,6 +45,16 @@ I have also tried with python2, but when doing pip install, I got an error with 
 
 Note: I created full and mini examples (a subset of rows) for the cases. If you take a subset of the rows, you must also update the label file with the reduced number of rows.
 
+## PyTests
+
+To run the pytests, you'll need to install pytest and mock. Then, run from the upper directory:
+
+```bash
+pytest
+```
+
+You should get pytests passed.
+
 ## HiRISE Example
 
 # Download HiRISE Label and Table files:

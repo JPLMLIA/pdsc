@@ -347,7 +347,7 @@ class SegmentedFootprint(with_metaclass(abc.ABCMeta, object)):
     Base class for segmenting an observation footprint
     """
 
-    def __init__(self, metadata, resolution, body_radius, localizer_kwargs):
+    def __init__(self, metadata, resolution, localizer_kwargs, body_radius=MARS_RADIUS_M):
         """
         :param metadata:
             a :py:class:`~pdsc.metadata.PdsMetadata` object
@@ -356,6 +356,8 @@ class SegmentedFootprint(with_metaclass(abc.ABCMeta, object)):
         :param localizer_kwargs:
             the ``kwargs`` passed to the localizer used to convert observation
             pixel coordinates into real-world coordinates
+        :param body_radius:
+            celestial body radius
         """
         self.metadata = metadata
         self.resolution = resolution
