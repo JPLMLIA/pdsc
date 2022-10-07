@@ -208,7 +208,6 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
 
         loc = np.deg2rad([lat, lon])
 
-        print('Inside latlon_to_pixel')
         print(self.BODY_RADIUS)
         def f(u):
             loc_u = np.deg2rad(self.pixel_to_latlon(*u))
@@ -229,6 +228,7 @@ class GeodesicLocalizer(Localizer):
     """
 
     BODY = Geodesic(MARS_RADIUS_M, MARS_FLATTENING)
+
     """
     A :py:class:`~geographiclib.geodesic.Geodesic` object describing the target
     body
@@ -307,6 +307,8 @@ class GeodesicLocalizer(Localizer):
         return self._height
 
     def pixel_to_latlon(self, row, col):
+        #print('body radius = ', self.BODY_RADIUS)
+        #pdb.set_trace()
         x_m = (col - self.center_col) * self.pixel_width_m
         y_m = (row - self.center_row) * self.pixel_height_m
         y_m *= self.flight_direction
@@ -489,8 +491,9 @@ class MapLocalizer(Localizer):
             np.sqrt(a**2 + b**2)
         )
         self.cos_proj_lat = np.cos(self.proj_latitude)
-
     def _equirect_pixel_to_latlon(self, row, col):
+        # equations come from section 3.5.1
+        # https://hirise.lpl.arizona.edu/pdf/HiRISE_RDR_v12_DTM_11_25_2009.pdf
         x = (col - self.col_offset)*self.map_scale
         y = -(row - self.row_offset)*self.map_scale
         return (
@@ -525,6 +528,8 @@ class MapLocalizer(Localizer):
         return lat, lon
 
     def _polar_latlon_to_pixel(self, lat, lon):
+        # equations come from section 3.5.2 
+        # https://hirise.lpl.arizona.edu/pdf/HiRISE_RDR_v12_DTM_11_25_2009.pdf
         lat_rad = np.deg2rad(lat)
         lon_rad = np.deg2rad(lon % 360.)
         T = np.tan((np.pi / 4.0) - np.abs(lat_rad / 2.0))
@@ -641,6 +646,7 @@ def lroc_cdr_localizer(metadata, browse=False):
     :return: a :py:class:`Localizer` for the appropriate data product
     """
     if browse:
+        # browse is set when creating the localizer
         return LrocCdrBrowseLocalizer(metadata)
     else:
         return LrocCdrLocalizer(metadata)
@@ -649,17 +655,16 @@ class LrocCdrLocalizer(GeodesicLocalizer):
     """
     A localizer for the Lroc CDR observations (subclass of
     :py:class:`GeodesicLocalizer`)
-    erd: Note, in progress
     """
 
     DEFAULT_RESOLUTION_M = 1/3*(1e-6)
     """
-    erd: Need to check this value
     Sets the default resolution for lroc CDR localization
+    1/3 of that of HiRISE
     """
 
     BODY_RADIUS = MOON_RADIUS_M
-    BODY = Geodesic(MOON_RADIUS_M, MOON_FLATTENING)
+    BODY = Geodesic(BODY_RADIUS, MOON_FLATTENING)
 
     def __init__(self, metadata):
         """
@@ -701,6 +706,7 @@ class LrocCdrBrowseLocalizer(LrocCdrLocalizer):
         self.scale_factor = 0.5 # browse images are at half the resolution
 
     def pixel_to_latlon(self, row, col):
+        #print('inside lroc localizer')
         return super(LrocCdrBrowseLocalizer, self).pixel_to_latlon(
             row / self.scale_factor, col / self.scale_factor
         )
@@ -968,5 +974,4 @@ def get_localizer(metadata, *args, **kwargs):
     if metadata.instrument not in LOCALIZERS:
         raise IndexError(
             'No localizer implemented for %s' % metadata.instrument)
-
     return LOCALIZERS[metadata.instrument](metadata, *args, **kwargs)
