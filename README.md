@@ -47,7 +47,9 @@ Note: I created full and mini examples (a subset of rows) for the cases. If you 
 
 ## PyTests
 
-To run the pytests, you'll need to install pytest and mock. Then, run from the upper directory:
+To run the pytests, you'll need to install pytest and mock. You can do this with "pip install pytest" and "pip install mock".
+
+Then, run from the upper directory:
 
 ```bash
 pytest
