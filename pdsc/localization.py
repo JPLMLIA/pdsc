@@ -764,9 +764,9 @@ class LrocCdrLocalizer(FourCornerLocalizer):
         """
         corners = np.array([
             [metadata.upper_left_latitude, metadata.upper_left_longitude],
-            [metadata.lower_left_latitude, metadata.lower_left_longitude],
-            [metadata.lower_right_latitude, metadata.lower_right_longitude],
             [metadata.upper_right_latitude, metadata.upper_right_longitude],
+            [metadata.lower_right_latitude, metadata.lower_right_longitude],
+            [metadata.lower_left_latitude, metadata.lower_left_longitude],
         ])
         super(LrocCdrLocalizer, self).__init__(
             corners, metadata.lines, metadata.samples, 1
@@ -793,9 +793,9 @@ class LrocCdrBrowseLocalizer(FourCornerLocalizer):
         """
         corners = np.array([
             [metadata.upper_left_latitude, metadata.upper_left_longitude],
-            [metadata.lower_left_latitude, metadata.lower_left_longitude],
-            [metadata.lower_right_latitude, metadata.lower_right_longitude],
             [metadata.upper_right_latitude, metadata.upper_right_longitude],
+            [metadata.lower_right_latitude, metadata.lower_right_longitude],
+            [metadata.lower_left_latitude, metadata.lower_left_longitude],
         ])
         super(LrocCdrBrowseLocalizer, self).__init__(
             corners, metadata.lines/2, metadata.samples/2, 1
