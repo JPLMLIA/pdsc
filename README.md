@@ -119,8 +119,8 @@ Follow the docs for basic usage, but make sure you're in the python prompt:
 ```
 # set the directory where the database is stored:
 export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
-# on my mac, for minidatabase:
-# export PDSC_DATABASE_DIR=/Users/edunkel/Documents/Projects/PDS/LROC/PDSIMG_repos/pdsc/outputs_lroc_mini/
+# or mini database
+# export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
 python
 >>> import pdsc
 >>> pds_client = pdsc.PdsClient()

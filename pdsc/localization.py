@@ -743,6 +743,64 @@ class HiRiseRdrNoMapLocalizer(FourCornerLocalizer):
             corners, 1.0, 1.0, 1
         )
 
+class LrocCdrLocalizer(FourCornerLocalizer):
+    """
+    A localizer for the LROC CDR  observations (subclass of
+    :py:class:`FourCornerLocalizer`)
+    """
+
+    DEFAULT_RESOLUTION_M = 1/3*(1e-6)
+    """
+    Sets the default resolution for lroc CDR localization
+    1/3 of that of HiRISE
+    """
+
+    NORMALIZED_PIXEL_SPACE = False
+
+    def __init__(self, metadata):
+        """
+        :param metadata:
+            "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        """
+        corners = np.array([
+            [metadata.upper_left_latitude, metadata.upper_left_longitude],
+            [metadata.lower_left_latitude, metadata.lower_left_longitude],
+            [metadata.lower_right_latitude, metadata.lower_right_longitude],
+            [metadata.upper_right_latitude, metadata.upper_right_longitude],
+        ])
+        super(LrocCdrLocalizer, self).__init__(
+            corners, metadata.lines, metadata.samples, 1
+        )
+
+class LrocCdrBrowseLocalizer(FourCornerLocalizer):
+    """
+    A localizer for the LROC CDR  observations (subclass of
+    :py:class:`FourCornerLocalizer`)
+    """
+
+    DEFAULT_RESOLUTION_M = 1/3*(1e-6)*2
+    """
+    Sets the default resolution for lroc CDR localization
+    1/3 of that of HiRISE, plus factor of 2 for browse
+    """
+
+    NORMALIZED_PIXEL_SPACE = False
+
+    def __init__(self, metadata):
+        """
+        :param metadata:
+            "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        """
+        corners = np.array([
+            [metadata.upper_left_latitude, metadata.upper_left_longitude],
+            [metadata.lower_left_latitude, metadata.lower_left_longitude],
+            [metadata.lower_right_latitude, metadata.lower_right_longitude],
+            [metadata.upper_right_latitude, metadata.upper_right_longitude],
+        ])
+        super(LrocCdrBrowseLocalizer, self).__init__(
+            corners, metadata.lines/2, metadata.samples/2, 1
+        )
+
 class HiRiseRdrLocalizer(MapLocalizer):
     """
     A localizer for the HiRISE RDR (map-projected) observations (subclass of
@@ -833,6 +891,22 @@ def hirise_rdr_localizer(metadata, nomap=False, browse=False,
             return HiRiseRdrBrowseLocalizer(metadata, browse_width)
         else:
             return HiRiseRdrLocalizer(metadata)
+
+@register_localizer('lroc_cdr')
+def lroc_cdr_localizer(metadata, browse=False):
+    """
+    Constructs the LROC CDR localizer (data is not map projected)
+
+    :param metadata:
+        "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+    :param browse:
+        construct localizer for the BROWSE data product
+    :return: a :py:class:`Localizer` for the appropriate data product
+    """
+    if browse:
+        return LrocCdrBrowseLocalizer(metadata)
+    else:
+        return LrocCdrLocalizer(metadata)
 
 @register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):

@@ -29,6 +29,14 @@ columns:
     - [SUB_SPACECRAFT_LONGITUDE, sub_spacecraft_longitude, real]
     - [SOLAR_DISTANCE, solar_distance, real]
     - [SOLAR_LONGITUDE, solar_longitude, real]
+    - [UPPER_RIGHT_LATITUDE, upper_right_latitude, real]
+    - [UPPER_RIGHT_LONGITUDE, upper_right_longitude, real]
+    - [LOWER_RIGHT_LATITUDE, lower_right_latitude, real]
+    - [LOWER_RIGHT_LONGITUDE, lower_right_longitude, real]
+    - [UPPER_LEFT_LATITUDE, upper_left_latitude, real]
+    - [UPPER_LEFT_LONGITUDE, upper_left_longitude, real]
+    - [LOWER_LEFT_LATITUDE, lower_left_latitude, real]
+    - [LOWER_LEFT_LONGITUDE, lower_left_longitude, real]
 
 scale_factors:
     SPACECRAFT_ALTITUDE: 1000 # km to m
