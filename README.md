@@ -95,18 +95,15 @@ pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/
 
 Full lroc database:
 
+running with file I got from pdsfs2:
 ```
-pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
+pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/from_pdsfs2/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
 ```
 
 Here is a mini example for lroc:
 
 ```
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
-
-# on my mac:
-# pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /Users/edunkel/Documents/Projects/PDS/LROC/PDSIMG_repos/pdsc/inputs_mini/lroc/CUMINDEX.LBL /Users/edunkel/Documents/Projects/PDS/LROC/PDSIMG_repos/pdsc/outputs_lroc_mini/
-
 ```
 
 Note: I need to check SIS documentation for localization function coordinate system, but PDSC is now able to handle bodies other than just Mars (was originally hard-coded).
