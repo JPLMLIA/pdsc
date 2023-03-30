@@ -65,6 +65,7 @@ pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /PATH/TO/LBL/FOLDER /PATH/TO
 ```
 
 Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly, and have added it to this repo):
+
 Note: the LBL folder must be a full path, so replace /home/edunkel/PDS/lroc_proj to where you are storing your repository.
 
 ```
