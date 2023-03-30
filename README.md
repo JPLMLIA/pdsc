@@ -106,7 +106,11 @@ pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pd
 
 # Basic Usage
 
-Follow the docs for basic usage, but make sure you're in the python prompt:
+Follow the docs for basic usage, but make sure you're in the python prompt.
+
+## Example commands for LROC
+
+We show some example commands for LROC imagery below:
 
 ```
 # set the directory where the database is stored:
@@ -114,15 +118,23 @@ export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
 python
 >>> import pdsc
 >>> pds_client = pdsc.PdsClient()
->>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101014437RC')
+>>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101013931LC')
 >>> mydata = metadata[0]
->>> localizer = pdsc.get_localizer(mydata, browse=True)
->>> lat, lon = localizer.pixel_to_latlon(10, 10)
+>>> localizer = pdsc.get_localizer(mydata, browse=False)
+>>> nrows = mydata.lines
+>>> ncols = mydata.samples
+>>> lat_center, lon_center = localizer.pixel_to_latlon(nrows//2, ncols//2)
+# The localizer will have an error on the order of 10-100s meters since we assume spherical
+>>> mydata.center_latitude
+>>> mydata.center_longitude
+# You can go back to pixel value
+>>> localizer.latlon_to_pixel(mydata.center_latitude, mydata.center_longitude)
+
 ```
 
-# Scripts
+# LROC Scripts
 
-To get lroc distributed samples around the lunar globe, you can call get_distritubed_samples.py. Either pass in parameters from the command line, or update the defaults in the script. Here is a calling example:
+To get lroc distributed samples around the lunar globe, you can call get_distritubed_samples.py in the scripts directory. Either pass in parameters from the command line, or update the defaults in the script. Here is a calling example:
 
 ```
 conda activate p37
@@ -134,3 +146,5 @@ python scripts/get_distributed_samples.py -o OUTPUT/FILE -n NUM_SAMPLES
 This will print a list of examples with their sun angle (which helps with labeling, since craters look different depending on where the sun is).
 
 I have a script to assemble the data from this list in the deep learning repository here: https://github.jpl.nasa.gov/PDSIMG/deep-learning/blob/master/src/lroc/salience/scripts/assemble_data.py
+
+

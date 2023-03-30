@@ -208,7 +208,7 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
 
         loc = np.deg2rad([lat, lon])
 
-        print(self.BODY_RADIUS)
+        #print(self.BODY_RADIUS)
         def f(u):
             loc_u = np.deg2rad(self.pixel_to_latlon(*u))
             return geodesic_distance(loc, loc_u, self.BODY_RADIUS)
