@@ -1,6 +1,6 @@
 # Emily Dunkel
 # 2023
-# Script to look at center lat lon conversion
+# Script to look at center lat lon conversion for example LROC NAC imagery
 
 import os
 import numpy as np

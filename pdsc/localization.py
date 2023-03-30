@@ -798,7 +798,7 @@ class LrocCdrBrowseLocalizer(FourCornerLocalizer):
             [metadata.lower_left_latitude, metadata.lower_left_longitude],
         ])
         super(LrocCdrBrowseLocalizer, self).__init__(
-            corners, metadata.lines/2, metadata.samples/2, 1
+            corners, metadata.lines/2.0, metadata.samples/2.0, 1
         )
 
 class HiRiseRdrLocalizer(MapLocalizer):

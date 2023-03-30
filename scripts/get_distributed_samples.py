@@ -1,3 +1,11 @@
+# Emily Dunkel
+# 2022
+# Get maximally distant lroc imagery
+# Selects a random image, then the maximally distant image from that, then for each image, get the minimum distance to every already select point, then take the max
+# This will give us distributed samples around the globe
+# Based on script: https://github-fn.jpl.nasa.gov/COSMIC/COSMIC_CTX_impacts/commit/e4c167a2e4d9e345693cd5e25df0149f5d641653
+
+
 import os
 import numpy as np
 from sklearn.neighbors import DistanceMetric
@@ -7,13 +15,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import pdsc
 import pdb
-
-# Emily Dunkel
-# 2022
-# Get maximally distant lroc imagery
-# Selects a random image, then the maximally distant image from that, then for each image, get the minimum distance to every already select point, then take the max
-# This will give us distributed samples around the globe
-# Based on script: https://github-fn.jpl.nasa.gov/COSMIC/COSMIC_CTX_impacts/commit/e4c167a2e4d9e345693cd5e25df0149f5d641653
 
 def get_latlon(row):
     """

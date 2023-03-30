@@ -10,11 +10,12 @@ several instruments from Mars orbiters are supported, but the system is
 designed to be extensible to other instruments and bodies.
 
 Please refer to the [documentation](https://jplmlia.github.io/pdsc/) for
-instructions on installation, setup, and usage.
+instructions on installation, setup, and usage. We also show some simple 
+commands below.
 
 ---
 
-Copyright 2019, by the California Institute of Technology. ALL RIGHTS RESERVED.
+Copyright 2023, by the California Institute of Technology. ALL RIGHTS RESERVED.
 United States Government Sponsorship acknowledged. Any commercial use must be
 negotiated with the Office of Technology Transfer at the California Institute
 of Technology.
@@ -64,12 +65,10 @@ Example call to ingest indices:
 pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /PATH/TO/LBL/FOLDER /PATH/TO/OUT/FOLDER
 ```
 
-Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly, and have added it to this repo):
-
-Note: the LBL folder must be a full path, so replace /home/edunkel/PDS/lroc_proj to where you are storing your repository.
+Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly, and have added it to this git repository):
 
 ```
-pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/hirise/RDRCUMINDEX.LBL /PATH/TO/OUT/FOLDER
+pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /PATH/TO/REPO/inputs_mini/hirise/RDRCUMINDEX.LBL /PATH/TO/OUT/FOLDER
 ```
 
 # CTX example:
@@ -83,7 +82,7 @@ pdsc_ingest /pds/pdsfs2/pdsdata/mro/ctx/mrox_4098/index/cumindex.tab /PATH/TO/OU
 Or, a mini example (I took a subset of rows from the table file and updated the index accordingly):
 
 ```
-pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /PATH/TO/OUT/FOLDER
+pdsc_ingest /PATH/TO/REPO/inputs_mini/ctx/cumindex.tab /PATH/TO/OUT/FOLDER
 ```
 
 
@@ -97,10 +96,10 @@ Example call if you have access to analysis machines:
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/from_pdsfs2/CUMINDEX.LBL /PATH/TO/OUT/FOLDER
 ```
 
-Here is a mini example for lroc:
+Here is a mini example for lroc included in this repository:
 
 ```
-pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /PATH/TO/OUT/FOLDER
+pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /PATH/TO/REPO/inputs_mini/lroc/CUMINDEX.LBL /PATH/TO/OUT/FOLDER
 ```
 
 
@@ -113,8 +112,8 @@ Follow the docs for basic usage, but make sure you're in the python prompt.
 We show some example commands for LROC imagery below:
 
 ```
-# set the directory where the database is stored:
-export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
+# set the directory where the database is stored (from the pdsc_ingest command):
+export PDSC_DATABASE_DIR=/PATH/TO/OUT/FOLDER
 python
 >>> import pdsc
 >>> pds_client = pdsc.PdsClient()
@@ -139,7 +138,7 @@ To get lroc distributed samples around the lunar globe, you can call get_distrit
 ```
 conda activate p37
 # point to database
-export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/ # example on analysis machines
+export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/ # example on JPL MLIA analysis machines
 python scripts/get_distributed_samples.py -o OUTPUT/FILE -n NUM_SAMPLES
 ```
 
