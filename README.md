@@ -21,12 +21,6 @@ of Technology.
 
 
 ----
-
-# Updates
-
-Emily Dunkel: updated for LROC
-
-
 # Usage
 
 First, create and activate a bare-bones env using python 3.7:
@@ -66,7 +60,7 @@ wget -O RDRCUMINDEX.LBL https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX
 wget -O RDRCUMINDEX.TAB https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX.TAB
 ```
 
-To ingest indices:
+Example to ingest indices (note: I was running from analysis):
 
 ```bash
 pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise/
@@ -93,9 +87,9 @@ pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/
 
 # LROC
 
-Full lroc database:
+LROC database:
 
-running with file I got from pdsfs2:
+Running with file I got from pdsfs2 on analysis:
 ```
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/from_pdsfs2/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
 ```
@@ -106,8 +100,6 @@ Here is a mini example for lroc:
 pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
 ```
 
-Note: I need to check SIS documentation for localization function coordinate system, but PDSC is now able to handle bodies other than just Mars (was originally hard-coded).
-
 
 # Basic Usage
 
@@ -116,14 +108,10 @@ Follow the docs for basic usage, but make sure you're in the python prompt:
 ```
 # set the directory where the database is stored:
 export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
-# or mini database
-# export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
 python
 >>> import pdsc
 >>> pds_client = pdsc.PdsClient()
 >>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101014437RC')
-# or, for minidatabase:
-#>>> metadata = pds_client.query_by_observation_id('lroc_cdr', ' M101013931LC')
 >>> mydata = metadata[0]
 >>> localizer = pdsc.get_localizer(mydata, browse=True)
 >>> lat, lon = localizer.pixel_to_latlon(10, 10)
@@ -131,7 +119,7 @@ python
 
 # Scripts
 
-To get lroc distributed samples around the globe, you can call get_distritubed_samples.py. Either pass in parameters from the command line, or update the defaults in the script. Here is a calling example:
+To get lroc distributed samples around the lunar globe, you can call get_distritubed_samples.py. Either pass in parameters from the command line, or update the defaults in the script. Here is a calling example:
 
 ```
 conda activate p37
