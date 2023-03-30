@@ -35,9 +35,7 @@ Then, do a pip install:
 pip install .
 ```
 
-I have also tried with python2, but when doing pip install, I got an error with incompatible numpy versions, but python 3 works, so recommend to use that.
-
-Note: I created full and mini examples (a subset of rows) for the cases. If you take a subset of the rows, you must also update the label file with the reduced number of rows.
+Note: I created full and mini examples (a subset of rows) for the cases. If you take a subset of the rows, you must also update the label file with the reduced number of rows. The full examples are available on the JPL MLIA machines only, but I have included the mini examples in this repository.
 
 ## PyTests
 
@@ -60,28 +58,31 @@ wget -O RDRCUMINDEX.LBL https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX
 wget -O RDRCUMINDEX.TAB https://hirise-pds.lpl.arizona.edu/PDS/INDEX/RDRCUMINDEX.TAB
 ```
 
-Example to ingest indices (note: I was running from analysis):
+Example call to ingest indices:
 
 ```bash
-pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise/
+pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /PATH/TO/LBL/FOLDER /PATH/TO/OUT/FOLDER
 ```
 
-Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly):
+Or, a mini example (I took a 9 row subset of the full table file and updated the index accordingly, and have added it to this repo):
+Note: the LBL folder must be a full path, so replace /home/edunkel/PDS/lroc_proj to where you are storing your repository.
 
 ```
-pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/hirise/RDRCUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_hirise_mini/
+pdsc_ingest -c pdsc/config/hirise_rdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/hirise/RDRCUMINDEX.LBL /PATH/TO/OUT/FOLDER
 ```
 
 # CTX example:
 
+Example call if you have access to analysis machines:
+
 ```
-pdsc_ingest /pds/pdsfs2/pdsdata/mro/ctx/mrox_4098/index/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputs_ctx/ 
+pdsc_ingest /pds/pdsfs2/pdsdata/mro/ctx/mrox_4098/index/cumindex.tab /PATH/TO/OUT/FOLDER
 ```
 
 Or, a mini example (I took a subset of rows from the table file and updated the index accordingly):
 
 ```
-pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/edunkel/PDS/lroc_proj/pdsc/outputs_ctx_mini/
+pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /PATH/TO/OUT/FOLDER
 ```
 
 
@@ -89,15 +90,16 @@ pdsc_ingest /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/ctx/cumindex.tab /home/
 
 LROC database:
 
-Running with file I got from pdsfs2 on analysis:
+Example call if you have access to analysis machines:
+
 ```
-pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/from_pdsfs2/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
+pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/from_pdsfs2/CUMINDEX.LBL /PATH/TO/OUT/FOLDER
 ```
 
 Here is a mini example for lroc:
 
 ```
-pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /home/edunkel/PDS/lroc_proj/pdsc/outputs_lroc_mini/
+pdsc_ingest -c pdsc/config/lroc_cdr_metadata.yaml /home/edunkel/PDS/lroc_proj/pdsc/inputs_mini/lroc/CUMINDEX.LBL /PATH/TO/OUT/FOLDER
 ```
 
 
@@ -124,7 +126,7 @@ To get lroc distributed samples around the lunar globe, you can call get_distrit
 ```
 conda activate p37
 # point to database
-export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/
+export PDSC_DATABASE_DIR=/home/edunkel/PDS/lroc_proj/pdsc/outputs/lroc/ # example on analysis machines
 python scripts/get_distributed_samples.py -o OUTPUT/FILE -n NUM_SAMPLES
 ```
 
