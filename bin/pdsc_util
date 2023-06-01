@@ -7,6 +7,7 @@ import pdsc
 
 SUBCOMMANDS = {
     'fix_hirise_index': pdsc.fix_hirise_index,
+    'fix_hirise_idxlbl': pdsc.fix_hirise_idxlbl
 }
 
 def main(*args, **kwargs):
@@ -32,6 +33,13 @@ if __name__ == '__main__':
         help='optional output file location (overwrite index if not specified)')
     hirise_fix_parser.add_argument('-q', '--quiet', default=False, action='store_true',
         help='do not display a progress bar')
+
+    hirise_idxlbl_parser = subparsers.add_parser('fix_hirise_idxlbl')
+    hirise_idxlbl_parser.add_argument('idx', help='cumulative index file location')
+    hirise_idxlbl_parser.add_argument('-o', '--outputfile', default=None,
+        help='optional output file location (overwrite index if not specified)')
+    hirise_idxlbl_parser.add_argument('-q', '--quiet', default=False,
+        action='store_true', help='do not print messages')
 
     args = parser.parse_args()
     main(**vars(args))

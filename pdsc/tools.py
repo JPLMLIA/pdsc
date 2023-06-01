@@ -3,8 +3,10 @@ Implements command line tools for PDSC
 """
 from __future__ import print_function
 import os
+import re
 import warnings
 from shutil import move
+from shutil import copy
 from itertools import count
 from tempfile import NamedTemporaryFile
 
@@ -122,3 +124,78 @@ def fix_hirise_index(idx, outputfile, quiet):
             print('Finished: 1 line repaired.')
         else:
             print('Finished: %d lines repaired.' % lines_repaired)
+
+def fix_hirise_idxlbl(idx, outputfile, quiet):
+    """
+    Repairs HiRISE RDR cumulative index files for which the values of
+    FILE_RECORDS and ROWS in the LBL file do not match the total number of lines
+    in the TAB file.
+
+    :param idx:
+       path to one LBL or TAB file from the index file pair
+    :param outputfile:
+       output file path for the corrected index TAB file; if ``None``,
+       overwrite the existing file
+    :param quiet:
+       if ``True``, do not output progress or results
+    """
+    lblfile, tabfile = get_idx_file_pair(idx)
+
+    # Count the number of lines in the TAB file
+    with open(tabfile, 'r') as f:
+        lines = f.readlines()
+        tabrows = len(lines)
+
+    _, table = parse_table(lblfile, tabfile)
+
+    # If the records in the LBL file match the TAB file, there is no correction
+    # needed.
+    if table.n_rows == tabrows:
+        if not quiet:
+            print('FILE_RECORDS and ROWS in the LBL file match the number '
+                  'of lines in the TAB file. No correction needed.')
+
+        if outputfile is not None:
+            copy(lblfile, outputfile)
+
+            if not quiet:
+                print('--outputfile is specified. The LBL file is copied to '
+                      '%s' % outputfile)
+
+        return
+
+    with NamedTemporaryFile(delete=False) as fout:
+        tempname = fout.name
+        file_records_regex = re.compile('FILE_RECORDS = \d+')
+        rows_regex = re.compile('\s+ROWS = \d+')
+
+        with open(lblfile, 'r') as f:
+            lbllines = f.readlines()
+
+        for line in lbllines:
+            # Fix FILE_RECORDS
+            if file_records_regex.match(line):
+                line = 'FILE_RECORDS = %d\n' % tabrows
+
+                if not quiet:
+                    print('Fixed FILE_RECORDS')
+
+            # Fix ROWS
+            if rows_regex.match(line):
+                line = '    ROWS = %d\n' % tabrows
+
+                if not quiet:
+                    print('Fixed ROWS')
+
+            fout.write(line)
+
+    if outputfile is not None:
+        move(tempname, outputfile)
+
+        if not quiet:
+            print('Output is saved to %s' % outputfile)
+    else:
+        move(tempname, lblfile)
+
+        if not quiet:
+            print('Output is saved to %s' % lblfile)
