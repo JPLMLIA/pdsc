@@ -179,11 +179,7 @@ def store_segments(outputfile, metadata, config, body_radius=MARS_RADIUS_M):
     progress = standard_progress_bar('Segmenting footprints')
     for m in progress(metadata):
         try:
-            # erd: if not Mars, store body radius
-            if body_radius == MARS_RADIUS_M:
-                s = TriSegmentedFootprint(m, resolution, localizer_kwargs)
-            else:
-                s = TriSegmentedFootprint(m, resolution, localizer_kwargs, body_radius)
+            s = TriSegmentedFootprint(m, resolution, localizer_kwargs, body_radius)
             for si in s.segments:
                 segments.append(si)
                 # erd: check if observation_id attribute exists
@@ -264,16 +260,12 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
     """
     instrument, table = parse_table(label_file, table_file)
 
-    # erd: radius will differ if mars vs moon
     if 'lroc' in instrument:
         # use moon radius
         body_radius = MOON_RADIUS_M
-        print('using Moon radius in ingest_idx: ')
-        print(body_radius)
     else:
+        # default radius is Mars
         body_radius = MARS_RADIUS_M 
-        print('using Mars radius in ingest_idx: ')
-        print(body_radius)
 
     if os.path.isdir(configpath):
         configfile = os.path.join(configpath, '%s_metadata.yaml' % instrument)
@@ -300,10 +292,8 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
         outputdir,
         '%s%s' % (instrument, SEGMENT_DB_SUFFIX)
     )
-    if body_radius == MARS_RADIUS_M:
-        segments = store_segments(outputfile, metadata, config)
-    else:
-        segments = store_segments(outputfile, metadata, config, body_radius)
+        
+    segments = store_segments(outputfile, metadata, config, body_radius)
 
     outputfile = os.path.join(
         outputdir,
