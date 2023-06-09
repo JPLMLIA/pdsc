@@ -125,7 +125,6 @@ def lroc_cdr_determiner(label_contents):
     :param label_contents: PDS cumulative index LBL file contents
     :return: ``True`` iff this label file is for LROC CDR products
     """
-    print('LROC CDR')
 
     return (
         'LROC' in label_contents and
