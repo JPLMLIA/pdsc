@@ -5,7 +5,6 @@ from __future__ import print_function
 import os
 import yaml
 import sqlite3
-import pdb
 
 from .table import parse_table
 from .metadata import PdsMetadata, METADATA_DB_SUFFIX
