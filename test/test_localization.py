@@ -2,7 +2,6 @@
 Unit tests for Localization code
 """
 import pytest
-import pdb
 import numpy as np
 from pdsc.metadata import PdsMetadata
 from numpy.testing import assert_allclose

@@ -157,7 +157,7 @@ def test_ingest_idx(mock_parse_table, mock_store_segment_tree,
     )
     mock_store_segment_tree.assert_called_with(
         os.path.join('test_output', 'instrument_name_segment_tree.pkl'),
-        'segments'
+        'segments', 3396200.0
     )
 
 @unit

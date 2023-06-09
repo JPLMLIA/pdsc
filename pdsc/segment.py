@@ -78,6 +78,7 @@ class SegmentTree(object):
         :param segments: collection of all observation segments
         :param verbose: if ``True`` display a progress bar as the index is being
             built
+        :param body_radius: celestial body radius, default is Mars
         """
         progress = standard_progress_bar('Finding segment centers', verbose)
         data = np.deg2rad([

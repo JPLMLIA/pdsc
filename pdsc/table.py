@@ -3,7 +3,6 @@ Parses PDS cumulative index files into an internal table representation
 """
 import re
 import numpy as np
-import pdb
 from datetime import datetime
 
 from .util import registerer, standard_progress_bar

@@ -299,11 +299,6 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
         outputdir,
         '%s%s' % (instrument, SEGMENT_TREE_SUFFIX)
     )
-    if body_radius == MARS_RADIUS_M:
-        store_segment_tree(outputfile, segments)
-    else:
-        if (segments != []):
-            store_segment_tree(outputfile, segments, body_radius)
-        else:
-            print('No segments to save as a tree')
+
+    store_segment_tree(outputfile, segments, body_radius)
 

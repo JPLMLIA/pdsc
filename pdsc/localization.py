@@ -27,7 +27,6 @@ from sklearn.neighbors import DistanceMetric
 from geographiclib.geodesic import Geodesic
 
 from .util import registerer, standard_progress_bar
-import pdb
 
 # https://tharsis.gsfc.nasa.gov/geodesy.html
 MARS_RADIUS_M = 3396200.
@@ -307,8 +306,6 @@ class GeodesicLocalizer(Localizer):
         return self._height
 
     def pixel_to_latlon(self, row, col):
-        #print('body radius = ', self.BODY_RADIUS)
-        #pdb.set_trace()
         x_m = (col - self.center_col) * self.pixel_width_m
         y_m = (row - self.center_row) * self.pixel_height_m
         y_m *= self.flight_direction
