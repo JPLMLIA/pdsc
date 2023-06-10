@@ -795,7 +795,7 @@ class LrocCdrBrowseLocalizer(FourCornerLocalizer):
             [metadata.lower_left_latitude, metadata.lower_left_longitude],
         ])
         super(LrocCdrBrowseLocalizer, self).__init__(
-            corners, metadata.lines/2.0, metadata.samples/2.0, 1
+            corners, metadata.lines/metadata.downsamp, metadata.samples/metadata.downsamp, 1
         )
 
 class HiRiseRdrLocalizer(MapLocalizer):
@@ -890,7 +890,7 @@ def hirise_rdr_localizer(metadata, nomap=False, browse=False,
             return HiRiseRdrLocalizer(metadata)
 
 @register_localizer('lroc_cdr')
-def lroc_cdr_localizer(metadata, browse=False):
+def lroc_cdr_localizer(metadata, browse=False, downsamp=2.0):
     """
     Constructs the LROC CDR localizer (data is not map projected)
 
@@ -898,9 +898,12 @@ def lroc_cdr_localizer(metadata, browse=False):
         "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
     :param browse:
         construct localizer for the BROWSE data product
+    :param downsamp:
+        if browse, use this downsample
     :return: a :py:class:`Localizer` for the appropriate data product
     """
     if browse:
+        metadata.downsamp = downsamp
         return LrocCdrBrowseLocalizer(metadata)
     else:
         return LrocCdrLocalizer(metadata)
@@ -943,9 +946,9 @@ def get_localizer(metadata, *args, **kwargs):
 
     :param metadata:
         a :py:class:`~pdsc.metadata.PdsMetadata` object for an observation
-    :param \*args:
+    :param *args:
         additional args provided to the localizer constructor
-    :param \**kwargs:
+    :param **kwargs:
         additional kwargs provided to the localizer constructor
 
     :return: a :py:class:`Localizer` for the observation
