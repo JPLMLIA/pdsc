@@ -752,12 +752,12 @@ class LrocCdrLocalizer(FourCornerLocalizer):
     1/3 of that of HiRISE
     """
 
-    NORMALIZED_PIXEL_SPACE = False
-
-    def __init__(self, metadata):
+    def __init__(self, metadata, downsamp):
         """
         :param metadata:
             "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        :param downsamp:
+            value of 1.0, no downsampling for LrocCdrLocalizer
         """
         corners = np.array([
             [metadata.upper_left_latitude, metadata.upper_left_longitude],
@@ -766,10 +766,10 @@ class LrocCdrLocalizer(FourCornerLocalizer):
             [metadata.lower_left_latitude, metadata.lower_left_longitude],
         ])
         super(LrocCdrLocalizer, self).__init__(
-            corners, metadata.lines, metadata.samples, 1
+            corners, metadata.lines/downsamp, metadata.samples/downsamp, 1
         )
 
-class LrocCdrBrowseLocalizer(FourCornerLocalizer):
+class LrocCdrBrowseLocalizer(LrocCdrLocalizer):
     """
     A localizer for the LROC CDR  observations (subclass of
     :py:class:`FourCornerLocalizer`)
@@ -781,22 +781,22 @@ class LrocCdrBrowseLocalizer(FourCornerLocalizer):
     1/3 of that of HiRISE, plus factor of 2 for browse
     """
 
-    NORMALIZED_PIXEL_SPACE = False
+    LROC_DOWNSAMP = 2.0
+    """
+    The default downsample amount for browse imagery
+    """
 
-    def __init__(self, metadata):
+    def __init__(self, metadata, downsamp):
         """
         :param metadata:
             "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        :param downsamp:
+            the downsample amount of lroc browse image (if it varies from the default
+            value)
         """
-        corners = np.array([
-            [metadata.upper_left_latitude, metadata.upper_left_longitude],
-            [metadata.upper_right_latitude, metadata.upper_right_longitude],
-            [metadata.lower_right_latitude, metadata.lower_right_longitude],
-            [metadata.lower_left_latitude, metadata.lower_left_longitude],
-        ])
-        super(LrocCdrBrowseLocalizer, self).__init__(
-            corners, metadata.lines/metadata.downsamp, metadata.samples/metadata.downsamp, 1
-        )
+        if downsamp < 1:
+            raise ValueError('Invalid downsample: %f' % downsamp)
+        super(LrocCdrBrowseLocalizer, self).__init__(metadata, downsamp)
 
 class HiRiseRdrLocalizer(MapLocalizer):
     """
@@ -890,7 +890,7 @@ def hirise_rdr_localizer(metadata, nomap=False, browse=False,
             return HiRiseRdrLocalizer(metadata)
 
 @register_localizer('lroc_cdr')
-def lroc_cdr_localizer(metadata, browse=False, downsamp=2.0):
+def lroc_cdr_localizer(metadata, browse=False, downsamp=LrocCdrBrowseLocalizer.LROC_DOWNSAMP):
     """
     Constructs the LROC CDR localizer (data is not map projected)
 
@@ -899,14 +899,14 @@ def lroc_cdr_localizer(metadata, browse=False, downsamp=2.0):
     :param browse:
         construct localizer for the BROWSE data product
     :param downsamp:
-        if browse, use this downsample
+        if ``browse=True``, use this value for the downsample amount
+
     :return: a :py:class:`Localizer` for the appropriate data product
     """
     if browse:
-        metadata.downsamp = downsamp
-        return LrocCdrBrowseLocalizer(metadata)
+        return LrocCdrBrowseLocalizer(metadata, downsamp)
     else:
-        return LrocCdrLocalizer(metadata)
+        return LrocCdrLocalizer(metadata, 1.0)
 
 @register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):

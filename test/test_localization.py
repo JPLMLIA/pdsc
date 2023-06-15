@@ -7,7 +7,7 @@ from pdsc.metadata import PdsMetadata
 from numpy.testing import assert_allclose
 from pdsc.localization import (
     MapLocalizer, HiRiseRdrLocalizer, HiRiseRdrBrowseLocalizer, Localizer,
-    xyz2latlon, get_localizer, GeodesicLocalizer, MARS_RADIUS_M
+    xyz2latlon, get_localizer, GeodesicLocalizer, MARS_RADIUS_M, LrocCdrBrowseLocalizer
 )
 
 from .cosmic_test_tools import unit
@@ -425,8 +425,7 @@ def test_localizer(metadata, latlons_pixels, browse=False):
                     metadata.samples
                 )
             elif metadata.instrument == 'lroc_cdr':
-                factor = 0.5
- 
+                factor = float(1.0/LrocCdrBrowseLocalizer.LROC_DOWNSAMP)
             row *= factor
             col *= factor
 
@@ -472,17 +471,29 @@ def test_localizer(metadata, latlons_pixels, browse=False):
         if not browse:
             # Run the same set of tests for the browse localizer
             test_localizer(metadata, latlons_pixels, browse=True)
-   
+ 
         # Test that the center lat/lon values are within a tolerance (100s meters)
         # of the calculated center values. Glob is assumed to be a sphere so parallax causes these errors
         # test with browse false
         localizer = get_localizer(metadata, browse=False)
         row_c, col_c = localizer.latlon_to_pixel(metadata.center_latitude, metadata.center_longitude)
         assert_allclose((row_c, col_c), (metadata.lines // 2, metadata.samples // 2), atol=450)
-        # test with browse true
+        # Test with browse=True, with default value
         localizer = get_localizer(metadata, browse=True)
         row_c, col_c = localizer.latlon_to_pixel(metadata.center_latitude, metadata.center_longitude)
         assert_allclose((row_c, col_c), (metadata.lines // 4, metadata.samples // 4), atol=225)
+        # Test with passing in downsample amount
+        def test_lroc_downsamp(downsamp_value):
+            localizer = get_localizer(metadata, browse=True, downsamp=downsamp_value)
+            row_c, col_c = localizer.latlon_to_pixel(metadata.center_latitude, metadata.center_longitude)
+            assert_allclose((row_c, col_c), (metadata.lines // (2*downsamp_value), metadata.samples // (2*downsamp_value)), atol=(450/downsamp_value))  
+        for ii in [1.0, 2.0, 3.0, 4.0, 5.0]:
+            test_lroc_downsamp(ii)
+        # Check raises exception if pass in not allowed downsample amount
+        with pytest.raises(Exception):
+            localizer = get_localizer(metadata, browse=True, downsamp=0.5)
+        with pytest.raises(Exception):
+            localizer = get_localizer(metadata, browse=True, downsamp=-1)
 
 # Regression tests for all CCDs/channels for HiRISE EDRs
 HIRISE_EDR_PSP_001334_2645_TEST_CASES = [
