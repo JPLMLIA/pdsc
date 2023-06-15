@@ -73,11 +73,12 @@ class SegmentTree(object):
     observation segments within some radius of a query point
     """
 
-    def __init__(self, segments, verbose=True):
+    def __init__(self, segments, verbose=True, body_radius=MARS_RADIUS_M):
         """
         :param segments: collection of all observation segments
         :param verbose: if ``True`` display a progress bar as the index is being
             built
+        :param body_radius: celestial body radius, default is Mars
         """
         progress = standard_progress_bar('Finding segment centers', verbose)
         data = np.deg2rad([
@@ -92,6 +93,7 @@ class SegmentTree(object):
 
         if verbose: print('Building index...')
         self.ball_tree = BallTree(data, metric='haversine')
+        self.body_radius = body_radius
         if verbose: print('...done.')
 
     def query_point(self, point):
@@ -104,7 +106,7 @@ class SegmentTree(object):
         :return: a collection of segment ids for segments that satisfy the query
         """
         total_radius = point.radius + self.max_radius
-        haversine_radius = total_radius / MARS_RADIUS_M
+        haversine_radius = total_radius / self.body_radius
         X = np.deg2rad(point.latlon).reshape((1, -1))
         return self.ball_tree.query_radius(X, haversine_radius)[0]
 
@@ -118,7 +120,7 @@ class SegmentTree(object):
         :return: a collection of segment ids for segments that satisfy the query
         """
         total_radius = segment.radius + self.max_radius
-        haversine_radius = total_radius / MARS_RADIUS_M
+        haversine_radius = total_radius / self.body_radius
         X = np.deg2rad([[segment.center_latitude, segment.center_longitude]])
         return self.ball_tree.query_radius(X, haversine_radius)[0]
 
@@ -149,7 +151,7 @@ class TriSegment(object):
     for indexing and efficient querying.
     """
 
-    def __init__(self, latlon0, latlon1, latlon2):
+    def __init__(self, latlon0, latlon1, latlon2, body_radius=MARS_RADIUS_M):
         """
         The three points of the triangular segment are enumerated in
         *counterclockwise* order looking down on the surface. Each point is a
@@ -163,6 +165,7 @@ class TriSegment(object):
             represents the third point (index 2) in a triangular segment
         """
         self.latlon_points = np.array([latlon0, latlon1, latlon2])
+        self.body_radius = body_radius
         self._center_longitude = None
         self._center_latitude = None
         self._xyz_points = None
@@ -227,7 +230,7 @@ class TriSegment(object):
         if self._radius is None:
             llcenter = np.deg2rad([self.center_latitude, self.center_longitude])
             self._radius = np.max([
-                geodesic_distance(llcenter, np.deg2rad(ll))
+                geodesic_distance(llcenter, np.deg2rad(ll), radius=self.body_radius)
                 for ll in self.latlon_points
             ])
         return self._radius
@@ -307,7 +310,7 @@ class TriSegment(object):
 
         p = np.deg2rad(xyz2latlon(xyz))
         return np.min([
-            geodesic_distance(p, pi)
+            geodesic_distance(p, pi, radius=self.body_radius)
             for pi in np.deg2rad(points_to_check)
         ])
 
@@ -345,7 +348,7 @@ class SegmentedFootprint(with_metaclass(abc.ABCMeta, object)):
     Base class for segmenting an observation footprint
     """
 
-    def __init__(self, metadata, resolution, localizer_kwargs):
+    def __init__(self, metadata, resolution, localizer_kwargs, body_radius=MARS_RADIUS_M):
         """
         :param metadata:
             a :py:class:`~pdsc.metadata.PdsMetadata` object
@@ -354,9 +357,12 @@ class SegmentedFootprint(with_metaclass(abc.ABCMeta, object)):
         :param localizer_kwargs:
             the ``kwargs`` passed to the localizer used to convert observation
             pixel coordinates into real-world coordinates
+        :param body_radius:
+            celestial body radius
         """
         self.metadata = metadata
         self.resolution = resolution
+        self.body_radius = body_radius
         self.localizer = get_localizer(metadata, **localizer_kwargs)
         n_row_chunks = int(np.ceil(
             self.localizer.observation_length_m / resolution
@@ -398,8 +404,8 @@ class TriSegmentedFootprint(SegmentedFootprint):
         for c in range(L.shape[1]-1):
             for r in range(L.shape[0]-1):
                 if self.localizer.flight_direction > 0:
-                    yield TriSegment(L[r, c], L[r, c+1], L[r+1, c])
-                    yield TriSegment(L[r+1, c+1], L[r+1, c], L[r, c+1])
+                    yield TriSegment(L[r, c], L[r, c+1], L[r+1, c], body_radius=self.body_radius)
+                    yield TriSegment(L[r+1, c+1], L[r+1, c], L[r, c+1], body_radius=self.body_radius)
                 else:
-                    yield TriSegment(L[r, c], L[r+1, c], L[r, c+1])
-                    yield TriSegment(L[r+1, c+1], L[r, c+1], L[r+1, c])
+                    yield TriSegment(L[r, c], L[r+1, c], L[r, c+1], body_radius=self.body_radius)
+                    yield TriSegment(L[r+1, c+1], L[r, c+1], L[r+1, c], body_radius=self.body_radius)

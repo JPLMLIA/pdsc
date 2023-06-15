@@ -13,6 +13,11 @@ from .segment import (
     TriSegmentedFootprint, SegmentTree)
 from .util import standard_progress_bar
 
+# https://tharsis.gsfc.nasa.gov/geodesy.html
+MARS_RADIUS_M = 3396200.
+#https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+MOON_RADIUS_M = 1736000
+
 DEFAULT_CONFIG_DIR = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
     'config',
@@ -134,7 +139,7 @@ def store_metadata(outputfile, instrument, table, config):
             for v in progress(cur.fetchall())
         ]
 
-def store_segments(outputfile, metadata, config):
+def store_segments(outputfile, metadata, config, body_radius=MARS_RADIUS_M):
     """
     Segments observations corresponding to each entry in ``metadata``, and
     stores these segments in a SQL database
@@ -159,6 +164,8 @@ def store_segments(outputfile, metadata, config):
                 - ``localizer_kwargs``: the ``kwargs`` that will be supplied to
                   the :py:meth:`~pdsc.localization.get_localizer` function for
                   determining observation footprints
+    :param body_radius:
+        radius of celestial body, default is mars
 
     :return: a list of :py:class:`~pdsc.segment.TriSegment` objects for segments
         across all observations
@@ -172,11 +179,16 @@ def store_segments(outputfile, metadata, config):
     progress = standard_progress_bar('Segmenting footprints')
     for m in progress(metadata):
         try:
-            s = TriSegmentedFootprint(m, resolution, localizer_kwargs)
+            s = TriSegmentedFootprint(m, resolution, localizer_kwargs, body_radius)
             for si in s.segments:
                 segments.append(si)
-                observation_ids.append(s.metadata.observation_id)
-
+                # erd: check if observation_id attribute exists
+                if hasattr(s.metadata, 'observation_id'):
+                    observation_ids.append(s.metadata.observation_id)
+                else:
+                    raise ValueError('Please rename your index col to observation_id in the config file')
+                    # erd: lroc does not have observation_id
+                    #observation_ids.append(s.metadata.file_specification_name)
         except (TypeError, ValueError):
             continue
 
@@ -208,7 +220,7 @@ def store_segments(outputfile, metadata, config):
 
     return segments
 
-def store_segment_tree(outputfile, segments):
+def store_segment_tree(outputfile, segments, body_radius=MARS_RADIUS_M):
     """
     Constructs a ball tree index for segmented observations and saves the
     resulting data structure to the specified output file.
@@ -218,8 +230,14 @@ def store_segment_tree(outputfile, segments):
 
     :param segments:
         a collection of :py:class:`~pdsc.segment.TriSegment` objects
+
+    :body_radius:
+        celestial body radius, default is Mars
     """
-    tree = SegmentTree(segments)
+    if body_radius == MARS_RADIUS_M:
+        tree = SegmentTree(segments)
+    else:
+        tree = SegmentTree(segments, True, body_radius)
     tree.save(outputfile)
 
 def ingest_idx(label_file, table_file, configpath, outputdir):
@@ -241,6 +259,14 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
         will be stored
     """
     instrument, table = parse_table(label_file, table_file)
+
+    if 'lroc' in instrument:
+        # use moon radius
+        body_radius = MOON_RADIUS_M
+    else:
+        # default radius is Mars
+        body_radius = MARS_RADIUS_M 
+
     if os.path.isdir(configpath):
         configfile = os.path.join(configpath, '%s_metadata.yaml' % instrument)
     else:
@@ -266,10 +292,13 @@ def ingest_idx(label_file, table_file, configpath, outputdir):
         outputdir,
         '%s%s' % (instrument, SEGMENT_DB_SUFFIX)
     )
-    segments = store_segments(outputfile, metadata, config)
+        
+    segments = store_segments(outputfile, metadata, config, body_radius)
 
     outputfile = os.path.join(
         outputdir,
         '%s%s' % (instrument, SEGMENT_TREE_SUFFIX)
     )
-    store_segment_tree(outputfile, segments)
+
+    store_segment_tree(outputfile, segments, body_radius)
+

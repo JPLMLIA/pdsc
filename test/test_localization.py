@@ -7,7 +7,7 @@ from pdsc.metadata import PdsMetadata
 from numpy.testing import assert_allclose
 from pdsc.localization import (
     MapLocalizer, HiRiseRdrLocalizer, HiRiseRdrBrowseLocalizer, Localizer,
-    xyz2latlon, get_localizer, GeodesicLocalizer, MARS_RADIUS_M
+    xyz2latlon, get_localizer, GeodesicLocalizer, MARS_RADIUS_M, LrocCdrBrowseLocalizer
 )
 
 from .cosmic_test_tools import unit
@@ -335,6 +335,57 @@ CTX_T01_000849_1676_XI_12S069W_TEST_CASE = [
     ((-12.059007889850992, -69.11293214267153), (7168, 5056)),
     ((-12.78793820020455, -69.02157480900689), (0, 5056)),
 ]
+# LROC Test cases are based on comparing the metadata with the
+# localization for the 4 corners and center of the image
+
+LROC_NAC_M101013931LC_META = PdsMetadata(
+    'lroc_cdr', center_latitude=-89.34, center_longitude=55.26,
+     lower_left_latitude=-88.58, lower_left_longitude=19.44,
+     upper_left_latitude=-89.1, upper_left_longitude=130.66,
+     upper_right_latitude=-89.15, upper_right_longitude=134.15,
+     lower_right_latitude=-88.6, lower_right_longitude=16.79,
+     lines=52224, samples=2532)
+
+# Test the 4 corners
+LROC_NAC_M101013931LC_TEST_CASE = [
+     ((-88.58, 19.44), (52224, 0)), # lower left
+     ((-89.1, 130.66), (0, 0)),     # upper left
+     ((-89.15, 134.15), (0, 2532)), # upper right
+     ((-88.6, 16.79), (52224, 2532)), # lower right
+]
+
+
+LROC_NAC_M101014437RC_META = PdsMetadata(
+    'lroc_cdr', center_latitude=-63.14, center_longitude=354.8,
+     lower_left_latitude=-63.09, lower_left_longitude=354.89,
+     upper_left_latitude=-63.18, upper_left_longitude=354.9,
+     upper_right_latitude=-63.18, upper_right_longitude=354.71,
+     lower_right_latitude=-63.09, lower_right_longitude=354.71,
+     lines=5120, samples=5064)
+
+# Test the 4 corners
+LROC_NAC_M101014437RC_TEST_CASE = [
+     ((-63.09, 354.89), (5120, 0)), # lower left
+     ((-63.18, 354.9), (0, 0)),     # upper left
+     ((-63.18, 354.71), (0, 5064)), # upper right
+     ((-63.09, 354.71), (5120, 5064)), # lower right
+]
+
+LROC_NAC_M191761375RC_META = PdsMetadata(
+    'lroc_cdr', center_latitude=80.52, center_longitude=188.83,
+     lower_left_latitude=81.53, lower_left_longitude=190.57,
+     upper_left_latitude=79.48, upper_left_longitude=189.11,
+     upper_right_latitude=79.51, upper_right_longitude=187.41,
+     lower_right_latitude=81.56, lower_right_longitude=188.46,
+     lines=23552, samples=5064)
+
+# Test the 4 corners
+LROC_NAC_M191761375RC_TEST_CASE = [
+     ((81.53, 190.57), (23552, 0)), # lower left
+     ((79.48, 189.11), (0, 0)),     # upper left
+     ((79.51, 187.41), (0, 5064)), # upper right
+     ((81.56, 188.46), (23552, 5064)), # lower right
+]
 
 @unit
 @pytest.mark.parametrize(
@@ -353,20 +404,28 @@ CTX_T01_000849_1676_XI_12S069W_TEST_CASE = [
             CTX_P06_003181_0946_XI_85S260W_TEST_CASE),
         (CTX_T01_000849_1676_XI_12S069W_META,
             CTX_T01_000849_1676_XI_12S069W_TEST_CASE),
+        (LROC_NAC_M101013931LC_META,  LROC_NAC_M101013931LC_TEST_CASE),
+        (LROC_NAC_M101014437RC_META,  LROC_NAC_M101014437RC_TEST_CASE),
+        (LROC_NAC_M191761375RC_META,  LROC_NAC_M191761375RC_TEST_CASE)
     ]
 )
 def test_localizer(metadata, latlons_pixels, browse=False):
     if metadata.instrument == 'hirise_rdr':
+        localizer = get_localizer(metadata, browse=browse)
+    elif metadata.instrument == 'lroc_cdr':
         localizer = get_localizer(metadata, browse=browse)
     else:
         localizer = get_localizer(metadata)
 
     for (lat, lon), (row, col) in latlons_pixels:
         if browse:
-            factor = (
-                float(HiRiseRdrBrowseLocalizer.HIRISE_BROWSE_WIDTH) /
-                metadata.samples
-            )
+            if metadata.instrument == 'hirise_rdr':
+                factor = (
+                    float(HiRiseRdrBrowseLocalizer.HIRISE_BROWSE_WIDTH) /
+                    metadata.samples
+                )
+            elif metadata.instrument == 'lroc_cdr':
+                factor = float(1.0/LrocCdrBrowseLocalizer.LROC_DOWNSAMP)
             row *= factor
             col *= factor
 
@@ -406,6 +465,35 @@ def test_localizer(metadata, latlons_pixels, browse=False):
         if not browse:
             # Run the same set of tests for the browse localizer...
             test_localizer(metadata, latlons_pixels, browse=True)
+
+
+    if metadata.instrument == 'lroc_cdr':
+        if not browse:
+            # Run the same set of tests for the browse localizer
+            test_localizer(metadata, latlons_pixels, browse=True)
+ 
+        # Test that the center lat/lon values are within a tolerance (100s meters)
+        # of the calculated center values. Glob is assumed to be a sphere so parallax causes these errors
+        # test with browse false
+        localizer = get_localizer(metadata, browse=False)
+        row_c, col_c = localizer.latlon_to_pixel(metadata.center_latitude, metadata.center_longitude)
+        assert_allclose((row_c, col_c), (metadata.lines // 2, metadata.samples // 2), atol=450)
+        # Test with browse=True, with default value
+        localizer = get_localizer(metadata, browse=True)
+        row_c, col_c = localizer.latlon_to_pixel(metadata.center_latitude, metadata.center_longitude)
+        assert_allclose((row_c, col_c), (metadata.lines // 4, metadata.samples // 4), atol=225)
+        # Test with passing in downsample amount
+        def test_lroc_downsamp(downsamp_value):
+            localizer = get_localizer(metadata, browse=True, downsamp=downsamp_value)
+            row_c, col_c = localizer.latlon_to_pixel(metadata.center_latitude, metadata.center_longitude)
+            assert_allclose((row_c, col_c), (metadata.lines // (2*downsamp_value), metadata.samples // (2*downsamp_value)), atol=(450/downsamp_value))  
+        for ii in [1.0, 2.0, 3.0, 4.0, 5.0]:
+            test_lroc_downsamp(ii)
+        # Check raises exception if pass in not allowed downsample amount
+        with pytest.raises(Exception):
+            localizer = get_localizer(metadata, browse=True, downsamp=0.5)
+        with pytest.raises(Exception):
+            localizer = get_localizer(metadata, browse=True, downsamp=-1)
 
 # Regression tests for all CCDs/channels for HiRISE EDRs
 HIRISE_EDR_PSP_001334_2645_TEST_CASES = [

@@ -10,11 +10,12 @@ several instruments from Mars orbiters are supported, but the system is
 designed to be extensible to other instruments and bodies.
 
 Please refer to the [documentation](https://jplmlia.github.io/pdsc/) for
-instructions on installation, setup, and usage.
+instructions on installation, setup, and usage. 
 
 ---
 
-Copyright 2019, by the California Institute of Technology. ALL RIGHTS RESERVED.
+Copyright 2023, by the California Institute of Technology. ALL RIGHTS RESERVED.
 United States Government Sponsorship acknowledged. Any commercial use must be
 negotiated with the Office of Technology Transfer at the California Institute
 of Technology.
+

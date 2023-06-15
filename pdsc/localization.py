@@ -32,6 +32,11 @@ from .util import registerer, standard_progress_bar
 MARS_RADIUS_M = 3396200.
 MARS_FLATTENING = 1.0 / 169.8
 
+# erd: added moon info (before, assumed Mars only)
+#https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+MOON_RADIUS_M = 1736000
+MOON_FLATTENING = 0.0012
+
 LOCALIZERS = {}
 
 register_localizer = registerer(LOCALIZERS)
@@ -63,6 +68,10 @@ def geodesic_distance(latlon1, latlon2, radius=MARS_RADIUS_M):
     >>> geodesic_distance((0, 0), (0, np.pi))
     10669476.970121656
     """
+    #print('The moons radius is: 1736000')
+    #print('Radius used is: ')
+    #print(radius)
+    #print('------')
     haversine = DistanceMetric.get_metric('haversine')
     return float(radius*haversine.pairwise([latlon1], [latlon2]))
 
@@ -198,6 +207,7 @@ class Localizer(with_metaclass(abc.ABCMeta, object)):
 
         loc = np.deg2rad([lat, lon])
 
+        #print(self.BODY_RADIUS)
         def f(u):
             loc_u = np.deg2rad(self.pixel_to_latlon(*u))
             return geodesic_distance(loc, loc_u, self.BODY_RADIUS)
@@ -217,6 +227,7 @@ class GeodesicLocalizer(Localizer):
     """
 
     BODY = Geodesic(MARS_RADIUS_M, MARS_FLATTENING)
+
     """
     A :py:class:`~geographiclib.geodesic.Geodesic` object describing the target
     body
@@ -477,8 +488,9 @@ class MapLocalizer(Localizer):
             np.sqrt(a**2 + b**2)
         )
         self.cos_proj_lat = np.cos(self.proj_latitude)
-
     def _equirect_pixel_to_latlon(self, row, col):
+        # equations come from section 3.5.1
+        # https://hirise.lpl.arizona.edu/pdf/HiRISE_RDR_v12_DTM_11_25_2009.pdf
         x = (col - self.col_offset)*self.map_scale
         y = -(row - self.row_offset)*self.map_scale
         return (
@@ -513,6 +525,8 @@ class MapLocalizer(Localizer):
         return lat, lon
 
     def _polar_latlon_to_pixel(self, lat, lon):
+        # equations come from section 3.5.2 
+        # https://hirise.lpl.arizona.edu/pdf/HiRISE_RDR_v12_DTM_11_25_2009.pdf
         lat_rad = np.deg2rad(lat)
         lon_rad = np.deg2rad(lon % 360.)
         T = np.tan((np.pi / 4.0) - np.abs(lat_rad / 2.0))
@@ -726,6 +740,64 @@ class HiRiseRdrNoMapLocalizer(FourCornerLocalizer):
             corners, 1.0, 1.0, 1
         )
 
+class LrocCdrLocalizer(FourCornerLocalizer):
+    """
+    A localizer for the LROC CDR  observations (subclass of
+    :py:class:`FourCornerLocalizer`)
+    """
+
+    DEFAULT_RESOLUTION_M = 1/3*(1e-6)
+    """
+    Sets the default resolution for lroc CDR localization
+    1/3 of that of HiRISE
+    """
+
+    def __init__(self, metadata, downsamp):
+        """
+        :param metadata:
+            "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        :param downsamp:
+            value of 1.0, no downsampling for LrocCdrLocalizer
+        """
+        corners = np.array([
+            [metadata.upper_left_latitude, metadata.upper_left_longitude],
+            [metadata.upper_right_latitude, metadata.upper_right_longitude],
+            [metadata.lower_right_latitude, metadata.lower_right_longitude],
+            [metadata.lower_left_latitude, metadata.lower_left_longitude],
+        ])
+        super(LrocCdrLocalizer, self).__init__(
+            corners, metadata.lines/downsamp, metadata.samples/downsamp, 1
+        )
+
+class LrocCdrBrowseLocalizer(LrocCdrLocalizer):
+    """
+    A localizer for the LROC CDR  observations (subclass of
+    :py:class:`FourCornerLocalizer`)
+    """
+
+    DEFAULT_RESOLUTION_M = 1/3*(1e-6)*2
+    """
+    Sets the default resolution for lroc CDR localization
+    1/3 of that of HiRISE, plus factor of 2 for browse
+    """
+
+    LROC_DOWNSAMP = 2.0
+    """
+    The default downsample amount for browse imagery
+    """
+
+    def __init__(self, metadata, downsamp):
+        """
+        :param metadata:
+            "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+        :param downsamp:
+            the downsample amount of lroc browse image (if it varies from the default
+            value)
+        """
+        if downsamp < 1:
+            raise ValueError('Invalid downsample: %f' % downsamp)
+        super(LrocCdrBrowseLocalizer, self).__init__(metadata, downsamp)
+
 class HiRiseRdrLocalizer(MapLocalizer):
     """
     A localizer for the HiRISE RDR (map-projected) observations (subclass of
@@ -817,6 +889,25 @@ def hirise_rdr_localizer(metadata, nomap=False, browse=False,
         else:
             return HiRiseRdrLocalizer(metadata)
 
+@register_localizer('lroc_cdr')
+def lroc_cdr_localizer(metadata, browse=False, downsamp=LrocCdrBrowseLocalizer.LROC_DOWNSAMP):
+    """
+    Constructs the LROC CDR localizer (data is not map projected)
+
+    :param metadata:
+        "lroc_cdr" :py:class:`~pdsc.metadata.PdsMetadata` object
+    :param browse:
+        construct localizer for the BROWSE data product
+    :param downsamp:
+        if ``browse=True``, use this value for the downsample amount
+
+    :return: a :py:class:`Localizer` for the appropriate data product
+    """
+    if browse:
+        return LrocCdrBrowseLocalizer(metadata, downsamp)
+    else:
+        return LrocCdrLocalizer(metadata, 1.0)
+
 @register_localizer('moc')
 class MocLocalizer(GeodesicLocalizer):
     """
@@ -855,9 +946,9 @@ def get_localizer(metadata, *args, **kwargs):
 
     :param metadata:
         a :py:class:`~pdsc.metadata.PdsMetadata` object for an observation
-    :param \*args:
+    :param *args:
         additional args provided to the localizer constructor
-    :param \**kwargs:
+    :param **kwargs:
         additional kwargs provided to the localizer constructor
 
     :return: a :py:class:`Localizer` for the observation
@@ -871,5 +962,4 @@ def get_localizer(metadata, *args, **kwargs):
     if metadata.instrument not in LOCALIZERS:
         raise IndexError(
             'No localizer implemented for %s' % metadata.instrument)
-
     return LOCALIZERS[metadata.instrument](metadata, *args, **kwargs)
